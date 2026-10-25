@@ -1,6 +1,6 @@
 // All data in this prototype is dummy. Amounts are in rupees.
 const DATA = {
-  user: { name: 'Sankar', household: 'Priya' },
+  user: { name: 'Sankar', household: 'XYZ' },
   balance: 84250.5,
   earning: 120000,
   spend: 35749.5,
@@ -52,8 +52,8 @@ const DATA = {
     { id: 3, from: 'SBI •1190', to: 'Paytm Wallet', amt: 2000, date: '02 Oct', why: 'Transfer to your own wallet' },
   ],
   household: [
-    { m: 'D-Mart groceries', who: 'Priya', amt: -3120, date: '22 Oct' },
+    { m: 'D-Mart groceries', who: 'XYZ', amt: -3120, date: '22 Oct' },
     { m: 'Rent', who: 'Sankar', amt: -22000, date: '01 Oct' },
-    { m: 'Jio Fiber', who: 'Priya', amt: -999, date: '05 Oct' },
+    { m: 'Jio Fiber', who: 'XYZ', amt: -999, date: '05 Oct' },
   ],
 };

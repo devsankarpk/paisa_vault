@@ -174,7 +174,7 @@ S.selftransfers = () => `
 
 S.household = () => `
   ${back('Household')}
-  <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div class="avatar" style="margin:0;width:52px;height:52px;font-size:20px">P</div><div style="flex:1"><div class="t" style="font-weight:700">${DATA.user.household}'s phone</div><div class="sub">Paired · last sync 10 min ago</div></div><span class="pill" data-done="Synced over Wi-Fi">Sync</span></div>
+  <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:16px"><div class="avatar" style="margin:0;width:52px;height:52px;font-size:20px">X</div><div style="flex:1"><div class="t" style="font-weight:700">${DATA.user.household}'s phone</div><div class="sub">Paired · last sync 10 min ago</div></div><span class="pill" data-done="Synced over Wi-Fi">Sync</span></div>
   <div class="note info">Sync is end-to-end encrypted over the same Wi-Fi. Only transactions marked shared are sent. Hidden ones never are.</div>
   <div class="card" style="margin-bottom:6px"><div class="sub">Household spend (shared categories)</div><div class="big" style="text-align:left;margin-top:6px">${inr(26119)}</div><div class="prog"><i style="width:58%"></i></div><div class="sub" style="margin-top:6px">58% of ₹45,000 home budget</div></div>
   <h2>Shared transactions</h2>
