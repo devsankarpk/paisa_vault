@@ -156,7 +156,7 @@ Export to an encrypted file, plus PDF/CSV for the user's own records
 White background with grey borders and separators
 Minimal animation: simple fades only
 Clean, readable typography
-Screens to be finalised once sample designs are shared 4. Architecture
+Update (29 Oct 2026): the visual style is now the soft-blue design in the clickable prototype (app/ and screenshots/), which supersedes the white and grey guideline above. Final sign-off happens in Phase 0. 4. Architecture
 ┌──────────────────────────────────────────────────────────────┐
 │ 1. INPUT │
 │ Android SMS receiver │ iOS Shortcut (App Intent) │ │
@@ -310,9 +310,10 @@ Estimated total: about 22–24 weeks for one experienced Flutter developer, or l
    Bank SMS formats change The LLM handles format changes better than fixed rules. Monitor accuracy.
    Storing card PINs Opt-in only, biometric-locked, with a clear warning
 10. Open Items
-    Screen designs: sample designs to be shared
-    Final model choice after Phase 0 testing
-    App name and branding
-    List of banks to support first (for collecting test SMS)
-    Default category list
-    Budget period: calendar month or salary-date cycle?
+    Screen designs: prototype in app/ is the reference; sign-off in Phase 0
+    Final model choice after Phase 0 testing (the only open technical decision)
+    App name and branding: "Paisa Vault" kept as the working name (proposed)
+    Banks to support first: HDFC, SBI, ICICI, Axis, Yes Bank (confirmed)
+    Default category list: Food, Groceries, Shopping, Bills, Travel, Health, Entertainment, Other, plus Income and Transfer (proposed)
+    Budget period: calendar month (proposed)
+    Further decisions and gaps found in review: docs/DECISIONS.md and docs/PLATFORM_AND_COMPLIANCE.md

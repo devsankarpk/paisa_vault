@@ -4,7 +4,7 @@ A private, offline-first expense manager for Android and iPhone. It reads new ba
 
 **Status:** planning complete, clickable screen prototype available. The Flutter app has not been started. Phase 0 is next.
 
-- Full product and technical spec: [CLOUD.md](CLOUD.md)
+- Full product and technical spec: [CLAUDE.md](CLAUDE.md)
 - Phase-by-phase plan: [docs/PHASE_PLAN.md](docs/PHASE_PLAN.md)
 
 ## Principles
@@ -36,7 +36,7 @@ Tips:
 
 ## Screens
 
-Spec numbers (3.x) refer to [CLOUD.md](CLOUD.md). The visual style follows the soft-blue UI reference and replaces the white/grey guideline in spec 3.11.
+Spec numbers (3.x) refer to [CLAUDE.md](CLAUDE.md). The visual style follows the soft-blue UI reference and replaces the white/grey guideline in spec 3.11.
 
 ### Access and onboarding
 
@@ -102,17 +102,27 @@ SMS (Android receiver / iOS Shortcut) → filter OTP and promo → on-device LLM
 
 ## Phase plan
 
-About 22 to 24 weeks for one developer. Details, scope and exit gates are in [docs/PHASE_PLAN.md](docs/PHASE_PLAN.md).
+One developer, starting 29 Oct 2026. 25 weeks of phases plus a 4 week buffer, store submission by 19 May 2027. Only the on-device LLM is undecided; Phase 0 decides it.
 
-| Phase | Weeks | Output |
-|---|---|---|
-| 0 Groundwork and design lock | 2 to 3 | Model chosen, platform spikes proven, screens signed off |
-| 1A Foundation, SMS and AI | 4 | SMS becomes a stored, card-mapped transaction |
-| 1B Categorise, search, budgets, backup | 3 to 4 | Usable personal tracker |
-| 2 Cards and privacy | 4 | Card vault and hidden transactions |
-| 3 Reports and self transfers | 3 | Accurate reports |
-| 4 Household sharing | 4 | Shared household budget |
-| 5 Release and polish | 2 to 3 | Play Store and App Store submissions |
+| Phase | Dates | Weeks | Output | Details |
+|---|---|---|---|---|
+| 0 Groundwork and design lock | 29 Oct to 18 Nov 2026 | 3 | LLM chosen, platform spikes proven, screens signed off | [phase 0](docs/phases/phase-0-groundwork.md) |
+| 1A Foundation, SMS and AI | 19 Nov to 16 Dec | 4 | SMS becomes a stored, card-mapped transaction | [phase 1A](docs/phases/phase-1a-foundation-sms-ai.md) |
+| 1B Categorise, search, budgets, backup | 17 Dec to 13 Jan 2027 | 4 | Usable personal tracker | [phase 1B](docs/phases/phase-1b-categorise-search-budgets.md) |
+| 2 Cards and privacy | 14 Jan to 10 Feb | 4 | Card vault and hidden transactions | [phase 2](docs/phases/phase-2-cards-privacy.md) |
+| 3 Reports and self transfers | 11 Feb to 3 Mar | 3 | Accurate reports | [phase 3](docs/phases/phase-3-reports-self-transfers.md) |
+| 4 Household sharing | 4 Mar to 31 Mar | 4 | Shared household budget | [phase 4](docs/phases/phase-4-household-sharing.md) |
+| Buffer | 1 Apr to 28 Apr | 4 | Overruns and bug fixing | n/a |
+| 5 Release and polish | 29 Apr to 19 May | 3 | Play Store and App Store submissions | [phase 5](docs/phases/phase-5-release.md) |
+
+Each phase ends on a measurable exit gate. Overview and feature coverage: [docs/PHASE_PLAN.md](docs/PHASE_PLAN.md).
+
+### Planning documents
+
+- [Decision log](docs/DECISIONS.md): confirmed and proposed decisions, spec gaps found in review
+- [Platform and compliance](docs/PLATFORM_AND_COMPLIANCE.md): Wi-Fi permissions, dual SIM and RCS, model licence, privacy forms, diagnostics, model updates, NFC
+- [Testing strategy](docs/TESTING.md)
+- [Risk register](docs/RISKS.md)
 
 ## Known prototype gaps
 
@@ -123,15 +133,19 @@ Tracked so Phase 0 can close them:
 
 ## Open items
 
-Bank list for test SMS, default categories, budget period (calendar month or salary cycle), final model, app name and branding.
+- **Open:** the on-device LLM (Gemma 3 1B or Qwen3 1.7B), chosen by the Phase 0 scorecard.
+- **Confirmed:** first banks are HDFC, SBI, ICICI, Axis and Yes Bank.
+- **Proposed:** calendar-month budgets; categories Food, Groceries, Shopping, Bills, Travel, Health, Entertainment, Other, plus Income and Transfer; "Paisa Vault" kept as the working name.
+
+Full list in [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## Repository layout
 
 ```
 app/          clickable prototype (index.html, app.js, data.js, styles.css)
 screenshots/  PNG of every screen
-docs/         phase plan
-CLOUD.md      product and technical spec
+docs/         phase plan, per-phase files, decisions, testing, risks, platform notes
+CLAUDE.md     product and technical spec
 screenshots.js  regenerates the PNGs
 ```
 
