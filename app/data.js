@@ -6,7 +6,7 @@ const DATA = {
   spend: 35749.5,
   cards: [
     { id: 'hdfc', bank: 'HDFC Bank', type: 'Credit', network: 'Visa', last4: '4821', holder: 'SANKAR PK', exp: '09/29', limit: 200000, used: 46500, due: '05 Nov', statement: '18 Oct', color: 'blue', full: '4532 7781 0092 4821' },
-    { id: 'sbi', bank: 'SBI', type: 'Debit', network: 'RuPay', last4: '1190', holder: 'SANKAR PK', exp: '02/28', color: 'dark', full: '6521 0043 8877 1190' },
+    { id: 'sbi', bank: 'SBI', type: 'Debit', network: 'RuPay', last4: '1190', holder: 'SANKAR PK', exp: '02/28', bal: 84250.5, color: 'dark', full: '6521 0043 8877 1190' },
     { id: 'icici', bank: 'ICICI Bank', type: 'Credit', network: 'Mastercard', last4: '7305', holder: 'SANKAR PK', exp: '12/27', limit: 100000, used: 12800, due: '12 Nov', statement: '25 Oct', color: 'violet', full: '5412 3390 6618 7305' },
   ],
   categories: [
@@ -29,6 +29,7 @@ const DATA = {
     { id: 6, m: 'BESCOM Electricity', sub: 'Bill pay · SBI •1190', amt: -1840, cat: 'Bills', date: '20 Oct', icon: 'doc', tone: 'orange' },
     { id: 7, m: 'Transfer to own account', sub: 'Possible self transfer', amt: -15000, cat: 'Transfer', date: '19 Oct', icon: 'transfer', tone: 'blue', self: true },
     { id: 8, m: 'Zomato', sub: 'UPI · HDFC •4821', amt: -640, cat: 'Food', date: '18 Oct', icon: 'food', tone: 'orange' },
+    { id: 9, m: 'Unclear merchant', sub: 'AI unsure of amount · please confirm', amt: -1250, cat: '?', date: '17 Oct', icon: 'question', tone: 'orange', confirm: true },
   ],
   budgets: [
     { name: 'Food', spent: 11240, limit: 12000, icon: 'food' },

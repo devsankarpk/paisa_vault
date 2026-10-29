@@ -1,7 +1,7 @@
 // Regenerates screenshots/*.png from the prototype. Usage: node screenshots.js (needs playwright)
 const { chromium } = require('playwright');
 const path = require('path');
-const screens = ['lock','home','dashboard','activity','search','ask','cards','card/hdfc','addcard','profile','hidden','selftransfers','household','reports','budgets','alerts','backup','security'];
+const screens = ['lock','home','dashboard','activity','search','ask','txn/9','addtxn','cards','card/hdfc','addcard','billsetup','profile','hidden','selftransfers','household','reports','budgets','alerts','backup','security','onboard','shortcut','setpin'];
 (async () => {
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
