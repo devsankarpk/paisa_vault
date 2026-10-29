@@ -44,15 +44,15 @@ const back = (title, right = '') => `<div class="top"><button class="iconbtn" da
 const searchBtn = `<button class="iconbtn" data-go="search">${ic('search')}</button>`;
 
 function ccCard(c) {
-  const bal = c.type === 'Credit' ? `<span class="lbl">Credit used</span><div class="bal"><small>INR</small>${(c.used).toLocaleString('en-IN')}</div>` : `<span class="lbl">${c.bank} Debit</span><div class="bal"><small>INR</small>84,250.50</div>`;
+  const bal = c.type === 'Credit' ? `<span class="lbl">Credit used</span><div class="bal"><small>INR</small>${(c.used).toLocaleString('en-IN')}</div>` : `<span class="lbl">${c.bank} Debit</span><div class="bal"><small>INR</small>${c.bal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>`;
   return `<div class="cc ${c.color}" data-go="card/${c.id}">${bal}<div class="net"><i></i><i></i></div>
     <div class="num">****&nbsp;&nbsp;****&nbsp;&nbsp;****&nbsp;&nbsp;${c.last4}</div>
     <div class="foot"><span>${c.holder}</span><span><small>${c.network} · ${c.type}</small><small>Exp. ${c.exp}</small></span></div></div>`;
 }
 
 function txnRow(t) {
-  const right = t.ask ? `<span class="pill warn">Categorise</span>` : `<span class="amt ${t.amt < 0 ? 'neg' : 'pos'}">${t.amt < 0 ? '-' : '+'}${inr(t.amt)}</span>`;
-  return `<button class="row" data-go="${t.ask ? 'ask' : t.self ? 'selftransfers' : 'activity'}"><div class="ic tone-${t.tone}">${ic(t.icon)}</div><div class="mid"><div class="t">${t.m}</div><div class="s">${t.sub}</div></div>${right}</button>`;
+  const right = t.confirm ? `<span class="pill warn">Confirm</span>` : t.ask ? `<span class="pill warn">Categorise</span>` : `<span class="amt ${t.amt < 0 ? 'neg' : 'pos'}">${t.amt < 0 ? '-' : '+'}${inr(t.amt)}</span>`;
+  return `<button class="row" data-go="${t.ask ? 'ask' : t.self ? 'selftransfers' : 'txn/' + t.id}"><div class="ic tone-${t.tone}">${ic(t.icon)}</div><div class="mid"><div class="t">${t.m}</div><div class="s">${t.sub}</div></div>${right}</button>`;
 }
 
 function donut(parts, size = 170, w = 28) {
@@ -70,9 +70,10 @@ function ring(pct, color) {
 const S = {};
 
 let pin = '';
-S.lock = () => `<div class="lock"><div class="logo">${ic('shield')}</div><h1 style="font-size:22px">Paisa Vault</h1><p class="sub" style="margin-top:6px">Enter your PIN to unlock</p>
+const pinPad = (title, sub, bio = true) => `<div class="lock"><div class="logo">${ic('shield')}</div><h1 style="font-size:22px">${title}</h1><p class="sub" style="margin-top:6px">${sub}</p>
   <div class="pins">${[0, 1, 2, 3].map((i) => `<i class="${i < pin.length ? 'on' : ''}"></i>`).join('')}</div>
-  <div class="keys">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((k) => `<button data-key="${k}">${k}</button>`).join('')}<button data-key="bio" style="font-size:13px;color:var(--blue)">Use Face ID</button><button data-key="0">0</button><button data-key="del">⌫</button></div></div>`;
+  <div class="keys">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((k) => `<button data-key="${k}">${k}</button>`).join('')}${bio ? '<button data-key="bio" style="font-size:13px;color:var(--blue)">Use Face ID</button>' : '<span></span>'}<button data-key="0">0</button><button data-key="del">⌫</button></div></div>`;
+S.lock = () => pinPad('Paisa Vault', 'Enter your PIN to unlock');
 
 S.home = () => `
   <div class="top"><div><div class="hello">Hello</div><div class="name">${DATA.user.name}</div></div>
@@ -80,7 +81,7 @@ S.home = () => `
   <div class="peek">${DATA.cards.map(ccCard).join('')}</div>
   <h2 style="margin-top:6px">Quick actions</h2>
   <div class="services">
-    ${[['Add', 'plus', 'green', 'ask'], ['Budgets', 'target', 'orange', 'budgets'], ['Reports', 'report', 'violet', 'reports'], ['Household', 'users', 'blue', 'household']].map((s) => `<button class="svc" data-go="${s[3]}"><div class="tile tone-${s[2]}">${ic(s[1])}</div>${s[0]}</button>`).join('')}
+    ${[['Add', 'plus', 'green', 'addtxn'], ['Budgets', 'target', 'orange', 'budgets'], ['Reports', 'report', 'violet', 'reports'], ['Household', 'users', 'blue', 'household']].map((s) => `<button class="svc" data-go="${s[3]}"><div class="tile tone-${s[2]}">${ic(s[1])}</div>${s[0]}</button>`).join('')}
   </div>
   <h2>Recent transactions</h2>
   ${DATA.txns.slice(0, 4).map(txnRow).join('')}
@@ -147,19 +148,20 @@ S.card = (id) => {
     <div class="sub">${revealed ? 'Hides again in 45 seconds' : 'Locked'}</div>
     <button class="btn" style="margin-top:14px" data-reveal>${revealed ? 'Hide now' : 'Reveal with Face ID'}</button></div>
   <div class="note" style="margin-top:14px">Screenshots are blocked on this screen. The app switcher preview is blurred.</div>
-  ${c.type === 'Credit' ? `<div class="row"><div class="mid"><div class="t">Bill reminder</div><div class="s">Statement ${c.statement} · Due ${c.due} · Remind 5 days and 1 day before</div></div><div class="switch on"></div></div>` : ''}
+  ${c.type === 'Credit' ? `<div class="row"><div class="mid"><div class="t">Bill reminder</div><div class="s">Statement ${c.statement} · Due ${c.due} · Remind 5 days and 1 day before</div></div><div class="switch on"></div></div><button class="btn ghost" data-go="billsetup">Edit bill reminder</button>` : ''}
   <div class="row"><div class="mid"><div class="t">Store card PIN</div><div class="s">Off. Banks may hold you liable if a stored PIN is misused.</div></div><div class="switch"></div></div>`;
 };
 S.addcard = () => `
   ${back('Add card')}
   <button class="row" data-done="NFC read: Visa •••• 5520" data-go="cards"><div class="ic tone-green">${ic('nfc')}</div><div class="mid"><div class="t">Tap card (Android NFC)</div><div class="s">Reads number and expiry</div></div>${ic('chevron', 'chev')}</button>
   <button class="row" data-done="Camera scan demo" data-go="cards"><div class="ic tone-violet">${ic('card')}</div><div class="mid"><div class="t">Scan with camera (iPhone)</div><div class="s">Or type the details yourself</div></div>${ic('chevron', 'chev')}</button>
-  <div class="note info">Bank, card type, network and holder name are confirmed manually. For credit cards you will be asked for statement date, due date and reminders.</div>`;
+  <div class="note info">Bank, card type, network and holder name are confirmed manually. For credit cards you will be asked for statement date, due date and reminders.</div>
+  <button class="btn ghost" data-go="billsetup">Next: credit card bill reminder</button>`;
 
 S.profile = () => `
   <div class="top"><h1 style="margin-left:0">Profile</h1></div>
-  <div style="text-align:center;margin-bottom:20px"><div class="avatar">S</div><div class="name" style="font-size:19px;font-weight:700">${DATA.user.name}</div><div class="sub">Paired with ${DATA.user.household}</div></div>
-  <div class="menu">${[['Hidden vault', 'lock', 'hidden'], ['Self transfers', 'transfer', 'selftransfers'], ['Household sharing', 'users', 'household'], ['Reports', 'report', 'reports'], ['Budgets', 'target', 'budgets'], ['Alerts', 'bell', 'alerts'], ['Encrypted backup', 'backup', 'backup'], ['Security', 'shield', 'security']].map((m) => `<button class="row" data-go="${m[2]}"><div class="ic">${ic(m[1])}</div><div class="mid"><div class="t">${m[0]}</div></div>${ic('chevron', 'chev')}</button>`).join('')}</div>`;
+  <div style="text-align:center;margin-bottom:20px"><div class="avatar" data-vault>S</div><div class="name" style="font-size:19px;font-weight:700">${DATA.user.name}</div><div class="sub">Paired with ${DATA.user.household}</div></div>
+  <div class="menu">${[['SMS setup guide', 'doc', 'onboard'], ['Change PIN', 'lock', 'setpin'], ['Self transfers', 'transfer', 'selftransfers'], ['Household sharing', 'users', 'household'], ['Reports', 'report', 'reports'], ['Budgets', 'target', 'budgets'], ['Alerts', 'bell', 'alerts'], ['Encrypted backup', 'backup', 'backup'], ['Security', 'shield', 'security']].map((m) => `<button class="row" data-go="${m[2]}"><div class="ic">${ic(m[1])}</div><div class="mid"><div class="t">${m[0]}</div></div>${ic('chevron', 'chev')}</button>`).join('')}</div>`;
 
 S.hidden = () => `
   ${back('Hidden vault', `<span class="pill ghost">${ic('lock')}</span>`)}
@@ -201,6 +203,62 @@ S.backup = () => `${back('Encrypted backup')}<div class="note info">Cloud backup
 S.security = () => `${back('Security')}${[['App lock (PIN)', 1], ['Face ID / fingerprint', 1], ['Auto-lock after 1 minute', 1], ['Block screenshots on card screens', 1]].map((s) => `<div class="row"><div class="mid"><div class="t">${s[0]}</div></div><div class="switch ${s[1] ? 'on' : ''}"></div></div>`).join('')}
   <div class="note info">Main data and the hidden vault use separate encryption keys. Nothing leaves this phone.</div>`;
 
+
+S.onboard = () => `
+  <div class="lock" style="padding-top:40px"><div class="logo">${ic('shield')}</div><h1 style="font-size:22px">Read bank SMS on this phone</h1>
+  <p class="sub" style="margin:8px 0 20px;line-height:1.5">Paisa Vault finds amount, merchant and card from new bank SMS so you do not type them.</p></div>
+  <div class="row"><div class="ic tone-green">${ic('lock')}</div><div class="mid"><div class="t">Stays on your phone</div><div class="s">SMS are read by an on-device AI. Nothing is uploaded.</div></div></div>
+  <div class="row"><div class="ic tone-blue">${ic('check')}</div><div class="mid"><div class="t">Only bank messages</div><div class="s">OTP and promotional SMS are ignored.</div></div></div>
+  <div class="row"><div class="ic tone-violet">${ic('bell')}</div><div class="mid"><div class="t">New messages only</div><div class="s">Older SMS are not imported.</div></div></div>
+  <button class="btn" style="margin-top:10px" data-done="SMS permission granted (demo)" data-go="setpin">Allow SMS access (Android)</button>
+  <button class="btn ghost" data-go="shortcut">I use iPhone: set up Shortcut</button>`;
+
+S.shortcut = () => `
+  ${back('iPhone Shortcut setup')}
+  <div class="note info">iPhone does not let apps read SMS. A one-time Shortcuts automation sends each new bank SMS to Paisa Vault.</div>
+  ${[['Open Shortcuts, then Automation, then New, then Message'], ['Set "Message contains" to one keyword: debited, credited, spent, Rs or INR. Repeat per keyword.'], ['Choose "Run Immediately"'], ['Add the action "Log Bank Message" (Paisa Vault) with the message as input'], ['Done. New bank SMS are saved and processed when you next open the app.']].map((s, i) => `<div class="row"><div class="ic" style="background:var(--blue-soft);color:var(--blue);font-weight:700">${i + 1}</div><div class="mid"><div class="s" style="font-size:13px;color:var(--ink);margin:0;white-space:normal">${s[0]}</div></div></div>`).join('')}
+  <div class="note">iOS may show a small "Shortcut ran" banner each time. This is normal.</div>
+  <button class="btn" data-done="Setup marked done" data-go="setpin">I have set it up</button>`;
+
+S.setpin = () => pinPad('Create your PIN', 'Choose a 4-digit PIN. You can add Face ID next.', false);
+
+S.txn = (id) => {
+  const t = DATA.txns.find((x) => x.id === +id) || DATA.txns[0];
+  return `${back('Transaction')}
+  <div class="card" style="text-align:center"><div class="sub">${t.amt < 0 ? 'Paid to' : 'Received from'}</div><div class="big" style="margin:6px 0">${t.m}</div>
+    <div style="font-size:26px;font-weight:700;color:${t.amt < 0 ? 'var(--red)' : 'var(--blue)'}">${inr(t.amt, true)}</div><div class="sub" style="margin-top:6px">${t.sub} · ${t.date}</div></div>
+  ${t.confirm ? `<div class="note" style="margin-top:14px">The AI could not match the amount to the SMS text. Please confirm it is right.</div><input class="field" value="1250" aria-label="Amount">` : ''}
+  <h2>Category</h2>
+  <div class="cats">${[['Food', 'food'], ['Shopping', 'bag'], ['Bills', 'doc'], ['Travel', 'car'], ['Groceries', 'bag'], ['Other', 'dots']].map((c) => `<button class="${c[0] === t.cat ? 'on' : ''}" data-cat>${ic(c[1])}${c[0]}</button>`).join('')}</div>
+  <div class="search" style="margin-bottom:8px"><input placeholder="Purpose note (optional)"></div>
+  <div class="check on" data-check><i>${ic('check')}</i>Always use this category for ${t.m}</div>
+  <div class="check" data-check><i>${ic('check')}</i>Share with household</div>
+  <div class="check" data-check><i>${ic('check')}</i>Hide this transaction (private vault)</div>
+  <button class="btn" style="margin-top:14px" data-done="Transaction updated" data-go="activity">Save</button>`;
+};
+
+S.addtxn = () => `
+  ${back('Add transaction')}
+  <div class="chips"><span class="chip on" data-seg>Expense</span><span class="chip" data-seg>Income</span></div>
+  <input class="field" placeholder="Amount (₹)" inputmode="decimal" aria-label="Amount">
+  <input class="field" placeholder="Merchant or payee" aria-label="Merchant">
+  <input class="field" value="Today" aria-label="Date">
+  <input class="field" value="SBI •1190" aria-label="Account or card">
+  <h2>Category</h2>
+  <div class="cats">${[['Food', 'food'], ['Shopping', 'bag'], ['Bills', 'doc'], ['Travel', 'car'], ['Groceries', 'bag'], ['Other', 'dots']].map((c) => `<button data-cat>${ic(c[1])}${c[0]}</button>`).join('')}</div>
+  <input class="field" placeholder="Purpose note (optional)" aria-label="Note">
+  <button class="btn" style="margin-top:8px" data-done="Transaction added" data-go="activity">Save</button>`;
+
+S.billsetup = () => `
+  ${back('Credit card bill reminder')}
+  <div class="note info">Set this up once so Paisa Vault can remind you before the due date. Reminders are local notifications.</div>
+  <div class="sub" style="margin:4px 0 6px">Statement date</div><input class="field" value="18th of every month" aria-label="Statement date">
+  <div class="sub" style="margin:4px 0 6px">Payment due date</div><input class="field" value="5th of every month" aria-label="Due date">
+  <div class="sub" style="margin:4px 0 6px">Credit limit (optional)</div><input class="field" value="₹2,00,000" aria-label="Credit limit">
+  <h2>Remind me</h2>
+  <div class="chips"><span class="chip on" data-seg>5 days before</span><span class="chip on" data-seg>1 day before</span><span class="chip" data-seg>On the day</span></div>
+  <button class="btn" style="margin-top:8px" data-done="Bill reminder saved" data-go="cards">Save</button>`;
+
 /* ---------- router ---------- */
 function render() {
   const [route, arg] = (location.hash.replace('#/', '') || 'lock').split('/');
@@ -209,8 +267,8 @@ function render() {
   scr.innerHTML = fn(arg);
   scr.className = 'screen fade';
   scr.scrollTop = 0;
-  const showNav = route !== 'lock';
-  const active = NAV_ROUTES.includes(route) ? route : route === 'card' || route === 'addcard' ? 'cards' : ['hidden', 'selftransfers', 'household', 'reports', 'budgets', 'alerts', 'backup', 'security'].includes(route) ? 'profile' : '';
+  const showNav = !['lock', 'onboard', 'setpin'].includes(route);
+  const active = NAV_ROUTES.includes(route) ? route : route === 'txn' || route === 'addtxn' ? 'activity' : route === 'card' || route === 'addcard' || route === 'billsetup' ? 'cards' : ['hidden', 'onboard', 'shortcut', 'setpin', 'selftransfers', 'household', 'reports', 'budgets', 'alerts', 'backup', 'security'].includes(route) ? 'profile' : '';
   const nav = $('#nav');
   nav.className = 'nav' + (showNav ? '' : ' hide');
   nav.innerHTML = NAV.map((n) => `<button class="${n[0] === active ? 'on' : ''}" data-go="${n[0]}" aria-label="${n[0]}">${ic(n[1])}</button>`).join('');
@@ -225,7 +283,7 @@ function bind(route) {
 }
 
 document.addEventListener('click', (e) => {
-  const el = e.target.closest('[data-go],[data-key],[data-btab],[data-cat],[data-check],[data-reveal],[data-done]');
+  const el = e.target.closest('[data-go],[data-key],[data-btab],[data-cat],[data-check],[data-reveal],[data-done],[data-seg]');
   if (!el) return;
   if (el.dataset.done) toast(el.dataset.done);
   if (el.dataset.key !== undefined) {
@@ -236,9 +294,14 @@ document.addEventListener('click', (e) => {
   }
   if (el.dataset.btab) { document.querySelectorAll('#btabs button').forEach((b) => b.classList.toggle('on', b === el)); $('#blist').innerHTML = budgetRows(el.dataset.btab); return; }
   if (el.dataset.cat !== undefined) { document.querySelectorAll('[data-cat]').forEach((b) => b.classList.toggle('on', b === el)); return; }
-  if (el.dataset.check !== undefined) return el.classList.toggle('on');
+  if (el.dataset.check !== undefined || el.dataset.seg !== undefined) return el.classList.toggle('on');
   if (el.dataset.reveal !== undefined) { revealed = !revealed; return render(); }
   if (el.dataset.go) { if (el.dataset.back !== undefined) return history.length > 1 ? history.back() : go(el.dataset.go); go(el.dataset.go); }
 });
+// Hidden vault has no menu entry: long-press (or double-click) the profile avatar.
+let lp;
+document.addEventListener('pointerdown', (e) => { if (e.target.closest('[data-vault]')) lp = setTimeout(() => go('hidden'), 700); });
+['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => document.addEventListener(ev, () => clearTimeout(lp)));
+document.addEventListener('dblclick', (e) => { if (e.target.closest('[data-vault]')) go('hidden'); });
 window.addEventListener('hashchange', render);
 render();
