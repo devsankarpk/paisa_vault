@@ -21,4 +21,5 @@ Expands CLAUDE.md section 9 with triggers and fallbacks, and adds risks found in
 | R15 | Solo schedule slips | High | Medium | A phase overruns by more than a week | Use the 4-week buffer, cut Future items, defer household polish | each phase |
 | R16 | Forgotten PIN locks the user out (G2) | Medium | Medium | Support request | Biometric fallback, wipe and restore from backup | 1B |
 | R17 | Backup cannot restore on a new phone (G4) | Medium | High | Restore test fails | Passphrase-derived backup key | 1B |
+| R19 | Flutter is deprecating Intel Macs; this dev machine is Intel (x86_64, 16 GB). Found 29 Oct 2026 when upgrading to Flutter 3.47.8. | Medium | Medium | `flutter doctor` warns or a Flutter release drops Intel builds | Pin the Flutter version in the repo (fvm or a `.flutter-version` note) and upgrade deliberately; plan an Apple Silicon machine or cloud CI before the pinned version goes out of date | 1A |
 | R18 | Real SMS leak into git | Low | High | Commit hook flags personal data | `.gitignore` for raw data, anonymise before commit, review | 0 |
