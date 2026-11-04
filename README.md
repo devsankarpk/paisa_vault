@@ -119,6 +119,7 @@ Each phase ends on a measurable exit gate. Overview and feature coverage: [docs/
 
 ### Planning documents
 
+- [Progress tracker](docs/PROGRESS.md): what is done, current focus, what is blocked
 - [Decision log](docs/DECISIONS.md): confirmed and proposed decisions, spec gaps found in review
 - [Platform and compliance](docs/PLATFORM_AND_COMPLIANCE.md): Wi-Fi permissions, dual SIM and RCS, model licence, privacy forms, diagnostics, model updates, NFC
 - [Testing strategy](docs/TESTING.md)

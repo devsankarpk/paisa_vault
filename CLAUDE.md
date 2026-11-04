@@ -1,3 +1,5 @@
+Working agreement: at the start of every session read docs/PROGRESS.md (what is done, current focus, what is blocked). When work is finished, tick it in docs/PROGRESS.md in the same commit. Phase details are in docs/phases/.
+
 Paisa Vault — Product & Technical Plan
 Working name. Version 1.0 — 16 October 2026 Status: Requirements agreed. Screen designs pending (sample designs to be shared later).
 

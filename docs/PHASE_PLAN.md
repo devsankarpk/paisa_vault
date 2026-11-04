@@ -10,6 +10,7 @@ Built from [CLAUDE.md](../CLAUDE.md) (the spec). Only the on-device LLM is left 
 | Document | Purpose |
 |---|---|
 | This file | Overview, timeline, feature coverage |
+| [PROGRESS.md](PROGRESS.md) | Checklist of every task: done, current focus, blocked |
 | [phases/phase-0-groundwork.md](phases/phase-0-groundwork.md) | Spikes, LLM bake-off, design lock |
 | [phases/phase-1a-foundation-sms-ai.md](phases/phase-1a-foundation-sms-ai.md) | Encrypted DB, lock, SMS to transaction |
 | [phases/phase-1b-categorise-search-budgets.md](phases/phase-1b-categorise-search-budgets.md) | Categories, search, budgets, backup |
