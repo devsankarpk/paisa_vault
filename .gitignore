@@ -1,0 +1,14 @@
+# Real SMS never go into git. Only the reviewed, anonymised corpus is committed.
+testdata/raw/
+testdata/*.json
+testdata/*.txt
+# After you have read review.txt and checked the files by eye, commit the reviewed corpus with:
+#   git add -f testdata/sms_samples.json testdata/sms_labels.json
+
+# Tooling
+node_modules/
+__pycache__/
+.DS_Store
+.dart_tool/
+build/
+.idea/

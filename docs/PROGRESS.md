@@ -2,37 +2,43 @@
 
 The single place to see what is done and what is not. Tasks mirror the phase files; details live there. Update this file in the same commit as the work.
 
-**Last updated:** 2 Nov 2026
+**Last updated:** 4 Nov 2026
 
 ## Current focus
+
 Phase 0, week 1: tooling, SMS corpus, first spikes.
 
 ## Blocked on you
-- [ ] Accept Android licences: `flutter doctor --android-licenses` (then I install SDK 36 and build-tools 28.0.3)
-- [ ] Connect the Android phone (USB debugging on) and the iPhone (Developer Mode on, free Apple ID set up in Xcode)
+
+Checked 2 Nov 2026. Done by me: Android licences, SDK 36, build-tools 28.0.3, CocoaPods 1.16.2. Still needs you (adb PATH is now done):
+
+- [x] `adb` on your PATH (verified 2 Nov 2026: a new shell finds it, version 1.0.41)
+- [x] iPhone connected (cable, Trust, Developer Mode)
+- [x] Android phone connected (verified 2 Nov 2026: model V2303, Android 15, API 35)
+- [ ] Free Apple ID added in Xcode for signing (needed to run apps on the iPhone)
 - [ ] Tell me phone models and OS versions (and whether a mid-range Android is available)
-- [ ] Export bank SMS for the corpus (20 or more per bank: HDFC, SBI, ICICI, Axis, Yes)
-- [ ] Optional: update CocoaPods 1.15.2 to 1.16.2
+- [ ] Export bank SMS and run the anonymiser: follow [tools/sms_corpus/README.md](../tools/sms_corpus/README.md), then read `testdata/review.txt` before anything is committed
 
 ## Phase status
 
-| Phase | Dates | Status |
-|---|---|---|
-| Planning | to 29 Oct 2026 | Done |
-| 0 Groundwork and design lock | 29 Oct to 18 Nov 2026 | In progress |
-| 1A Foundation, SMS and AI | 19 Nov to 16 Dec | Not started |
+| Phase                                  | Dates                 | Status      |
+| -------------------------------------- | --------------------- | ----------- |
+| Planning                               | to 29 Oct 2026        | Done        |
+| 0 Groundwork and design lock           | 29 Oct to 18 Nov 2026 | In progress |
+| 1A Foundation, SMS and AI              | 19 Nov to 16 Dec      | Not started |
 | 1B Categorise, search, budgets, backup | 17 Dec to 13 Jan 2027 | Not started |
-| 2 Cards and privacy | 14 Jan to 10 Feb | Not started |
-| 3 Reports and self transfers | 11 Feb to 3 Mar | Not started |
-| 4 Household sharing | 4 Mar to 31 Mar | Not started |
-| Buffer | 1 Apr to 28 Apr | Not started |
-| 5 Release and polish | 29 Apr to 19 May | Not started |
+| 2 Cards and privacy                    | 14 Jan to 10 Feb      | Not started |
+| 3 Reports and self transfers           | 11 Feb to 3 Mar       | Not started |
+| 4 Household sharing                    | 4 Mar to 31 Mar       | Not started |
+| Buffer                                 | 1 Apr to 28 Apr       | Not started |
+| 5 Release and polish                   | 29 Apr to 19 May      | Not started |
 
 Status values: Not started, In progress, Blocked, Done.
 
 ---
 
 ## Planning (done)
+
 - [x] Product and technical spec ([CLAUDE.md](../CLAUDE.md))
 - [x] Clickable prototype, 24 screens, screenshots
 - [x] README with screen gallery and phase table
@@ -41,29 +47,34 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Decisions confirmed: banks, team, LLM left open, hidden dedupe, PIN recovery, dashboard scope
 
 ## Phase 0: Groundwork and design lock
+
 [Details](phases/phase-0-groundwork.md)
 
 **Tooling**
+
 - [x] Flutter upgraded to 3.47.8 stable
 - [x] Flutter pointed at JDK 17 (Android Studio bundled)
 - [x] Intel Mac risk recorded (R19)
-- [ ] Android licences accepted, SDK 36 and build-tools 28.0.3 installed
-- [ ] `adb` on PATH
-- [ ] Both phones connected and recognised by `flutter devices`
+- [x] Android licences accepted, SDK 36 and build-tools 28.0.3 installed
+- [x] CocoaPods updated to 1.16.2
+- [x] `adb` on PATH
+- [x] Both phones connected and recognised by `flutter devices` (Android V2303 on Android 15, iPhone on iOS 26.7.1)
 - [ ] Phone models and OS versions recorded in [TESTING.md](TESTING.md)
 - [ ] Google Play and Apple developer accounts set up (or decision to defer)
 
 **Week 1: data and Android basics**
-- [ ] Collect SMS, 20 or more per bank, all message types
-- [ ] Anonymisation script
+
+- [ ] Collect SMS, 20 or more per core bank (HDFC, SBI, ICICI, Axis, Yes), all message types. Other Indian banks are optional bonus samples
+- [x] Anonymisation script ([tools/sms_corpus/](../tools/sms_corpus/), 9 tests passing)
 - [ ] Anonymised corpus `testdata/sms_samples.json`
 - [ ] Labels `testdata/sms_labels.json`
 - [ ] Sender ID table `testdata/sender_ids.json` (T2)
-- [ ] `testdata/` raw data in `.gitignore`
+- [x] `testdata/` raw data in `.gitignore`
 - [ ] Flutter project skeleton, lint, CI green
 - [ ] Android SMS receiver spike on the real phone
 
 **Week 2: spikes and LLM bake-off**
+
 - [ ] iOS Shortcut to App Intent spike (SMS and RCS/iMessage)
 - [ ] NFC spike and card matrix (T7)
 - [ ] Camera card scan spike
@@ -73,6 +84,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Wi-Fi sync spike (T1)
 
 **Week 3: bundling, design, decisions**
+
 - [ ] Bundling check: model size, install-time pack, iOS app size
 - [ ] Design lock: prototype updated and every screen signed off
 - [ ] Technical decisions logged in [DECISIONS.md](DECISIONS.md) (state management, min OS versions, ids, folder layout, logging, PDF package, share-to-app)
@@ -81,6 +93,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Phase review and demo
 
 **Exit gate**
+
 - [ ] ADR 0001 accepted (model chosen, thresholds met, licence checked)
 - [ ] Android SMS receiver works on the real phone
 - [ ] iOS Shortcut route saves SMS in the background, or fallback chosen
@@ -91,6 +104,7 @@ Status values: Not started, In progress, Blocked, Done.
 ---
 
 ## Phase 1A: Foundation, SMS and AI
+
 [Details](phases/phase-1a-foundation-sms-ai.md)
 
 - [ ] Interfaces and fakes (SmsSource, LlmEngine, CardReader, TextScanner, Clock, Logger)
@@ -113,6 +127,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Golden-SMS suite in CI, real SMS from all five banks on both phones
 
 **Exit gate**
+
 - [ ] Real SMS from each bank becomes a mapped transaction on Android and iPhone
 - [ ] Amount safety check proven
 - [ ] Golden suite green and meets Phase 0 thresholds
@@ -121,6 +136,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Redaction test passes
 
 ## Phase 1B: Categorise, search, budgets, backup
+
 [Details](phases/phase-1b-categorise-search-budgets.md)
 
 - [ ] Categories, merchants, merchant_rules, seed data
@@ -140,6 +156,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] One-week dogfood on both phones
 
 **Exit gate**
+
 - [ ] A week of real use with no lost or duplicated transactions
 - [ ] Same merchant categorised automatically after first answer
 - [ ] Each threshold alerts once per period
@@ -147,6 +164,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Diagnostics export has no amounts, merchants or SMS text
 
 ## Phase 2: Cards and privacy
+
 [Details](phases/phase-2-cards-privacy.md)
 
 - [ ] cards and card_bill_settings, card mapping
@@ -165,6 +183,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Security review
 
 **Exit gate**
+
 - [ ] Hidden exclusion test green
 - [ ] No CVV stored or logged
 - [ ] Card number only after auth, hides after timer
@@ -172,6 +191,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Bill reminders fire
 
 ## Phase 3: Reports and self transfers
+
 [Details](phases/phase-3-reports-self-transfers.md)
 
 - [ ] self_transfer_reviews table
@@ -187,6 +207,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] One month of real data
 
 **Exit gate**
+
 - [ ] Totals reconcile to the paisa
 - [ ] Confirmed transfers excluded from totals and budgets
 - [ ] Gate appears before every report with unconfirmed items
@@ -194,6 +215,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] PDF, CSV and encrypted exports work
 
 ## Phase 4: Household sharing
+
 [Details](phases/phase-4-household-sharing.md)
 
 - [ ] Key design and pairing storage
@@ -211,6 +233,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] LAN-only network test
 
 **Exit gate**
+
 - [ ] Two phones pair and sync both ways
 - [ ] Hidden never leaves the device
 - [ ] Duplicate SMS shows once
@@ -218,6 +241,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] File fallback works
 
 ## Phase 5: Release and polish
+
 [Details](phases/phase-5-release.md)
 
 - [ ] Visual polish
@@ -232,6 +256,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Submit both stores
 
 **Exit gate**
+
 - [ ] Both stores approved, or fallback chosen
 - [ ] Privacy, security and accessibility checklists signed
 - [ ] Release build passes full tests and device matrix
@@ -240,7 +265,12 @@ Status values: Not started, In progress, Blocked, Done.
 
 ## Log
 
-| Date | What changed |
-|---|---|
-| 2 Nov 2026 | Created this tracker. Phase 0 in progress. |
-| 29 Oct 2026 | Flutter upgraded to 3.47.8, JDK 17 configured, Intel Mac risk recorded. Planning docs committed. |
+| Date        | What changed                                                                                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2 Nov 2026  | Both phones detected by `flutter devices`: Android V2303 (Android 15) and iPhone (iOS 26.7.1).                                                                                              |
+| 4 Nov 2026  | SMS tool now recognises 20 more Indian banks as bonus samples (core five unchanged), adds a `core` flag and `--list-senders`. 14 tests passing.                                           |
+| 2 Nov 2026  | `adb` added to PATH by you and verified.                                                                                                                                                   |
+| 2 Nov 2026  | Accepted Android licences, installed SDK 36 and build-tools 28.0.3, updated CocoaPods. Added SMS anonymiser, export guide and `.gitignore`. `flutter doctor` Android toolchain now passes. |
+| 2 Nov 2026  | Verified the "Blocked on you" items: none done yet.                                                                                                                                        |
+| 2 Nov 2026  | Created this tracker. Phase 0 in progress.                                                                                                                                                 |
+| 29 Oct 2026 | Flutter upgraded to 3.47.8, JDK 17 configured, Intel Mac risk recorded. Planning docs committed.                                                                                           |
