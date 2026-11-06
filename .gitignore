@@ -2,6 +2,7 @@
 testdata/raw/
 testdata/*.json
 testdata/*.txt
+!testdata/sender_ids.json
 # After you have read review.txt and checked the files by eye, commit the reviewed corpus with:
 #   git add -f testdata/sms_samples.json testdata/sms_labels.json
 
@@ -12,3 +13,6 @@ __pycache__/
 .dart_tool/
 build/
 .idea/
+
+# Model files are large and licensed; download them locally, never commit
+models/

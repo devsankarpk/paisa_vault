@@ -1,0 +1,321 @@
+[
+  {
+    "bank": "HDFC",
+    "core": true,
+    "sender_codes": [
+      "HDFCBK",
+      "HDFCBN",
+      "HDFCBANK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "SBI",
+    "core": true,
+    "sender_codes": [
+      "SBIINB",
+      "SBIUPI",
+      "SBICRD",
+      "SBIPSG",
+      "SBMSMS",
+      "ATMSBI",
+      "SBIBNK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "ICICI",
+    "core": true,
+    "sender_codes": [
+      "ICICIB",
+      "ICICIT",
+      "ICICIO",
+      "ICIBNK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "AXIS",
+    "core": true,
+    "sender_codes": [
+      "AXISBK",
+      "AXISBN",
+      "AXISMB"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "YES",
+    "core": true,
+    "sender_codes": [
+      "YESBNK",
+      "YESBKS",
+      "YESBNKL"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "PNB",
+    "core": false,
+    "sender_codes": [
+      "PNBSMS",
+      "PNBBNK",
+      "PNBONE"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "BOB",
+    "core": false,
+    "sender_codes": [
+      "BOBSMS",
+      "BOBTXN",
+      "BARODA",
+      "BOBCRD"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "CANARA",
+    "core": false,
+    "sender_codes": [
+      "CANBNK",
+      "CANARA",
+      "CANBKS"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "UNION",
+    "core": false,
+    "sender_codes": [
+      "UNIONB",
+      "UBOIBK",
+      "UNIONS"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "KOTAK",
+    "core": false,
+    "sender_codes": [
+      "KOTAKB",
+      "KOTAKM",
+      "KMBLTD"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "INDUSIND",
+    "core": false,
+    "sender_codes": [
+      "INDUSB",
+      "INDUSL",
+      "INDUSI"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "IDFC",
+    "core": false,
+    "sender_codes": [
+      "IDFCFB",
+      "IDFCBK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "FEDERAL",
+    "core": false,
+    "sender_codes": [
+      "FEDBNK",
+      "FEDFIB",
+      "FEDERL"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "BOI",
+    "core": false,
+    "sender_codes": [
+      "BOIIND",
+      "BOIBNK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "INDIAN",
+    "core": false,
+    "sender_codes": [
+      "INDIAN",
+      "INDBKS"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "CENTRAL",
+    "core": false,
+    "sender_codes": [
+      "CBOIND",
+      "CENTRL"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "UCO",
+    "core": false,
+    "sender_codes": [
+      "UCOBNK",
+      "UCOSMS"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "IDBI",
+    "core": false,
+    "sender_codes": [
+      "IDBIBK",
+      "IDBIBN"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "RBL",
+    "core": false,
+    "sender_codes": [
+      "RBLBNK",
+      "RBLCRD"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "AU",
+    "core": false,
+    "sender_codes": [
+      "AUBANK",
+      "AUSFBL",
+      "AUSFB"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "BANDHAN",
+    "core": false,
+    "sender_codes": [
+      "BANDHN",
+      "BDHNBK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "SIB",
+    "core": false,
+    "sender_codes": [
+      "SIBSMS",
+      "SOUTHI"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "KARNATAKA",
+    "core": false,
+    "sender_codes": [
+      "KARBNK",
+      "KBLBNK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "PAYTMBANK",
+    "core": false,
+    "sender_codes": [
+      "PAYTMB",
+      "PYTMBK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  },
+  {
+    "bank": "IPPB",
+    "core": false,
+    "sender_codes": [
+      "IPPBMS",
+      "IPPBNK"
+    ],
+    "seen_on_my_phones": [],
+    "channel": "unknown (SMS or RCS: check in Phase 0)",
+    "sim": "unknown",
+    "formats": []
+  }
+]
