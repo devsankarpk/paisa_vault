@@ -2,7 +2,7 @@
 
 The single place to see what is done and what is not. Tasks mirror the phase files; details live there. Update this file in the same commit as the work.
 
-**Last updated:** 4 Nov 2026
+**Last updated:** 6 Nov 2026
 
 ## Current focus
 
@@ -68,10 +68,10 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Anonymisation script ([tools/sms_corpus/](../tools/sms_corpus/), 9 tests passing)
 - [ ] Anonymised corpus `testdata/sms_samples.json`
 - [ ] Labels `testdata/sms_labels.json`
-- [ ] Sender ID table `testdata/sender_ids.json` (T2)
+- [ ] Sender ID table `testdata/sender_ids.json` (T2): draft with the known codes created; fill in what your phones actually receive, SMS or RCS, and SIM
 - [x] `testdata/` raw data in `.gitignore`
-- [ ] Flutter project skeleton, lint, CI green
-- [ ] Android SMS receiver spike on the real phone
+- [x] Flutter project skeleton in `mobile/`, lint and test pass locally; CI workflow added (confirm it is green after the first push)
+- [ ] Android SMS receiver spike on the real phone (receiver works on the emulator: sender and SIM id logged, no message text; real vivo test pending, including both SIMs and RCS on/off)
 
 **Week 2: spikes and LLM bake-off**
 
@@ -268,6 +268,8 @@ Status values: Not started, In progress, Blocked, Done.
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 2 Nov 2026  | Both phones detected by `flutter devices`: Android V2303 (Android 15) and iPhone (iOS 26.7.1).                                                                                              |
+| 6 Nov 2026  | Android SMS receiver spike (`mobile/android/.../SmsReceiver.kt`) logs sender and SIM id on the emulator. Sender ID table drafted. `models/` git-ignored.                                         |
+| 6 Nov 2026  | Flutter skeleton in `mobile/`, stricter lints, one widget test, CI workflow. Gemma 3 1B console app in `tools/llm_console/`: first runs got several fields wrong, so prompt tuning is next. |
 | 4 Nov 2026  | SMS tool now recognises 20 more Indian banks as bonus samples (core five unchanged), adds a `core` flag and `--list-senders`. 14 tests passing.                                           |
 | 2 Nov 2026  | `adb` added to PATH by you and verified.                                                                                                                                                   |
 | 2 Nov 2026  | Accepted Android licences, installed SDK 36 and build-tools 28.0.3, updated CocoaPods. Added SMS anonymiser, export guide and `.gitignore`. `flutter doctor` Android toolchain now passes. |
