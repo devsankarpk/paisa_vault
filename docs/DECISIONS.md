@@ -42,6 +42,11 @@ Status values: **Confirmed** (you said so), **Proposed** (my default, change if 
 
 State management approach, minimum Android and iOS versions, bundle and package ids, Flutter folder layout, logging approach, PDF package, share-to-app in version 1 (yes or no), Google Play and Apple developer account set-up.
 
+Taken so far (4 Nov 2026):
+- Flutter app lives in `mobile/` (the HTML prototype stays in `app/`).
+- Bundle and package id prefix `com.paisavault` (placeholder; confirm before store accounts are created, because the id cannot change after publishing).
+- Release builds must not request INTERNET until Phase 4. CI checks the main Android manifest (debug and profile manifests add it for Flutter tooling, which is expected).
+
 ## Changes to CLAUDE.md
 
 - 3.11: note that the prototype style supersedes the white and grey guideline (done).

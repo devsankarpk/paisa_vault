@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - name: Main manifest must not request INTERNET (added in Phase 4 only)
+        run: "! grep -q 'android.permission.INTERNET' android/app/src/main/AndroidManifest.xml"
+
+  sms-tools:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/sms_corpus
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python3 -m unittest -v
+      - run: python3 -m unittest -v
+        working-directory: tools/llm_console
