@@ -28,6 +28,22 @@ class Postprocess(unittest.TestCase):
                           'Rs.480.00 debited to VPA swiggy@icici - HDFC Bank')
         self.assertEqual((d['channel'], d['merchant'], d['bank']), ('UPI', 'swiggy@icici', 'HDFC'))
 
+    def test_promo_balance_and_failed_are_not_transactions(self):
+        for sms in ['Get a loan up to Rs 5,00,000 at 10.5%! Apply now',
+                    'Your A/c XX4821 balance is Rs 9,999.00 as of 05-11-26',
+                    'UPI of Rs.500.00 from HDFC Bank A/c XX4821 failed. Will be refunded if debited.']:
+            d = x.postprocess(dict(BLANK, is_transaction=True, amount=500.0), sms)
+            self.assertFalse(d['is_transaction'], sms)
+
+    def test_upi_handle_bank_ignored_and_merchant_from_handle(self):
+        sms = 'Rs.250.00 credited to your Yes Bank A/c XX7788 from VPA anita@okhdfcbank (UPI Ref 650011223344)'
+        d = x.postprocess(dict(BLANK, amount=250.0, bank='HDFC', merchant='OKHDFCBANK'), sms)
+        self.assertEqual((d['bank'], d['merchant']), ('YES', 'anita'))
+
+    def test_reference_keeps_digits_only(self):
+        d = x.postprocess(dict(BLANK, amount=1.0, reference='P2M/630011223344'), 'Rs 1 debited')
+        self.assertEqual(d['reference'], '630011223344')
+
     def test_otp_is_not_transaction(self):
         d = x.postprocess(dict(BLANK, is_transaction=True), '482913 is your OTP. Do not share.')
         self.assertFalse(d['is_transaction'])

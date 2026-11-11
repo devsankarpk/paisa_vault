@@ -100,13 +100,15 @@ BANK_NAMES = [('HDFC', r'hdfc'), ('SBI', r'\bsbi\b|state bank'), ('ICICI', r'ici
               ('AXIS', r'axis'), ('YES', r'yes\s*bank')]
 DEBIT_WORDS = r'\b(debited|sent|spent|paid|withdrawn|purchase|purchased|deducted|payment of)\b'
 CREDIT_WORDS = r'\b(credited|received|deposited|refund(?:ed)?)\b'
+FAILED_WORDS = r'\b(failed|declined|unsuccessful)\b'
 
 
 def postprocess(data, sms):
     """Cheap, deterministic fixes for mistakes the 1B model makes. Rules win over the model."""
     low = sms.lower()
     debit, credit = re.search(DEBIT_WORDS, low), re.search(CREDIT_WORDS, low)
-    if re.search(r'\botp\b|one.time password', low) and not (debit or credit):
+    # No money moved: OTPs, promos, balance alerts (no debit/credit word) and failed attempts.
+    if not (debit or credit) or re.search(FAILED_WORDS, low):
         data['is_transaction'] = False
         return data
     if data.get('amount') is not None and (debit or credit):
@@ -115,10 +117,11 @@ def postprocess(data, sms):
             data['direction'] = 'debit'
         elif credit and not debit:
             data['direction'] = 'credit'
-    for name, pat in BANK_NAMES:
-        if re.search(pat, low):
-            data['bank'] = name
-            break
+    # UPI handles like anita@okhdfcbank name the other party's bank, so ignore them. First mention wins.
+    text = re.sub(r'\S*@\S*', ' ', low)
+    found = [(m.start(), name) for name, pat in BANK_NAMES if (m := re.search(pat, text))]
+    if found:
+        data['bank'] = min(found)[1]
     if re.search(r'\bupi\b|\bvpa\b|\w@\w', low):
         data['channel'] = 'UPI'
         if data.get('account_type') in (None, 'credit_card') and 'credit card' not in low:
@@ -135,6 +138,12 @@ def postprocess(data, sms):
     if data.get('last4'):
         digits = re.sub(r'\D', '', str(data['last4']))
         data['last4'] = digits[-4:] if len(digits) >= 4 else None
+    handle = re.search(r'([\w.\-]+)@(\w+)', sms)
+    if handle and (data.get('merchant') or '').lower() in ('', 'vpa', 'upi', handle.group(2).lower()):
+        data['merchant'] = handle.group(1)
+    if data.get('reference'):
+        digits = re.search(r'\d{6,}', str(data['reference']))
+        data['reference'] = digits.group(0) if digits else None
     if data.get('merchant'):
         data['merchant'] = re.sub(r'^(vpa|upi)[\s:-]+', '', data['merchant'], flags=re.I).strip()
     return data
@@ -142,11 +151,14 @@ def postprocess(data, sms):
 
 def extract(sms, model=MODEL):
     t0 = time.perf_counter()
-    res = ollama('/api/chat', {
+    payload = {
         'model': model, 'stream': False, 'format': SCHEMA,
         'options': {'temperature': 0, 'num_predict': 300},
         'messages': [{'role': 'user', 'content': PROMPT.format(cats=', '.join(CATEGORIES), sms=sms)}],
-    })
+    }
+    if model.startswith('qwen3'):
+        payload['think'] = False  # skip the reasoning phase: too slow for a per-SMS task
+    res = ollama('/api/chat', payload)
     secs = time.perf_counter() - t0
     try:
         data = json.loads(res['message']['content'])
