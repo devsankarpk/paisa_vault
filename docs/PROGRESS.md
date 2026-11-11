@@ -2,7 +2,7 @@
 
 The single place to see what is done and what is not. Tasks mirror the phase files; details live there. Update this file in the same commit as the work.
 
-**Last updated:** 6 Nov 2026
+**Last updated:** 11 Nov 2026
 
 ## Current focus
 
@@ -78,7 +78,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] iOS Shortcut to App Intent spike (SMS and RCS/iMessage)
 - [ ] NFC spike and card matrix (T7)
 - [ ] Camera card scan spike
-- [ ] LLM Stage A: prompt and schema tuning on the Mac
+- [ ] LLM Stage A: prompt and schema tuning on the Mac (first pass done on 24 synthetic SMS: Qwen3 1.7B 2 misses, Gemma 3 1B 11 misses; needs the real corpus to confirm)
 - [ ] LLM Stage B: benchmark app on both phones
 - [ ] Scorecard and ADR 0001 draft
 - [ ] Wi-Fi sync spike (T1)
@@ -268,6 +268,7 @@ Status values: Not started, In progress, Blocked, Done.
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 2 Nov 2026  | Both phones detected by `flutter devices`: Android V2303 (Android 15) and iPhone (iOS 26.7.1).                                                                                              |
+| 11 Nov 2026 | Added 24-message synthetic seed set and scorer. Mac result: Qwen3 1.7B 100% on all fields except channel (86.7%); Gemma 3 1B weaker on reference (63.6%) and channel (80%). Small synthetic test, not the model decision. |
 | 6 Nov 2026  | Android SMS receiver spike (`mobile/android/.../SmsReceiver.kt`) logs sender and SIM id on the emulator. Sender ID table drafted. `models/` git-ignored.                                         |
 | 6 Nov 2026  | Flutter skeleton in `mobile/`, stricter lints, one widget test, CI workflow. Gemma 3 1B console app in `tools/llm_console/`: first runs got several fields wrong, so prompt tuning is next. |
 | 4 Nov 2026  | SMS tool now recognises 20 more Indian banks as bonus samples (core five unchanged), adds a `core` flag and `--list-senders`. 14 tests passing.                                           |

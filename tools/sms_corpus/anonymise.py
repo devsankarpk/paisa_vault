@@ -26,7 +26,7 @@ BANK_CODES = {
     'SBI': ['SBIINB', 'SBIUPI', 'SBICRD', 'SBIPSG', 'SBMSMS', 'ATMSBI', 'SBIBNK'],
     'ICICI': ['ICICIB', 'ICICIT', 'ICICIO', 'ICIBNK'],
     'AXIS': ['AXISBK', 'AXISBN', 'AXISMB'],
-    'YES': ['YESBNK', 'YESBKS', 'YESBNKL'],
+    'YES': ['YESBNK', 'YESBKS', 'YESBNKL', 'YESBAK'],
     'PNB': ['PNBSMS', 'PNBBNK', 'PNBONE'],
     'BOB': ['BOBSMS', 'BOBTXN', 'BARODA', 'BOBCRD'],
     'CANARA': ['CANBNK', 'CANARA', 'CANBKS'],
@@ -51,9 +51,9 @@ BANK_CODES = {
 
 
 def normalise_sender(raw):
-    """VM-HDFCBK, AX-SBIINB-S -> HDFCBK, SBIINB (strip prefix and -S/-T/-P/-G suffix)."""
-    s = raw.strip().upper()
-    m = re.match(r'^[A-Z]{2}-([A-Z0-9]{3,11})(?:-[STPG])?$', s)
+    """VM-HDFCBK, AX-SBIINB-S, HDFCBK-S(SMSFT) -> HDFCBK, SBIINB, HDFCBK (strip prefix, suffix, iPhone tag)."""
+    s = re.sub(r'\s*\([^)]*\)\s*$', '', raw.strip().upper())  # iPhone adds e.g. (SMSFT), (SMSFP_RM)
+    m = re.match(r'^(?:[A-Z]{2}-)?([A-Z0-9]{3,11})(?:-[STPG])?$', s)
     return m.group(1) if m else s
 
 
