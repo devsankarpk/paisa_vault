@@ -12,6 +12,13 @@ class Normalise(unittest.TestCase):
         self.assertEqual(an.normalise_sender('AX-SBIINB-S'), 'SBIINB')
         self.assertEqual(an.normalise_sender('JD-ICICIB-T'), 'ICICIB')
 
+    def test_iphone_sender_tags(self):
+        self.assertEqual(an.normalise_sender('TX-SBIBNK(SMSFP)'), 'SBIBNK')
+        self.assertEqual(an.normalise_sender('HDFCBK-S'), 'HDFCBK')
+        self.assertEqual(an.normalise_sender('CP-YESBNK-S(SMSFT)'), 'YESBNK')
+        self.assertEqual(an.normalise_sender('VM-ICICIT(SMSFT_RM)'), 'ICICIT')
+        self.assertEqual(an.bank_for(an.normalise_sender('AX-YESBAK(SMSFT)')), 'YES')
+
     def test_bank(self):
         self.assertEqual(an.bank_for('HDFCBK'), 'HDFC')
         self.assertEqual(an.bank_for('AXISBK'), 'AXIS')
