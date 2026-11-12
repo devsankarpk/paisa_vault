@@ -28,6 +28,11 @@ Checked 11 Nov 2026 from pub.dev pages and the downloaded package files. Nothing
 3. **Young packages.** Both were published very recently and change quickly. Pin exact versions.
 4. **Speed and memory** on the vivo and iPhone 15 are untested. The benchmark app (next) measures them.
 
+## Checked 12 Nov 2026
+
+- Release APK of the benchmark has no INTERNET permission.
+- `llamadart` build hook verifies downloaded native archives with SHA-256 (per the package source); versions are pinned exactly.
+
 ## Next
 
 Build a benchmark app in `mobile/` (or a separate folder) that loads a local GGUF with `llamadart`, runs the 24 seed SMS and shows accuracy and seconds per SMS. Add `flutter_edge_ai` with Gemma 3 1B `.litertlm` as the second runtime if time allows.
