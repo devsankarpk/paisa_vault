@@ -55,8 +55,8 @@ Status: working choice, not final. ADR 0001 is accepted only after the open chec
 - **Open checks before ADR 0001 is accepted:**
   1. Rerun both models on the vivo with the latest build (the Qwen3 vivo run did not include the UPI-handle fix).
   2. Rerun on real SMS once the corpus has more transaction alerts (only about 6 so far; the 24-message set is synthetic and the rules were tuned on it).
-  3. Licence review for Gemma and Qwen3 for store redistribution (T3).
-  4. Play install-time asset pack size limit against the 1.36 GB file.
+  3. ~~Licence review for Gemma and Qwen3 for store redistribution (T3).~~ Done 12 Nov 2026, see `docs/spikes/model-licences.md`: both can be shipped; Qwen3 (Apache 2.0) has no use restrictions, Gemma needs a notice file, pass-through of its use policy and can be terminated by Google. Still to do: note the exact GGUF source and hash, add an open source licences screen.
+  4. ~~Play install-time asset pack size limit against the 1.36 GB file.~~ Checked 12 Nov 2026 (Play Console help, "maximum size limits"): one asset pack may be 1.5 GB compressed, all install-time packs together 4 GB, base module 500 MB. Qwen3 at 1.36 GB fits in one pack, Gemma at 806 MB fits easily. A GGUF is already quantised so compression saves little. Install-time packs need about twice their size in free space during install (about 2.8 GB for Qwen3), and they count towards the size shown on the Play listing. Still to check: the real size of the Play upload (Phase 0 bundling check) and the iOS App Store download warning for a large app.
   5. `llamadart` downloads native binaries at build time: pin versions and checksums, and confirm no INTERNET permission in the release manifest.
 - Neither model reaches under 3 s per SMS on the vivo. Accepted for now because processing runs in the background; revisit if real use feels slow.
 
