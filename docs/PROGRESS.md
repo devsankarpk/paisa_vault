@@ -79,7 +79,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] NFC spike and card matrix (T7)
 - [ ] Camera card scan spike
 - [ ] LLM Stage A: prompt and schema tuning on the Mac (first pass done on 24 synthetic SMS: Qwen3 1.7B 2 misses, Gemma 3 1B 11 misses; needs the real corpus to confirm)
-- [ ] LLM Stage B: benchmark app on both phones
+- [x] LLM Stage B: benchmark app run on both phones (iPhone 15 release: Gemma 1.7 s, Qwen3 2.4 s per SMS; vivo: 4.7 s and 6.8 s; working choice Qwen3 1.7B, see DECISIONS.md). Reruns on real SMS and the latest vivo build still open.
 - [ ] Scorecard and ADR 0001 draft
 - [ ] Wi-Fi sync spike (T1)
 
@@ -267,6 +267,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 12 Nov 2026 | Split extraction (rules plus model for merchant, category, channel) benchmarked on both phones. iPhone 15 release: Gemma 1.7 s, Qwen3 2.4 s per SMS; vivo: 4.7 s and 6.8 s. Working model choice Qwen3 1.7B recorded in `docs/DECISIONS.md`; ADR 0001 still needs vivo and real-SMS reruns, licence and pack-size checks. |
+| 12 Nov 2026 | Benchmark app `spikes/llm_bench/` runs Gemma 3 1B and Qwen3 1.7B on the iPhone 15 and vivo. vivo avg per SMS: Gemma 12.5 s, Qwen3 60.7 s (target under 3 s). Next: rules take most fields, model returns merchant and category only. Runtime notes in `docs/spikes/llm-runtime.md`. |
 | 2 Nov 2026  | Both phones detected by `flutter devices`: Android V2303 (Android 15) and iPhone (iOS 26.7.1).                                                                                              |
 | 11 Nov 2026 | Added 24-message synthetic seed set and scorer. Mac result: Qwen3 1.7B 100% on all fields except channel (86.7%); Gemma 3 1B weaker on reference (63.6%) and channel (80%). Small synthetic test, not the model decision. |
 | 6 Nov 2026  | Android SMS receiver spike (`mobile/android/.../SmsReceiver.kt`) logs sender and SIM id on the emulator. Sender ID table drafted. `models/` git-ignored.                                         |
