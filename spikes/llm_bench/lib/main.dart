@@ -38,10 +38,10 @@ class _BenchPageState extends State<BenchPage> {
     final files = base == null
         ? <File>[]
         : base
-            .listSync()
-            .whereType<File>()
-            .where((f) => f.path.endsWith('.gguf'))
-            .toList();
+              .listSync()
+              .whereType<File>()
+              .where((f) => f.path.endsWith('.gguf'))
+              .toList();
     setState(() {
       _dir = base?.path;
       _models = files;
@@ -90,7 +90,9 @@ class _BenchPageState extends State<BenchPage> {
           for (final f in _models)
             ListTile(
               title: Text(f.path.split(Platform.pathSeparator).last),
-              subtitle: Text('${(f.lengthSync() / 1048576).toStringAsFixed(0)} MB'),
+              subtitle: Text(
+                '${(f.lengthSync() / 1048576).toStringAsFixed(0)} MB',
+              ),
               trailing: ElevatedButton(
                 onPressed: _running ? null : () => _run(f),
                 child: const Text('Run'),

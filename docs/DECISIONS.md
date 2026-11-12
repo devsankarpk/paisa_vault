@@ -38,6 +38,28 @@ Status values: **Confirmed** (you said so), **Proposed** (my default, change if 
 | `pipeline_log` | Local diagnostics (T5) | 1A |
 | `hidden_hash` | Hidden dedupe while the vault is locked (G1) | 1A reserve, 2 use |
 
+## Model and extraction approach (working decision, 12 Nov 2026)
+
+Status: working choice, not final. ADR 0001 is accepted only after the open checks below.
+
+- **Extraction split (changes CLAUDE.md 3.2).** Rules read amount, last 4 digits, direction, bank, date, reference and UPI channel from the SMS. The on-device model is asked only for merchant, category and channel, in a short JSON reply, and its merchant is used only when no rule matches. The amount safety check stays. Reason: asking the model for all 11 fields took 12 to 60 s per SMS on the vivo and 5 s on the iPhone; the split cut this to 4.7 to 6.8 s on the vivo and 1.7 to 2.4 s on the iPhone 15 (release build).
+- **Working model: Qwen3 1.7B (GGUF, int4, 1.36 GB) via `llamadart`.** Fallback: Gemma 3 1B (806 MB). Same run, 24 synthetic SMS, split design:
+
+| | iPhone 15 Gemma | iPhone 15 Qwen3 | vivo V2303 Gemma | vivo V2303 Qwen3 |
+|---|---|---|---|---|
+| Average per SMS | 1.7 s | 2.4 s | 4.7 s | 6.8 s |
+| Merchant | 87.5% | 93.8% | 68.8% | 81.3% |
+| Amount, bank, last 4 | 100% | 100% | 100% | 100% |
+
+- Why Qwen3: only it passes the 90% merchant threshold on the iPhone, and its licence is expected to be simpler (Apache 2.0, to verify).
+- **Open checks before ADR 0001 is accepted:**
+  1. Rerun both models on the vivo with the latest build (the Qwen3 vivo run did not include the UPI-handle fix).
+  2. Rerun on real SMS once the corpus has more transaction alerts (only about 6 so far; the 24-message set is synthetic and the rules were tuned on it).
+  3. Licence review for Gemma and Qwen3 for store redistribution (T3).
+  4. Play install-time asset pack size limit against the 1.36 GB file.
+  5. `llamadart` downloads native binaries at build time: pin versions and checksums, and confirm no INTERNET permission in the release manifest.
+- Neither model reaches under 3 s per SMS on the vivo. Accepted for now because processing runs in the background; revisit if real use feels slow.
+
 ## Technical decisions to take in Phase 0 (deadline 18 Nov 2026)
 
 State management approach, minimum Android and iOS versions, bundle and package ids, Flutter folder layout, logging approach, PDF package, share-to-app in version 1 (yes or no), Google Play and Apple developer account set-up.
@@ -51,4 +73,5 @@ Taken so far (4 Nov 2026):
 
 - 3.11: note that the prototype style supersedes the white and grey guideline (done).
 - 10: record the confirmed and proposed open items (done).
+- 3.2 (what the LLM extracts) and 2, decision 6 (AI model): rules take most fields, model returns merchant, category and channel; working model Qwen3 1.7B (see Model and extraction approach). Update CLAUDE.md when ADR 0001 is accepted.
 - 2, decision 9 (card capture): may change after the Phase 0 NFC matrix (T7).
