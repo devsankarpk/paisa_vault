@@ -75,7 +75,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 **Week 2: spikes and LLM bake-off**
 
-- [ ] iOS Shortcut to App Intent spike (SMS and RCS/iMessage)
+- [ ] iOS Shortcut to App Intent spike (SMS and RCS/iMessage): SMS path works on iPhone 15 (a few seconds, banner shows, duplicates when several keywords match); closed-app, locked, iMessage and RCS tests still open. See docs/spikes/ios-shortcut.md
 - [ ] NFC spike and card matrix (T7)
 - [ ] Camera card scan spike
 - [ ] LLM Stage A: prompt and schema tuning on the Mac (first pass done on 24 synthetic SMS: Qwen3 1.7B 2 misses, Gemma 3 1B 11 misses; needs the real corpus to confirm)
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 13 Nov 2026 | iOS Shortcut spike: App Intent "Log Bank Message" saves SMS text from a Shortcuts automation on the iPhone 15 within seconds. Several keywords double-save, so the app must deduplicate. Notes in `docs/spikes/ios-shortcut.md`. |
 | 12 Nov 2026 | Split extraction (rules plus model for merchant, category, channel) benchmarked on both phones. iPhone 15 release: Gemma 1.7 s, Qwen3 2.4 s per SMS; vivo: 4.7 s and 6.8 s. Working model choice Qwen3 1.7B recorded in `docs/DECISIONS.md`; ADR 0001 still needs vivo and real-SMS reruns, licence and pack-size checks. |
 | 12 Nov 2026 | Benchmark app `spikes/llm_bench/` runs Gemma 3 1B and Qwen3 1.7B on the iPhone 15 and vivo. vivo avg per SMS: Gemma 12.5 s, Qwen3 60.7 s (target under 3 s). Next: rules take most fields, model returns merchant and category only. Runtime notes in `docs/spikes/llm-runtime.md`. |
 | 2 Nov 2026  | Both phones detected by `flutter devices`: Android V2303 (Android 15) and iPhone (iOS 26.7.1).                                                                                              |

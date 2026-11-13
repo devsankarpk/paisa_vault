@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -17,17 +18,57 @@ class BenchPage extends StatefulWidget {
   State<BenchPage> createState() => _BenchPageState();
 }
 
-class _BenchPageState extends State<BenchPage> {
+class _BenchPageState extends State<BenchPage> with WidgetsBindingObserver {
   String? _dir;
   List<File> _models = [];
   String _status = 'Pick a model file';
   String _report = '';
   bool _running = false;
 
+  List<String> _inbox = [];
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _refresh();
+    _loadInbox();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _loadInbox();
+  }
+
+  /// Messages saved by the iPhone Shortcut action "Log Bank Message" (iOS only).
+  Future<void> _loadInbox() async {
+    if (!Platform.isIOS) return;
+    final docs = await getApplicationDocumentsDirectory();
+    final f = File('${docs.path}/shortcut_inbox.jsonl');
+    final lines = f.existsSync() ? f.readAsLinesSync() : <String>[];
+    setState(() {
+      _inbox = [
+        for (final l in lines.reversed)
+          if (l.trim().isNotEmpty) _summary(l),
+      ];
+    });
+  }
+
+  String _summary(String line) {
+    try {
+      final m = jsonDecode(line) as Map<String, dynamic>;
+      final body = (m['body'] as String).replaceAll('\n', ' ');
+      final snip = body.length > 40 ? '${body.substring(0, 40)}...' : body;
+      return '${m['received_at']}  (${m['length']} chars)  $snip';
+    } on FormatException {
+      return 'unreadable line';
+    }
   }
 
   Future<void> _refresh() async {
@@ -106,6 +147,16 @@ class _BenchPageState extends State<BenchPage> {
               onPressed: () => Clipboard.setData(ClipboardData(text: _report)),
               child: const Text('Copy results'),
             ),
+          if (Platform.isIOS) ...[
+            const Divider(),
+            Text('Shortcut inbox: ${_inbox.length} message(s)'),
+            for (final line in _inbox.take(10))
+              Text(line, style: const TextStyle(fontSize: 12)),
+            TextButton(
+              onPressed: _loadInbox,
+              child: const Text('Refresh inbox'),
+            ),
+          ],
           SelectableText(
             _report,
             style: const TextStyle(fontFamily: 'Courier', fontSize: 12),
