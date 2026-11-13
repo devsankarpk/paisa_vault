@@ -36,7 +36,7 @@ BANK_CODES = {
     'IDFC': ['IDFCFB', 'IDFCBK'],
     'FEDERAL': ['FEDBNK', 'FEDFIB', 'FEDERL'],
     'BOI': ['BOIIND', 'BOIBNK'],
-    'INDIAN': ['INDIAN', 'INDBKS'],
+    'INDIAN': ['INDIAN', 'INDBKS', 'INDBNK'],
     'CENTRAL': ['CBOIND', 'CENTRL'],
     'UCO': ['UCOBNK', 'UCOSMS'],
     'IDBI': ['IDBIBK', 'IDBIBN'],

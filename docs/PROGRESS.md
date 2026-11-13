@@ -71,7 +71,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Sender ID table `testdata/sender_ids.json` (T2): draft with the known codes created; fill in what your phones actually receive, SMS or RCS, and SIM
 - [x] `testdata/` raw data in `.gitignore`
 - [x] Flutter project skeleton in `mobile/`, lint and test pass locally; CI workflow added (confirm it is green after the first push)
-- [ ] Android SMS receiver spike on the real phone (receiver works on the emulator: sender and SIM id logged, no message text; real vivo test pending, including both SIMs and RCS on/off)
+- [ ] Android SMS receiver spike on the real phone (receiver works on the emulator: sender and SIM id logged, no message text; real vivo: plain SMS and a real bank alert (INDBNK) received, sender and SIM id logged; app swiped away delivered 2 to 4 minutes late on default vivo settings, retest pending; dual SIM and RCS still to test, see docs/spikes/android-sms-receiver.md)
 
 **Week 2: spikes and LLM bake-off**
 
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 13 Nov 2026 | Android SMS receiver works on the real vivo (plain SMS, sub id 1, no text logged). One SIM only, so dual SIM untested. Notes in `docs/spikes/android-sms-receiver.md`. |
 | 13 Nov 2026 | iOS Shortcut spike: App Intent "Log Bank Message" saves SMS text from a Shortcuts automation on the iPhone 15 within seconds. Several keywords double-save, so the app must deduplicate. Notes in `docs/spikes/ios-shortcut.md`. |
 | 12 Nov 2026 | Split extraction (rules plus model for merchant, category, channel) benchmarked on both phones. iPhone 15 release: Gemma 1.7 s, Qwen3 2.4 s per SMS; vivo: 4.7 s and 6.8 s. Working model choice Qwen3 1.7B recorded in `docs/DECISIONS.md`; ADR 0001 still needs vivo and real-SMS reruns, licence and pack-size checks. |
 | 12 Nov 2026 | Benchmark app `spikes/llm_bench/` runs Gemma 3 1B and Qwen3 1.7B on the iPhone 15 and vivo. vivo avg per SMS: Gemma 12.5 s, Qwen3 60.7 s (target under 3 s). Next: rules take most fields, model returns merchant and category only. Runtime notes in `docs/spikes/llm-runtime.md`. |

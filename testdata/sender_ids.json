@@ -190,9 +190,10 @@
     "core": false,
     "sender_codes": [
       "INDIAN",
-      "INDBKS"
+      "INDBKS",
+      "INDBNK"
     ],
-    "seen_on_my_phones": [],
+    "seen_on_my_phones": ["vivo, 13 Nov 2026: JX-INDBNK-S and BV-INDBNK-S, SIM 1, plain SMS (to confirm the bank)"],
     "channel": "unknown (SMS or RCS: check in Phase 0)",
     "sim": "unknown",
     "formats": []
