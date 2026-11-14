@@ -71,7 +71,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Sender ID table `testdata/sender_ids.json` (T2): draft with the known codes created; fill in what your phones actually receive, SMS or RCS, and SIM
 - [x] `testdata/` raw data in `.gitignore`
 - [x] Flutter project skeleton in `mobile/`, lint and test pass locally; CI workflow added (confirm it is green after the first push)
-- [ ] Android SMS receiver spike on the real phone (receiver works on the emulator: sender and SIM id logged, no message text; real vivo: plain SMS and a real bank alert (INDBNK) received, sender and SIM id logged; app swiped away delivered 2 to 4 minutes late on default vivo settings, retest pending; dual SIM and RCS still to test, see docs/spikes/android-sms-receiver.md)
+- [ ] Android SMS receiver spike on the real phone (receiver works on the emulator: sender and SIM id logged, no message text; real vivo: plain SMS and a real bank alert (INDBNK) received, sender and SIM id logged; app swiped away was 2 to 4 minutes late on default settings, 0.6 s after setting battery to unrestricted (14 Nov); restart, dual SIM and RCS still to test, see docs/spikes/android-sms-receiver.md)
 
 **Week 2: spikes and LLM bake-off**
 
@@ -95,7 +95,7 @@ Status values: Not started, In progress, Blocked, Done.
 **Exit gate**
 
 - [ ] ADR 0001 accepted (model chosen, thresholds met, licence checked)
-- [ ] Android SMS receiver works on the real phone
+- [x] Android SMS receiver works on the real phone
 - [ ] iOS Shortcut route saves SMS in the background, or fallback chosen
 - [ ] NFC decision made
 - [ ] Wi-Fi sync works, fallback decided
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 14 Nov 2026 | vivo SMS delay fixed: with battery set to unrestricted, a real bank alert reached the receiver about 0.6 s after the system got it, app swiped away. `INDBNK` confirmed as Indian Bank. Still to test: after phone restart, RCS. |
 | 13 Nov 2026 | Android SMS receiver works on the real vivo (plain SMS, sub id 1, no text logged). One SIM only, so dual SIM untested. Notes in `docs/spikes/android-sms-receiver.md`. |
 | 13 Nov 2026 | iOS Shortcut spike: App Intent "Log Bank Message" saves SMS text from a Shortcuts automation on the iPhone 15 within seconds. Several keywords double-save, so the app must deduplicate. Notes in `docs/spikes/ios-shortcut.md`. |
 | 12 Nov 2026 | Split extraction (rules plus model for merchant, category, channel) benchmarked on both phones. iPhone 15 release: Gemma 1.7 s, Qwen3 2.4 s per SMS; vivo: 4.7 s and 6.8 s. Working model choice Qwen3 1.7B recorded in `docs/DECISIONS.md`; ADR 0001 still needs vivo and real-SMS reruns, licence and pack-size checks. |
