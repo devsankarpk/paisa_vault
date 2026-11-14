@@ -75,7 +75,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 **Week 2: spikes and LLM bake-off**
 
-- [ ] iOS Shortcut to App Intent spike (SMS and RCS/iMessage): SMS path works on iPhone 15 (a few seconds, banner shows, duplicates when several keywords match); closed-app, locked, iMessage and RCS tests still open. See docs/spikes/ios-shortcut.md
+- [ ] iOS Shortcut to App Intent spike (SMS and RCS/iMessage): SMS path works on iPhone 15 (a few seconds, banner shows, duplicates when several keywords match); closed-app (unlocked) works as of 14 Nov; locked-then-unlocked works; SMS arriving while still locked, iMessage and RCS still open. See docs/spikes/ios-shortcut.md
 - [ ] NFC spike and card matrix (T7)
 - [ ] Camera card scan spike
 - [ ] LLM Stage A: prompt and schema tuning on the Mac (first pass done on 24 synthetic SMS: Qwen3 1.7B 2 misses, Gemma 3 1B 11 misses; needs the real corpus to confirm)
@@ -96,7 +96,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 - [ ] ADR 0001 accepted (model chosen, thresholds met, licence checked)
 - [x] Android SMS receiver works on the real phone
-- [ ] iOS Shortcut route saves SMS in the background, or fallback chosen
+- [x] iOS Shortcut route saves SMS in the background, or fallback chosen (app closed works; app must deduplicate the double save)
 - [ ] NFC decision made
 - [ ] Wi-Fi sync works, fallback decided
 - [ ] Screens signed off and technical decisions logged
