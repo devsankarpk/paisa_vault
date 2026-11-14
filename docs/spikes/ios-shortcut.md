@@ -15,7 +15,9 @@ An App Intent "Log Bank Message" with one text parameter. It appends the message
 | "Shortcut ran" banner | Yes, appears each time |
 | Message with a keyword the automation lacks (for example "Sent", UPI wording) | Not triggered |
 | Same message matching two automations (`Sent` and `Rs.`) | Saved twice |
-| Not yet confirmed | App fully closed and phone locked; iMessage and RCS messages; whether `Rs.` also matches non-bank chats; behaviour after a phone restart before first unlock |
+| App swiped away, phone unlocked (14 Nov 2026) | Works: banner appeared and the message was saved to the inbox; one SMS again saved twice when two keywords matched |
+| App swiped away, phone locked for a while, then unlocked just before the transfer (14 Nov 2026) | Works: Shortcut fired and saved the message while the app was closed; two identical records again |
+| Not yet confirmed | Phone locked the whole time the SMS arrives (screen off); iMessage and RCS messages; whether `Rs.` also matches non-bank chats; behaviour after a phone restart before first unlock |
 
 ## What this means for the design
 
