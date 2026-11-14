@@ -69,6 +69,23 @@ Taken so far (4 Nov 2026):
 - Bundle and package id prefix `com.paisavault` (placeholder; confirm before store accounts are created, because the id cannot change after publishing).
 - Release builds must not request INTERNET until Phase 4. CI checks the main Android manifest (debug and profile manifests add it for Flutter tooling, which is expected).
 
+### Taken 14 Nov 2026 (recommended defaults, accepted by the owner)
+
+| Topic | Decision | Reason |
+|---|---|---|
+| State management | **Riverpod** (`flutter_riverpod`), with plain Dart classes for services behind interfaces | Testable without widgets, works in background code with no `BuildContext`, fits the app-level interfaces in CLAUDE.md section 5 |
+| Minimum Android | **Android 8 (API 26)** as the target, arm64 only. Check against `llamadart` and the NFC and biometric packages in the first Phase 1A build and raise if needed | Covers almost all active phones; the vivo test phone runs Android 15 |
+| Minimum iOS | **iOS 16.4**, because `llamadart` needs it (the Phase 0 bench already builds for it). `mobile/` is still at 15.0 and must be raised when the model package is added | App Intents and Face ID are fine on this version |
+| Bundle and package ids | Keep `com.paisavault.paisa_vault` (Android) and `com.paisavault.paisaVault` (iOS) as the placeholder. **Confirm before creating the store accounts** | Cannot change after publishing |
+| Folder layout | Feature folders under `mobile/lib/`: `core/` (database, crypto, lock, logging), `features/<name>/` (data, domain, ui), `services/` (SMS, model, notifications behind interfaces), `app.dart`, `main.dart` | Keeps one feature per folder and platform code behind interfaces |
+| Logging | The `logging` package, in-memory ring buffer plus an optional local file the user can export. **Never log message text, card numbers or amounts with merchants.** No network crash reporting (T5) | Matches the privacy promises |
+| PDF export | `pdf` package (pure Dart, no network); CSV by hand | Used in Phase 3 |
+| Share to Paisa Vault from other apps | **No in version 1.** iPhone uses the Shortcut route and manual entry; revisit if the Shortcut proves unreliable | Less to build and to review |
+| Store accounts | Open both **now**: Apple Developer Program and Google Play Console (identity checks can take days) | Lead time, not effort |
+| Database | `drift` with `sqlite3` and SQLCipher-compatible build (CLAUDE.md section 5) | Already decided |
+
+Still open: confirm the bundle ids with the owner before the first store account is created.
+
 ## Changes to CLAUDE.md
 
 - 3.11: note that the prototype style supersedes the white and grey guideline (done).

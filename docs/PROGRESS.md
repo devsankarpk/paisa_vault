@@ -87,7 +87,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 - [ ] Bundling check: model size, install-time pack, iOS app size
 - [ ] Design lock: prototype updated and every screen signed off
-- [ ] Technical decisions logged in [DECISIONS.md](DECISIONS.md) (state management, min OS versions, ids, folder layout, logging, PDF package, share-to-app)
+- [x] Technical decisions logged in [DECISIONS.md](DECISIONS.md) (state management, min OS versions, ids, folder layout, logging, PDF package, share-to-app)
 - [x] Privacy groundwork: data inventory, draft policy, Play SMS declaration draft (T4) (`docs/privacy/`; legal review and hosting still to do in Phase 5)
 - [x] Model licence review (T3): both models can be shipped; Qwen3 is simpler (Apache 2.0). See docs/spikes/model-licences.md
 - [ ] Phase review and demo
