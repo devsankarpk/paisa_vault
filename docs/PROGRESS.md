@@ -76,19 +76,19 @@ Status values: Not started, In progress, Blocked, Done.
 **Week 2: spikes and LLM bake-off**
 
 - [ ] iOS Shortcut to App Intent spike (SMS and RCS/iMessage): SMS path works on iPhone 15 (a few seconds, banner shows, duplicates when several keywords match); closed-app (unlocked) works as of 14 Nov; locked-then-unlocked works; SMS arriving while still locked, iMessage and RCS still open. See docs/spikes/ios-shortcut.md
-- [ ] NFC spike and card matrix (T7)
-- [ ] Camera card scan spike
+- [ ] NFC spike and card matrix (T7) (spike app built and tested in the parser; no NFC phone available yet, matrix deferred, see `docs/spikes/nfc-matrix.md`)
+- [x] Camera card scan spike (works on iPhone 15 and vivo after parser fixes, see `docs/spikes/camera-scan.md`)
 - [ ] LLM Stage A: prompt and schema tuning on the Mac (first pass done on 24 synthetic SMS: Qwen3 1.7B 2 misses, Gemma 3 1B 11 misses; needs the real corpus to confirm)
 - [x] LLM Stage B: benchmark app run on both phones (iPhone 15 release: Gemma 1.7 s, Qwen3 2.4 s per SMS; vivo: 4.7 s and 6.8 s; working choice Qwen3 1.7B, see DECISIONS.md). Reruns on real SMS and the latest vivo build still open.
-- [ ] Scorecard and ADR 0001 draft
+- [x] Scorecard and ADR 0001 draft (`docs/adr/0001-on-device-model.md`, status Proposed; open checks listed there)
 - [ ] Wi-Fi sync spike (T1)
 
 **Week 3: bundling, design, decisions**
 
 - [ ] Bundling check: model size, install-time pack, iOS app size
 - [ ] Design lock: prototype updated and every screen signed off
-- [ ] Technical decisions logged in [DECISIONS.md](DECISIONS.md) (state management, min OS versions, ids, folder layout, logging, PDF package, share-to-app)
-- [ ] Privacy groundwork: data inventory, draft policy, Play SMS declaration draft (T4)
+- [x] Technical decisions logged in [DECISIONS.md](DECISIONS.md) (state management, min OS versions, ids, folder layout, logging, PDF package, share-to-app)
+- [x] Privacy groundwork: data inventory, draft policy, Play SMS declaration draft (T4) (`docs/privacy/`; legal review and hosting still to do in Phase 5)
 - [x] Model licence review (T3): both models can be shipped; Qwen3 is simpler (Apache 2.0). See docs/spikes/model-licences.md
 - [ ] Phase review and demo
 
@@ -97,7 +97,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] ADR 0001 accepted (model chosen, thresholds met, licence checked)
 - [x] Android SMS receiver works on the real phone
 - [x] iOS Shortcut route saves SMS in the background, or fallback chosen (app closed works; app must deduplicate the double save)
-- [ ] NFC decision made
+- [ ] NFC decision made (provisional: optional, manual entry and camera first; final after the NFC matrix)
 - [ ] Wi-Fi sync works, fallback decided
 - [ ] Screens signed off and technical decisions logged
 
