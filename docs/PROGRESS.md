@@ -81,7 +81,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] LLM Stage A: prompt and schema tuning on the Mac (first pass done on 24 synthetic SMS: Qwen3 1.7B 2 misses, Gemma 3 1B 11 misses; needs the real corpus to confirm)
 - [x] LLM Stage B: benchmark app run on both phones (iPhone 15 release: Gemma 1.7 s, Qwen3 2.4 s per SMS; vivo: 4.7 s and 6.8 s; working choice Qwen3 1.7B, see DECISIONS.md). Reruns on real SMS and the latest vivo build still open.
 - [x] Scorecard and ADR 0001 draft (`docs/adr/0001-on-device-model.md`, status Proposed; open checks listed there)
-- [ ] Wi-Fi sync spike (T1)
+- [x] Wi-Fi sync spike (T1) (iPhone and vivo found each other by mDNS on home Wi-Fi, encrypted message each way, same code on both; isolated network untested, see `docs/spikes/wifi-sync.md`)
 
 **Week 3: bundling, design, decisions**
 
@@ -98,7 +98,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Android SMS receiver works on the real phone
 - [x] iOS Shortcut route saves SMS in the background, or fallback chosen (app closed works; app must deduplicate the double save)
 - [ ] NFC decision made (provisional: optional, manual entry and camera first; final after the NFC matrix)
-- [ ] Wi-Fi sync works, fallback decided
+- [ ] Wi-Fi sync works, fallback decided (works on home Wi-Fi; fallbacks kept; isolated network still to test)
 - [ ] Screens signed off and technical decisions logged
 
 ---
