@@ -86,6 +86,8 @@ Taken so far (4 Nov 2026):
 
 Still open: confirm the bundle ids with the owner before the first store account is created.
 
+**Add card (16 Nov 2026, provisional).** Lead with manual entry and camera scan; NFC is an optional "tap card" shortcut. Camera scan works on both test phones (`docs/spikes/camera-scan.md`); NFC is untested because the vivo has no NFC (`docs/spikes/nfc-matrix.md`). A deliberate change to CLAUDE.md decision 9 only if the NFC matrix later shows fewer than half the cards read.
+
 ## Changes to CLAUDE.md
 
 - 3.11: note that the prototype style supersedes the white and grey guideline (done).
