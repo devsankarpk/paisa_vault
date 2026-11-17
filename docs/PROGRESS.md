@@ -85,7 +85,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 **Week 3: bundling, design, decisions**
 
-- [ ] Bundling check: model size, install-time pack, iOS app size
+- [ ] Bundling check: model size, install-time pack, iOS app size (sizes measured; model fits in one Play pack; install-time packs give no file path so first-run copy is needed; real Play and TestFlight upload still to do, see `docs/spikes/bundling.md`)
 - [x] Design lock: prototype updated and every screen signed off (owner approved the screenshots on 17 Nov 2026; changes later are allowed)
 - [x] Technical decisions logged in [DECISIONS.md](DECISIONS.md) (state management, min OS versions, ids, folder layout, logging, PDF package, share-to-app)
 - [x] Privacy groundwork: data inventory, draft policy, Play SMS declaration draft (T4) (`docs/privacy/`; legal review and hosting still to do in Phase 5)

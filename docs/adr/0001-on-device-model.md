@@ -46,12 +46,13 @@ Details in `docs/spikes/model-licences.md`. Both models can be shipped.
 
 | | Size | Limit | Status |
 |---|---|---|---|
-| Qwen3 1.7B GGUF | 1.36 GB | 1.5 GB per Play asset pack (compressed) | Fits; real upload not yet tried |
+| Qwen3 1.7B GGUF | 1.36 GB (1.31 GB gzipped) | 1.5 GB per Play asset pack (compressed) | Fits with 195 MB spare; real upload not yet tried |
 | Gemma 3 1B GGUF | 806 MB | same | Fits |
 | All install-time packs | | 4 GB | Fits |
 | Base module | | 500 MB | Model must stay out of it |
 | Free space during install | about 2.8 GB for Qwen3 | | Tell users |
-| iOS bundled size and App Store download warning | not measured | | Open |
+| iOS app: 37 MB without model, about 1.4 GB with it | | 4 GB limit; 200 MB mobile-data warning | Measured without a store upload |
+| Install-time packs are read through AssetManager, not a file path | | | The runtime needs a file path: first-run copy (needs 2x space) or a fast-follow pack. See `docs/spikes/bundling.md` |
 
 ## Risks and consequences
 
