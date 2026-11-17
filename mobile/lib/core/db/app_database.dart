@@ -6,19 +6,23 @@ import 'package:path_provider/path_provider.dart';
 
 import 'encrypted_executor.dart';
 import 'key_store.dart';
+import 'tables.dart';
+
+export 'tables.dart';
 
 part 'app_database.g.dart';
 
-/// Key-value app settings. More tables arrive with schema v1.
-class Settings extends Table {
-  TextColumn get key => text()();
-  TextColumn get value => text()();
-
-  @override
-  Set<Column<Object>> get primaryKey => {key};
-}
-
-@DriftDatabase(tables: [Settings])
+@DriftDatabase(
+  tables: [
+    Settings,
+    Banks,
+    Accounts,
+    RawMessages,
+    Transactions,
+    PipelineLog,
+    HiddenHash,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
@@ -31,4 +35,12 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 }

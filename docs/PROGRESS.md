@@ -109,7 +109,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 - [x] Interfaces and fakes (SmsSource, LlmEngine, CardReader, TextScanner, Clock, Logger) in mobile/lib, Riverpod wired, 3 tests
 - [x] Encrypted main.db with keys in Keystore or Keychain (drift + SQLite3 Multiple Ciphers in SQLCipher mode; wrong key refused, refuses to open if encryption missing; 4 tests; checked on iPhone 15 and vivo V29e; background open still to test with SMS)
-- [ ] Schema v1 and migrations
+- [x] Schema v1 and migrations (7 tables, paise + currency, indexes, foreign keys on, schema dump saved in mobile/drift_schemas for v2 migration tests; 6 tests)
 - [ ] App lock: PIN, biometrics, auto-lock, create-PIN with recovery note
 - [ ] Android SMS disclosure and receiver plugin
 - [ ] iPhone App Intent and Shortcut guide
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 17 Nov 2026 | Schema v1 done: banks, accounts, raw_messages, transactions, pipeline_log, hidden_hash, settings. |
 | 17 Nov 2026 | Encrypted main.db done: file is unreadable without the key on both iPhone 15 and vivo V29e, wrong key refused. |
 | 17 Nov 2026 | Package ids confirmed (Android `com.paisavault.paisa_vault`, iOS `com.paisavault.paisaVault`). Phase 1A started: app interfaces, fakes and Riverpod set up in `mobile/`. |
 | 17 Nov 2026 | Design signed off from the screenshots (owner; later changes allowed). vivo benchmark rerun on the latest build: Qwen3 5.9 s and 93.8% merchant, Gemma 4.2 s and 87.5%. Device matrix recorded. NFC left for later. Owner's main phone is the iPhone and they will use the app themselves; Apple and Google accounts being created.  |
