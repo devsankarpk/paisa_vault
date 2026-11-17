@@ -57,13 +57,17 @@ CI rule: accuracy per field must not drop below the Phase 0 thresholds.
 
 ## Device matrix
 
-| Device | Used for |
-|---|---|
-| Your Android phone (note model and Android version) | SMS receiver, NFC, biometrics, WorkManager, notifications |
-| Your iPhone (note model and iOS version) | Shortcut and App Intent, camera scan, Face ID, local network |
-| A mid-range Android (borrow one in Phase 5 if yours is high-end) | Speed and battery limits |
-| Second phone on the same Wi-Fi | Household sync |
-| Cards you own | NFC and scan tests |
+Recorded 17 Nov 2026.
+
+| Device | Model and OS | Used for | Notes |
+|---|---|---|---|
+| Android phone | vivo V29e (model V2303), Android 15, one SIM, **no NFC** | SMS receiver, camera scan, biometrics, WorkManager, notifications, Wi-Fi sync | Mid-range. Default vivo battery settings delay SMS delivery by minutes when the app is swiped away; set battery to unrestricted. No Autostart page on this build. |
+| iPhone | iPhone 15, iOS 26.7.1 | Shortcut and App Intent, camera scan, Face ID, local network | Free developer signing: installed apps expire after 7 days. Intel Mac, Flutter 3.47.8. |
+| NFC Android phone | Not available yet | NFC card read matrix (T7) | Borrow one to finish `docs/spikes/nfc-matrix.md`. |
+| Android with two SIMs | Not available | Dual-SIM subscription ids | The vivo has one SIM only. |
+| A second phone on the same Wi-Fi | The iPhone and the vivo serve as each other's peer | Household sync | An isolated guest network is still to test. |
+| A different Android (high-end or older) | Not available | Speed and battery limits | Borrow one in Phase 5. |
+| Cards you own | Some scanned with the camera | NFC and scan tests | |
 
 ## Dogfood
 End of 1B: one week of real use on both phones. Collect diagnostics exports, fix the top issues before Phase 2.

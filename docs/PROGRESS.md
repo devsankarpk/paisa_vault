@@ -15,7 +15,7 @@ Checked 2 Nov 2026. Done by me: Android licences, SDK 36, build-tools 28.0.3, Co
 - [x] `adb` on your PATH (verified 2 Nov 2026: a new shell finds it, version 1.0.41)
 - [x] iPhone connected (cable, Trust, Developer Mode)
 - [x] Android phone connected (verified 2 Nov 2026: model V2303, Android 15, API 35)
-- [ ] Free Apple ID added in Xcode for signing (needed to run apps on the iPhone)
+- [x] Free Apple ID added in Xcode for signing (needed to run apps on the iPhone)
 - [ ] Tell me phone models and OS versions (and whether a mid-range Android is available)
 - [ ] Export bank SMS and run the anonymiser: follow [tools/sms_corpus/README.md](../tools/sms_corpus/README.md), then read `testdata/review.txt` before anything is committed
 
@@ -59,8 +59,8 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] CocoaPods updated to 1.16.2
 - [x] `adb` on PATH
 - [x] Both phones connected and recognised by `flutter devices` (Android V2303 on Android 15, iPhone on iOS 26.7.1)
-- [ ] Phone models and OS versions recorded in [TESTING.md](TESTING.md)
-- [ ] Google Play and Apple developer accounts set up (or decision to defer)
+- [x] Phone models and OS versions recorded in [TESTING.md](TESTING.md)
+- [ ] Google Play and Apple developer accounts set up (or decision to defer) (owner is creating both, 17 Nov 2026; bundle ids to be confirmed first)
 
 **Week 1: data and Android basics**
 
@@ -86,7 +86,7 @@ Status values: Not started, In progress, Blocked, Done.
 **Week 3: bundling, design, decisions**
 
 - [ ] Bundling check: model size, install-time pack, iOS app size
-- [ ] Design lock: prototype updated and every screen signed off
+- [x] Design lock: prototype updated and every screen signed off (owner approved the screenshots on 17 Nov 2026; changes later are allowed)
 - [x] Technical decisions logged in [DECISIONS.md](DECISIONS.md) (state management, min OS versions, ids, folder layout, logging, PDF package, share-to-app)
 - [x] Privacy groundwork: data inventory, draft policy, Play SMS declaration draft (T4) (`docs/privacy/`; legal review and hosting still to do in Phase 5)
 - [x] Model licence review (T3): both models can be shipped; Qwen3 is simpler (Apache 2.0). See docs/spikes/model-licences.md
@@ -97,9 +97,9 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] ADR 0001 accepted (model chosen, thresholds met, licence checked)
 - [x] Android SMS receiver works on the real phone
 - [x] iOS Shortcut route saves SMS in the background, or fallback chosen (app closed works; app must deduplicate the double save)
-- [ ] NFC decision made (provisional: optional, manual entry and camera first; final after the NFC matrix)
+- [ ] NFC decision made (provisional: optional, manual entry and camera first; owner will test NFC later with a borrowed phone)
 - [ ] Wi-Fi sync works, fallback decided (works on home Wi-Fi; fallbacks kept; isolated network still to test)
-- [ ] Screens signed off and technical decisions logged
+- [x] Screens signed off and technical decisions logged
 
 ---
 
@@ -267,6 +267,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 17 Nov 2026 | Design signed off from the screenshots (owner; later changes allowed). vivo benchmark rerun on the latest build: Qwen3 5.9 s and 93.8% merchant, Gemma 4.2 s and 87.5%. Device matrix recorded. NFC left for later. Owner's main phone is the iPhone and they will use the app themselves; Apple and Google accounts being created.  |
+| 16 Nov 2026 | Camera card scan works on iPhone and vivo (`docs/spikes/camera-scan.md`). Wi-Fi sync spike works on home Wi-Fi (`docs/spikes/wifi-sync.md`). NFC spike app built, untested (vivo has no NFC). ADR 0001 and privacy drafts written. Technical decisions logged. |
 | 14 Nov 2026 | vivo SMS delay fixed: with battery set to unrestricted, a real bank alert reached the receiver about 0.6 s after the system got it, app swiped away. `INDBNK` confirmed as Indian Bank. Still to test: after phone restart, RCS. |
 | 13 Nov 2026 | Android SMS receiver works on the real vivo (plain SMS, sub id 1, no text logged). One SIM only, so dual SIM untested. Notes in `docs/spikes/android-sms-receiver.md`. |
 | 13 Nov 2026 | iOS Shortcut spike: App Intent "Log Bank Message" saves SMS text from a Shortcuts automation on the iPhone 15 within seconds. Several keywords double-save, so the app must deduplicate. Notes in `docs/spikes/ios-shortcut.md`. |
