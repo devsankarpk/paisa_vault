@@ -19,18 +19,19 @@ CLAUDE.md section 3.2 plans one bundled LLM (Gemma 3 1B via `flutter_gemma`) tha
 
 ## Scorecard
 
-Run 12 Nov 2026 on the 24 synthetic seed SMS, release builds, split design, one run each. Thresholds come from `docs/phases/phase-0-groundwork.md`.
+Run 12 Nov 2026 (iPhone) and 17 Nov 2026 (vivo, latest build with the UPI-handle fix) on the 24 synthetic seed SMS, release builds, split design, one run each. Thresholds come from `docs/phases/phase-0-groundwork.md`.
 
 | Criterion | Threshold | iPhone 15 Gemma | iPhone 15 Qwen3 | vivo Gemma | vivo Qwen3 |
 |---|---|---|---|---|---|
 | Amount correct | 98% | 100% | 100% | 100% | 100% |
 | Bank and last 4 | 95% | 100% | 100% | 100% | 100% |
-| Merchant | 90% | 87.5% fail | **93.8% pass** | 68.8% fail | 81.3% fail |
-| Speed per SMS | under 3 s | 1.7 s pass | 2.4 s pass | 4.7 s fail | 6.8 s fail |
-| Peak memory | none set | 974 MB | 1443 MB | not recorded | 2207 MB |
-| Debit/credit, channel, reference, date | 98%, 90% | not scored in the report; rules read them and were tuned on this set | | | |
+| Merchant | 90% | 87.5% fail | **93.8% pass** | 87.5% fail | **93.8% pass** |
+| Speed per SMS | under 3 s | 1.7 s pass | 2.4 s pass | 4.2 s fail | 5.9 s fail |
+| Memory after load | none set | 974 MB | 1443 MB | 1522 MB | 2212 MB |
+| Direction, reference, date | 98%, 90% | rules read them: 100% on the vivo reports | | 100% | 100% |
+| Channel | 90% | not recorded | not recorded | 93.3% pass | 86.7% fail |
 | Category within the user list | 80% | not scored | | | |
-| Valid JSON | 99% | not scored | | | |
+| Valid JSON | 99% | not scored | not scored | 100% (0 bad replies) | 100% (0 bad replies) |
 | Three runs averaged | required | one run | | | |
 
 Amount, bank and last 4 are read by rules, so those 100% results show the rules, not the model. The 24 messages are synthetic and the rules were tuned on them, so these numbers are optimistic.
@@ -62,7 +63,7 @@ Details in `docs/spikes/model-licences.md`. Both models can be shipped.
 
 ## Open checks before acceptance
 
-1. Rerun both models on the vivo with the latest build (UPI-handle fix).
+1. ~~Rerun both models on the vivo with the latest build (UPI-handle fix).~~ Done 17 Nov 2026: Qwen3 5.9 s, merchant 93.8%; Gemma 4.2 s, merchant 87.5%. The slowest message took 23.3 s (Qwen3) and 18.1 s (Gemma), likely the first one after load.
 2. Rerun on real SMS with at least 20 transaction alerts per core bank (only about 6 real alerts now).
 3. Score direction, channel, reference, date, category and JSON validity, and average three runs.
 4. Record the exact Qwen3 GGUF source file and its hash.
