@@ -108,7 +108,7 @@ Status values: Not started, In progress, Blocked, Done.
 [Details](phases/phase-1a-foundation-sms-ai.md)
 
 - [x] Interfaces and fakes (SmsSource, LlmEngine, CardReader, TextScanner, Clock, Logger) in mobile/lib, Riverpod wired, 3 tests
-- [ ] Encrypted main.db with keys in Keystore or Keychain
+- [x] Encrypted main.db with keys in Keystore or Keychain (drift + SQLite3 Multiple Ciphers in SQLCipher mode; wrong key refused, refuses to open if encryption missing; 4 tests; checked on iPhone 15 and vivo V29e; background open still to test with SMS)
 - [ ] Schema v1 and migrations
 - [ ] App lock: PIN, biometrics, auto-lock, create-PIN with recovery note
 - [ ] Android SMS disclosure and receiver plugin
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 17 Nov 2026 | Encrypted main.db done: file is unreadable without the key on both iPhone 15 and vivo V29e, wrong key refused. |
 | 17 Nov 2026 | Package ids confirmed (Android `com.paisavault.paisa_vault`, iOS `com.paisavault.paisaVault`). Phase 1A started: app interfaces, fakes and Riverpod set up in `mobile/`. |
 | 17 Nov 2026 | Design signed off from the screenshots (owner; later changes allowed). vivo benchmark rerun on the latest build: Qwen3 5.9 s and 93.8% merchant, Gemma 4.2 s and 87.5%. Device matrix recorded. NFC left for later. Owner's main phone is the iPhone and they will use the app themselves; Apple and Google accounts being created.  |
 | 16 Nov 2026 | Camera card scan works on iPhone and vivo (`docs/spikes/camera-scan.md`). Wi-Fi sync spike works on home Wi-Fi (`docs/spikes/wifi-sync.md`). NFC spike app built, untested (vivo has no NFC). ADR 0001 and privacy drafts written. Technical decisions logged. |
