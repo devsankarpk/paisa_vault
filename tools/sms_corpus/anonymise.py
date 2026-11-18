@@ -66,6 +66,25 @@ def bank_for(sender):
     return None
 
 
+# The iPhone Shortcut gives only the message text, no sender, so the bank is guessed from words in it.
+BANK_WORDS = {
+    'HDFC': r'hdfc', 'SBI': r'\bsbi\b|state bank', 'ICICI': r'icici', 'AXIS': r'axis',
+    'YES': r'yes ?bank', 'RBL': r'\brbl\b', 'PNB': r'\bpnb\b|punjab national',
+    'BOB': r'bank of baroda|\bbob\b', 'CANARA': r'canara', 'UNION': r'union bank', 'KOTAK': r'kotak',
+    'INDUSIND': r'indusind', 'IDFC': r'idfc', 'FEDERAL': r'federal bank', 'BOI': r'bank of india',
+    'INDIAN': r'indian bank', 'CENTRAL': r'central bank', 'UCO': r'\buco\b', 'IDBI': r'idbi',
+    'AU': r'au small|au bank', 'BANDHAN': r'bandhan', 'SIB': r'south indian bank',
+    'KARNATAKA': r'karnataka bank', 'PAYTMBANK': r'paytm payments', 'IPPB': r'india post payments',
+}
+
+
+def bank_from_body(body):
+    for bank, pattern in BANK_WORDS.items():
+        if re.search(pattern, body, re.I):
+            return bank
+    return None
+
+
 def mask_digits(match):
     digits = re.sub(r'\D', '', match.group(0))
     return 'X' * (len(digits) - 4) + digits[-4:]
@@ -143,6 +162,22 @@ def parse_blocks(path):
     return out
 
 
+def parse_jsonl(path):
+    """iPhone Shortcut inbox (shortcut_inbox.jsonl): one JSON object per line with body and
+    received_at (ISO time). There is no sender."""
+    out = []
+    for line in open(path, encoding='utf-8'):
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        try:
+            ts = datetime.fromisoformat(r.get('received_at', '').replace('Z', '+00:00')).timestamp()
+        except ValueError:
+            ts = 0
+        out.append({'sender': '', 'body': r.get('body', ''), 'ts': ts, 'sim': None})
+    return out
+
+
 def parse_chatdb(path):
     """Mac Messages database (iPhone messages forwarded to the Mac). Needs Full Disk Access."""
     con = sqlite3.connect(f'file:{path}?mode=ro', uri=True)
@@ -154,7 +189,7 @@ def parse_chatdb(path):
     return out
 
 
-PARSERS = {'adb': parse_adb, 'xml': parse_xml, 'blocks': parse_blocks, 'chatdb': parse_chatdb}
+PARSERS = {'adb': parse_adb, 'xml': parse_xml, 'blocks': parse_blocks, 'chatdb': parse_chatdb, 'jsonl': parse_jsonl}
 
 
 def main(argv=None):
@@ -171,7 +206,7 @@ def main(argv=None):
     if a.list_senders:
         counts = {}
         for r in PARSERS[a.format](a.input):
-            sender = normalise_sender(r['sender'])
+            sender = normalise_sender(r['sender']) or '(no sender)'
             counts[sender] = counts.get(sender, 0) + 1
         for sender, n in sorted(counts.items(), key=lambda kv: -kv[1]):
             print(f'{sender:<14} {n:>4}  {bank_for(sender) or "-"}')
@@ -180,7 +215,7 @@ def main(argv=None):
     seen, samples = set(), []
     for r in PARSERS[a.format](a.input):
         sender = normalise_sender(r['sender'])
-        bank = bank_for(sender)
+        bank = bank_for(sender) or (bank_from_body(r['body']) if not sender else None)
         if not bank and not a.all:
             continue
         body = anonymise(r['body'])
