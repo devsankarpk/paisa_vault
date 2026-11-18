@@ -117,5 +117,30 @@ class EndToEnd(unittest.TestCase):
         self.assertNotIn('SECRET', out)
 
 
+class JsonlTests(unittest.TestCase):
+    def test_bank_guessed_from_body_when_no_sender(self):
+        self.assertEqual(an.bank_from_body('Rs 5 spent on your YES BANK Credit Card XX1234'), 'YES')
+        self.assertEqual(an.bank_from_body('Rs 5 debited from RBL Bank card'), 'RBL')
+        self.assertIsNone(an.bank_from_body('Your parcel is out for delivery'))
+
+    def test_jsonl_without_sender_is_kept_by_bank_and_deduplicated(self):
+        import json, os, tempfile
+        row = {'body': 'Rs 5 spent on your YES BANK card XX1234', 'received_at': '2026-11-17T10:00:00Z'}
+        other = {'body': 'Hello from a friend', 'received_at': '2026-11-17T10:01:00Z'}
+        with tempfile.TemporaryDirectory() as d:
+            src = os.path.join(d, 'in.jsonl')
+            with open(src, 'w') as f:
+                for r in (row, row, other):
+                    f.write(json.dumps(r) + '\n')
+            out = os.path.join(d, 'out.json')
+            import io, contextlib
+            with contextlib.redirect_stdout(io.StringIO()):
+                an.main([src, '--format', 'jsonl', '-o', out, '--review', os.path.join(d, 'rev.txt')])
+            samples = json.load(open(out))
+        self.assertEqual(len(samples), 1)
+        self.assertEqual(samples[0]['bank_hint'], 'YES')
+        self.assertTrue(samples[0]['core'])
+
+
 if __name__ == '__main__':
     unittest.main()

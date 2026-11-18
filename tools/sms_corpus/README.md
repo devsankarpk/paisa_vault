@@ -60,3 +60,7 @@ Then tell me, and I will help label the expected output for each message in `tes
 ```sh
 cd tools/sms_corpus && python3 -m unittest -v
 ```
+
+## iPhone Shortcut inbox
+
+The Shortcut saves only the message text and time (no sender), so the bank is guessed from words in the message. With the iPhone connected and unlocked, run `tools/sms_corpus/pull_iphone_inbox.sh` from the repo root. It copies `shortcut_inbox.jsonl`, removes repeats and writes `testdata/iphone_inbox_samples.json` and `testdata/iphone_inbox_review.txt`. Both stay out of git; read the review file before sharing anything.

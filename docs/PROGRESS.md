@@ -64,7 +64,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 **Week 1: data and Android basics**
 
-- [ ] Collect SMS, 20 or more per core bank (HDFC, SBI, ICICI, Axis, Yes), all message types. Other Indian banks are optional bonus samples
+- [ ] Collect SMS, 20 or more per core bank (HDFC, SBI, ICICI, Yes), all message types. Axis dropped for now (owner has no Axis card, 17 Nov); add it back if one turns up. Owner has Yes Bank and RBL credit cards (17 Nov): Yes is core, RBL is a bonus bank (already recognised). iPhone inbox pulled 17 Nov: 35 lines, 26 unique (HDFC 21, SBI 1, Indian 1, RBL 1, 2 unmatched); `tools/sms_corpus/pull_iphone_inbox.sh` repeats it. Other Indian banks are optional bonus samples
 - [x] Anonymisation script ([tools/sms_corpus/](../tools/sms_corpus/), 9 tests passing)
 - [ ] Anonymised corpus `testdata/sms_samples.json`
 - [ ] Labels `testdata/sms_labels.json`
@@ -110,7 +110,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Interfaces and fakes (SmsSource, LlmEngine, CardReader, TextScanner, Clock, Logger) in mobile/lib, Riverpod wired, 3 tests
 - [x] Encrypted main.db with keys in Keystore or Keychain (drift + SQLite3 Multiple Ciphers in SQLCipher mode; wrong key refused, refuses to open if encryption missing; 4 tests; checked on iPhone 15 and vivo V29e; background open still to test with SMS)
 - [x] Schema v1 and migrations (7 tables, paise + currency, indexes, foreign keys on, schema dump saved in mobile/drift_schemas for v2 migration tests; 6 tests)
-- [ ] App lock: PIN, biometrics, auto-lock, create-PIN with recovery note
+- [x] App lock: PIN, biometrics, auto-lock, create-PIN with recovery note (built 17 Nov, 27 tests pass, 4-digit PIN with lockout; iPhone 15 checked 18 Nov: Face ID, auto-lock, blank app switcher, lockout; vivo V29e passed all 9 checks on 18 Nov: PIN, fingerprint, auto-lock, blank recent-apps card, lockout)
 - [ ] Android SMS disclosure and receiver plugin
 - [ ] iPhone App Intent and Shortcut guide
 - [ ] OTP and promo filter, sender normalisation
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 18 Nov 2026 | App lock done and checked on iPhone 15 and vivo V29e. SMS tool reads the iPhone Shortcut inbox (35 lines, 26 unique; HDFC 21). |
 | 17 Nov 2026 | Schema v1 done: banks, accounts, raw_messages, transactions, pipeline_log, hidden_hash, settings. |
 | 17 Nov 2026 | Encrypted main.db done: file is unreadable without the key on both iPhone 15 and vivo V29e, wrong key refused. |
 | 17 Nov 2026 | Package ids confirmed (Android `com.paisavault.paisa_vault`, iOS `com.paisavault.paisaVault`). Phase 1A started: app interfaces, fakes and Riverpod set up in `mobile/`. |
