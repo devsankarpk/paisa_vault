@@ -31,9 +31,6 @@ class LockState {
   );
 }
 
-final secretStoreProvider = Provider<SecretStore>(
-  (_) => throw UnimplementedError(),
-);
 final biometricsProvider = Provider<Biometrics>(
   (_) => throw UnimplementedError(),
 );

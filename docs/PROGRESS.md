@@ -111,7 +111,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Encrypted main.db with keys in Keystore or Keychain (drift + SQLite3 Multiple Ciphers in SQLCipher mode; wrong key refused, refuses to open if encryption missing; 4 tests; checked on iPhone 15 and vivo V29e; background open still to test with SMS)
 - [x] Schema v1 and migrations (7 tables, paise + currency, indexes, foreign keys on, schema dump saved in mobile/drift_schemas for v2 migration tests; 6 tests)
 - [x] App lock: PIN, biometrics, auto-lock, create-PIN with recovery note (built 17 Nov, 27 tests pass, 4-digit PIN with lockout; iPhone 15 checked 18 Nov: Face ID, auto-lock, blank app switcher, lockout; vivo V29e passed all 9 checks on 18 Nov: PIN, fingerprint, auto-lock, blank recent-apps card, lockout)
-- [ ] Android SMS disclosure and receiver plugin
+- [x] Android SMS disclosure and receiver plugin (done 19 Nov: Keystore-encrypted stage, drain into raw_messages, disclosure screen, RECEIVE_SMS only, 37 Dart + 7 Kotlin tests; real INDBNK alerts saved on vivo with the app open and with it closed)
 - [ ] iPhone App Intent and Shortcut guide
 - [ ] OTP and promo filter, sender normalisation
 - [ ] Encrypted raw_messages with purge job
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 19 Nov 2026 | Android SMS receiver done: bank alerts are encrypted-staged even with the app closed and saved to raw_messages on unlock; disclosure screen added. Old test database on the phones had to be wiped (same schema version, fewer tables). |
 | 18 Nov 2026 | App lock done and checked on iPhone 15 and vivo V29e. SMS tool reads the iPhone Shortcut inbox (35 lines, 26 unique; HDFC 21). |
 | 17 Nov 2026 | Schema v1 done: banks, accounts, raw_messages, transactions, pipeline_log, hidden_hash, settings. |
 | 17 Nov 2026 | Encrypted main.db done: file is unreadable without the key on both iPhone 15 and vivo V29e, wrong key refused. |

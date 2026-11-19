@@ -15,10 +15,37 @@ class FakeClock implements Clock {
 }
 
 class FakeSmsSource implements SmsSource {
-  final _controller = StreamController<IncomingSms>.broadcast();
-  void emit(IncomingSms sms) => _controller.add(sms);
+  FakeSmsSource({this.granted = true});
+  bool granted;
+  int permissionRequests = 0;
+  final staged = <StagedSms>[];
+  final acknowledged = <String>[];
+  final _controller = StreamController<void>.broadcast();
+  var _n = 0;
+
+  /// Test helper: a message arrives while the app is open.
+  void emit(IncomingSms sms) {
+    staged.add(StagedSms('id${_n++}', sms));
+    _controller.add(null);
+  }
+
   @override
-  Stream<IncomingSms> get messages => _controller.stream;
+  Stream<void> get arrivals => _controller.stream;
+  @override
+  Future<bool> get hasPermission async => granted;
+  @override
+  Future<bool> requestPermission() async {
+    permissionRequests++;
+    return granted;
+  }
+
+  @override
+  Future<List<StagedSms>> pending() async => List.of(staged);
+  @override
+  Future<void> acknowledge(List<String> ids) async {
+    staged.removeWhere((s) => ids.contains(s.id));
+    acknowledged.addAll(ids);
+  }
 }
 
 class FakeLlmEngine implements LlmEngine {
