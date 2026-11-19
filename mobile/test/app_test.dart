@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:paisa_vault/core/providers.dart';
 import 'package:paisa_vault/core/secret_store.dart';
 import 'package:paisa_vault/features/lock/biometrics.dart';
 import 'package:paisa_vault/features/lock/lock_controller.dart';

@@ -7,17 +7,26 @@ import android.provider.Telephony
 import android.util.Log
 
 /**
- * Phase 0 spike: prove a new SMS reaches the app and tell the two SIMs apart.
- * Logs the sender and SIM subscription id only. The message text is never logged.
+ * Saves each new bank-looking SMS into the encrypted stage straight away, even when the app is
+ * closed. Logs only the sender, SIM id and length, never the message text.
  */
 class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
         val parts = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-        val sender = parts.firstOrNull()?.originatingAddress
-        val bodyLength = parts.sumOf { it.messageBody?.length ?: 0 }
+        if (parts.isEmpty()) return
+        val sender = parts.first().originatingAddress ?: return
+        val body = parts.joinToString("") { it.messageBody ?: "" }
         val subscription = intent.getIntExtra("subscription", -1)
-        Log.i(TAG, "sender=$sender sub=$subscription parts=${parts.size} bodyLength=$bodyLength")
+        val keep = SmsFilter.looksLikeBankMessage(body)
+        Log.i(TAG, "sender=$sender sub=$subscription bodyLength=${body.length} kept=$keep")
+        if (!keep) return
+        try {
+            SmsStage(context).add(sender, body, System.currentTimeMillis(), subscription)
+            SmsEvents.arrived()
+        } catch (e: Exception) {
+            Log.e(TAG, "stage failed: ${e.javaClass.simpleName}")
+        }
     }
 
     companion object {

@@ -13,8 +13,25 @@ class IncomingSms {
   final int? simSubscriptionId;
 }
 
+/// A message waiting in the native staging area until the app has stored it.
+class StagedSms {
+  const StagedSms(this.id, this.sms);
+  final String id;
+  final IncomingSms sms;
+}
+
 /// Where new SMS come from: the Android receiver or the iPhone Shortcut inbox.
+///
+/// Messages are first held by the native side (works while the app is closed). The app reads
+/// them with [pending], saves them, and only then calls [acknowledge], so nothing is lost if the
+/// app is killed halfway.
 abstract class SmsSource {
-  /// New messages as they arrive (Android) or are found on app open (iPhone).
-  Stream<IncomingSms> get messages;
+  /// Fires when a new message was just staged while the app is running.
+  Stream<void> get arrivals;
+
+  Future<bool> get hasPermission;
+  Future<bool> requestPermission();
+
+  Future<List<StagedSms>> pending();
+  Future<void> acknowledge(List<String> ids);
 }

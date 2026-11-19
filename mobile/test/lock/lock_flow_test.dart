@@ -39,6 +39,7 @@ void main() {
         secretStoreProvider.overrideWithValue(store),
         biometricsProvider.overrideWithValue(bio),
         clockProvider.overrideWithValue(clock),
+        smsSourceProvider.overrideWithValue(FakeSmsSource()),
         pinServiceProvider.overrideWith(
           (ref) => PinService(store, clock, iterations: 1000),
         ),

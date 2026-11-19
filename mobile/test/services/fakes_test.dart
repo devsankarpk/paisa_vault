@@ -24,11 +24,12 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final got = container.read(smsSourceProvider).messages.first;
+    final got = container.read(smsSourceProvider).arrivals.first;
     sms.emit(
       IncomingSms(sender: 'VM-HDFCBK', body: 'x', receivedAt: DateTime(2026)),
     );
-    expect((await got).sender, 'VM-HDFCBK');
+    await got;
+    expect((await sms.pending()).single.sms.sender, 'VM-HDFCBK');
 
     final out = await container
         .read(llmEngineProvider)

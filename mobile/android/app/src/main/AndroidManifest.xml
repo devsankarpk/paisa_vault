@@ -2,7 +2,9 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <application
-        android:label="paisa_vault"
+        android:label="Paisa Vault"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
