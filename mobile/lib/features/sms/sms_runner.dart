@@ -60,9 +60,14 @@ class _SmsRunnerState extends ConsumerState<SmsRunner>
   Future<void> _drain() async {
     try {
       final ingest = await ref.read(smsIngestProvider.future);
-      final saved = await ingest.drain();
+      final r = await ingest.drain();
       // Counts only. Never print message text.
-      if (saved > 0) debugPrint('PV_INGEST saved=$saved');
+      if (r.saved + r.dropped > 0) {
+        final kinds = r.byKind.entries
+            .map((e) => '${e.key.name}=${e.value}')
+            .join(',');
+        debugPrint('PV_INGEST saved=${r.saved} dropped=${r.dropped} $kinds');
+      }
     } catch (e) {
       // Left staged; the next drain retries. Only the error type is logged, never its text.
       debugPrint('PV_INGEST failed ${e.runtimeType}');

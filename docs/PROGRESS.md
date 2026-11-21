@@ -113,7 +113,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] App lock: PIN, biometrics, auto-lock, create-PIN with recovery note (built 17 Nov, 27 tests pass, 4-digit PIN with lockout; iPhone 15 checked 18 Nov: Face ID, auto-lock, blank app switcher, lockout; vivo V29e passed all 9 checks on 18 Nov: PIN, fingerprint, auto-lock, blank recent-apps card, lockout)
 - [x] Android SMS disclosure and receiver plugin (done 19 Nov: Keystore-encrypted stage, drain into raw_messages, disclosure screen, RECEIVE_SMS only, 37 Dart + 7 Kotlin tests; real INDBNK alerts saved on vivo with the app open and with it closed)
 - [x] iPhone App Intent and Shortcut guide (done 21 Nov: Log Bank Message action in the real app, encrypted per-message stage, Shortcut guide screen, drain into raw_messages, repeats merged; a real HDFC alert on the iPhone fired the Rs automation, was staged encrypted and saved after unlock; keep the Message field on the Shortcut Input variable, never "Ask Each Time"; free signing expires after 7 days)
-- [ ] OTP and promo filter, sender normalisation
+- [ ] OTP and promo filter, sender normalisation (built 21 Nov: rule classifier with 34 tests, OTP and promo dropped and never stored, reminders and declines stored as ignored; run on 31 real messages: 25 transaction, 4 other, 2 promo; 3 messages to review with the owner; sender normalisation done in the SMS tool only, not yet in the app)
 - [ ] Encrypted raw_messages with purge job
 - [ ] LlmEngine for the chosen model, manifest, bundled model
 - [ ] Extraction prompt and strict JSON schema
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 21 Nov 2026 | Lock screen shows a Face ID or fingerprint icon instead of text. OTP and promo filter built and run on the real corpus (counts only); three messages left to review. |
 | 21 Nov 2026 | iPhone route confirmed with a real HDFC alert: automation fired, message staged and saved after unlock. Earlier misses were automation setup (old Llm Bench action, Ask Each Time). Llm Bench removed from the iPhone; inbox saved in testdata/raw/iphone_inbox_all.jsonl. |
 | 20 Nov 2026 | iPhone Shortcut route built in the real app. Manual action proven end to end (found and fixed a lost-message bug in the first stage design). Real bank SMS automations are not triggering: under investigation. |
 | 19 Nov 2026 | Android SMS receiver done: bank alerts are encrypted-staged even with the app closed and saved to raw_messages on unlock; disclosure screen added. Old test database on the phones had to be wiped (same schema version, fewer tables). |
