@@ -11,6 +11,7 @@ import 'package:paisa_vault/core/providers.dart';
 import 'package:paisa_vault/core/secret_store.dart';
 import 'package:paisa_vault/features/sms/raw_message_repository.dart';
 import 'package:paisa_vault/features/sms/shortcut_guide_screen.dart';
+import 'package:paisa_vault/features/sms/sms_classifier.dart';
 import 'package:paisa_vault/features/sms/sms_disclosure_screen.dart';
 import 'package:paisa_vault/features/sms/sms_runner.dart';
 import 'package:paisa_vault/services/sms_source.dart';
@@ -78,10 +79,10 @@ void main() {
       final source = FakeSmsSource()
         ..emit(sms('Rs 1 debited'))
         ..emit(sms('Rs 2 credited'));
-      final saved = await SmsIngest(
+      final saved = (await SmsIngest(
         source,
         RawMessageRepository(db, clock),
-      ).drain();
+      ).drain()).saved;
       expect(saved, 2);
       expect(source.staged, isEmpty);
       expect(source.acknowledged.length, 2);
@@ -91,13 +92,60 @@ void main() {
       final source = FakeSmsSource()
         ..emit(sms('Rs 1 debited'))
         ..emit(sms('Rs 1 debited'));
-      final saved = await SmsIngest(
+      final saved = (await SmsIngest(
         source,
         RawMessageRepository(db, clock),
-      ).drain();
+      ).drain()).saved;
       expect(saved, 1);
       expect(source.acknowledged.length, 2);
     });
+
+    test(
+      'OTP and promo messages are dropped, not stored, but acknowledged',
+      () async {
+        final source = FakeSmsSource()
+          ..emit(
+            sms('123456 is your OTP for txn of Rs 500.00. Do not share it.'),
+          )
+          ..emit(
+            sms('Pre-approved loan up to Rs 5,00,000! Apply now http://x.co/a'),
+          )
+          ..emit(sms('Rs 75.00 debited from A/c XX1234 to TESTSHOP'));
+        final r = await SmsIngest(
+          source,
+          RawMessageRepository(db, clock),
+        ).drain();
+        expect(r.dropped, 2);
+        expect(r.saved, 1);
+        expect(r.byKind[SmsKind.otp], 1);
+        expect(source.staged, isEmpty);
+        expect((await db.select(db.rawMessages).get()).length, 1);
+      },
+    );
+
+    test(
+      'transactions are marked new, reminders and declines are ignored',
+      () async {
+        final source = FakeSmsSource()
+          ..emit(sms('Rs 75.00 debited from A/c XX1234 to TESTSHOP'))
+          ..emit(
+            sms(
+              'Statement generated. Total amount due Rs 12,345.00. Pay by 05-Dec-26',
+            ),
+          )
+          ..emit(sms('Your txn of Rs 500 at XYZ STORE was declined'));
+        await SmsIngest(source, RawMessageRepository(db, clock)).drain();
+        final rows = await db.select(db.rawMessages).get();
+        expect(
+          rows.where((r) => r.status == RawMessageStatus.newMessage).length,
+          1,
+        );
+        expect(
+          rows.where((r) => r.status == RawMessageStatus.ignored).length,
+          2,
+        );
+      },
+    );
 
     test(
       'if saving fails nothing is acknowledged, so nothing is lost',
@@ -202,5 +250,8 @@ void main() {
 class _FailingRepository extends RawMessageRepository {
   _FailingRepository(super.db, super.clock);
   @override
-  Future<int?> save(IncomingSms sms) async => throw StateError('disk full');
+  Future<int?> save(
+    IncomingSms sms, {
+    RawMessageStatus status = RawMessageStatus.newMessage,
+  }) async => throw StateError('disk full');
 }
