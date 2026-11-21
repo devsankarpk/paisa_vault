@@ -18,9 +18,10 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 
 # Normalised sender codes (after stripping the operator prefix) per bank. The first five are the
-# core banks counted in the Phase 0 scorecard; the rest are bonus samples for format variety.
+# banks counted in the scorecard (the owner's real banks, decided 20 Nov); the rest are bonus samples.
+# The supported-bank list in the spec (HDFC, SBI, ICICI, Axis, Yes) is unchanged.
 # Codes are best-effort and vary by operator: run with --list-senders to find any that are missing.
-CORE_BANKS = ('HDFC', 'SBI', 'ICICI', 'AXIS', 'YES')
+CORE_BANKS = ('HDFC', 'SBI', 'YES', 'RBL', 'INDIAN')
 BANK_CODES = {
     'HDFC': ['HDFCBK', 'HDFCBN', 'HDFCBANK'],
     'SBI': ['SBIINB', 'SBIUPI', 'SBICRD', 'SBIPSG', 'SBMSMS', 'ATMSBI', 'SBIBNK'],

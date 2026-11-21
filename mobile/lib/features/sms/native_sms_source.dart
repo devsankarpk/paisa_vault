@@ -4,9 +4,10 @@ import 'package:flutter/services.dart';
 
 import '../../services/sms_source.dart';
 
-/// Talks to the Kotlin receiver and encrypted stage (see SmsStage.kt, MainActivity.kt).
-class AndroidSmsSource implements SmsSource {
-  AndroidSmsSource() {
+/// Talks to the native encrypted stage: Kotlin on Android (SmsStage.kt, MainActivity.kt) and
+/// Swift on iPhone (SmsStage.swift, fed by the Shortcut action). Same channel on both.
+class NativeSmsSource implements SmsSource {
+  NativeSmsSource() {
     _channel.setMethodCallHandler((call) async {
       if (call.method == 'arrived') _arrivals.add(null);
     });
@@ -50,18 +51,4 @@ class AndroidSmsSource implements SmsSource {
   @override
   Future<void> acknowledge(List<String> ids) =>
       _channel.invokeMethod<void>('acknowledge', {'ids': ids});
-}
-
-/// iPhone: the Shortcut inbox is added in its own task. Until then nothing arrives.
-class NoSmsSource implements SmsSource {
-  @override
-  Stream<void> get arrivals => const Stream.empty();
-  @override
-  Future<bool> get hasPermission async => true;
-  @override
-  Future<bool> requestPermission() async => true;
-  @override
-  Future<List<StagedSms>> pending() async => const [];
-  @override
-  Future<void> acknowledge(List<String> ids) async {}
 }

@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'db/app_database.dart';
@@ -35,3 +37,6 @@ final appDatabaseProvider = FutureProvider<AppDatabase>((ref) async {
   ref.onDispose(db.close);
   return db;
 });
+
+/// iPhone has no SMS permission; instead the user sets up a Shortcuts automation once.
+final needsShortcutGuideProvider = Provider<bool>((_) => Platform.isIOS);

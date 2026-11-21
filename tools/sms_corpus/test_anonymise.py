@@ -37,7 +37,7 @@ class Normalise(unittest.TestCase):
         self.assertIsNone(an.bank_for('UCO'))
 
     def test_core_banks(self):
-        self.assertEqual(set(an.CORE_BANKS), {'HDFC', 'SBI', 'ICICI', 'AXIS', 'YES'})
+        self.assertEqual(set(an.CORE_BANKS), {'HDFC', 'SBI', 'YES', 'RBL', 'INDIAN'})
         self.assertTrue(set(an.CORE_BANKS) <= set(an.BANK_CODES))
 
 

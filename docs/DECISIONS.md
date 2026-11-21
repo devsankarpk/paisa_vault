@@ -6,7 +6,7 @@ Status values: **Confirmed** (you said so), **Proposed** (my default, change if 
 
 | # | Decision | Status | Phase |
 |---|---|---|---|
-| D1 | Banks to support first: HDFC, SBI, ICICI, Axis, Yes Bank | Confirmed | 0 |
+| D1 | Banks to support first: HDFC, SBI, ICICI, Axis, Yes Bank. **Scored in tests (20 Nov):** HDFC, SBI, Yes, RBL, Indian Bank, the owner's real banks; ICICI and Axis stay supported but unscored; the owner's ICICI is a FASTag account (keep as an extra test case) | Confirmed | 0 |
 | D2 | Team: one developer, a real Android phone and a real iPhone | Confirmed | all |
 | D3 | Budget period: calendar month. Salary-date cycle later. | Proposed | 1B |
 | D4 | Default categories: Food, Groceries, Shopping, Bills, Travel, Health, Entertainment, Other, plus Income and Transfer | Proposed | 1B |
