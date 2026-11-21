@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
+import 'biometrics.dart';
 import 'lock_controller.dart';
 import 'pin_pad.dart';
 import 'pin_service.dart';
@@ -61,11 +62,15 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   String _message = 'Enter your PIN to unlock';
   bool _error = false;
   bool _blocked = false;
+  BiometricKind _kind = BiometricKind.fingerprint;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _bio());
+    ref.read(biometricsProvider).kind.then((k) {
+      if (mounted) setState(() => _kind = k);
+    });
   }
 
   Future<void> _bio() async {
@@ -118,14 +123,17 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                   enabled: !_blocked,
                   onComplete: _submit,
                   bottomLeft: bio
-                      ? TextButton(
+                      ? IconButton(
                           onPressed: _bio,
-                          child: const Text(
-                            'Use biometrics',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: PvColors.primary,
-                            ),
+                          iconSize: 34,
+                          color: PvColors.primary,
+                          tooltip: _kind == BiometricKind.face
+                              ? 'Use Face ID'
+                              : 'Use fingerprint',
+                          icon: Icon(
+                            _kind == BiometricKind.face
+                                ? Icons.face_unlock_outlined
+                                : Icons.fingerprint,
                           ),
                         )
                       : null,
