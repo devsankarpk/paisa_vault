@@ -2,7 +2,7 @@
 
 Builds the test set for the Phase 0 LLM bake-off and the golden-SMS CI suite. Needs 20 or more messages per bank (HDFC, SBI, ICICI, Axis, Yes Bank) covering debit card, credit card, UPI, NEFT/IMPS, ATM, POS, failed transactions, refunds, OTP and promo messages.
 
-**Banks recognised.** Core (counted in the scorecard): HDFC, SBI, ICICI, Axis, Yes Bank. Bonus (extra format variety, each sample is tagged `"core": false`): PNB, Bank of Baroda, Canara, Union, Kotak, IndusInd, IDFC First, Federal, Bank of India, Indian Bank, Central Bank, UCO, IDBI, RBL, AU, Bandhan, South Indian, Karnataka, Paytm Payments Bank, India Post Payments Bank. The sender codes are best-effort and vary by operator, so check them against your own export (see "Missing a sender?" below). The list lives in `BANK_CODES` in `anonymise.py`.
+**Banks recognised.** Core (counted in the scorecard, the owner's real banks): HDFC, SBI, Yes Bank, RBL, Indian Bank. The spec's supported banks (HDFC, SBI, ICICI, Axis, Yes) are unchanged; ICICI and Axis are recognised but not scored until someone has an account (the owner's ICICI is a FASTag account, a special toll-SMS format worth keeping as an extra case). Bonus (extra format variety, each sample is tagged `"core": false`): ICICI, Axis, PNB, Bank of Baroda, Canara, Union, Kotak, IndusInd, IDFC First, Federal, Bank of India, Central Bank, UCO, IDBI, AU, Bandhan, South Indian, Karnataka, Paytm Payments Bank, India Post Payments Bank. The sender codes are best-effort and vary by operator, so check them against your own export (see "Missing a sender?" below). The list lives in `BANK_CODES` in `anonymise.py`.
 
 **Rule:** raw messages stay in `testdata/raw/`, which is git-ignored. Nothing personal is committed.
 

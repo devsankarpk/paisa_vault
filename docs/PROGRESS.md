@@ -64,7 +64,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 **Week 1: data and Android basics**
 
-- [ ] Collect SMS, 20 or more per core bank (HDFC, SBI, ICICI, Yes), all message types. Axis dropped for now (owner has no Axis card, 17 Nov); add it back if one turns up. Owner has Yes Bank and RBL credit cards (17 Nov): Yes is core, RBL is a bonus bank (already recognised). iPhone inbox pulled 17 Nov: 35 lines, 26 unique (HDFC 21, SBI 1, Indian 1, RBL 1, 2 unmatched); `tools/sms_corpus/pull_iphone_inbox.sh` repeats it. Other Indian banks are optional bonus samples
+- [ ] Collect SMS, 20 or more per scored bank (HDFC, SBI, Yes, RBL, Indian Bank: the owner's real banks, decided 20 Nov), all message types. ICICI and Axis stay supported but unscored. Owner's banks (20 Nov): iPhone SIM has HDFC, SBI, Yes Bank accounts and RBL, HDFC, SBI credit cards; Indian Bank (INDBNK) is on the vivo; ICICI is a FASTag account only (toll SMS, a special format); Axis not used. HDFC, SBI, Yes, RBL and Indian Bank are the scored banks. iPhone inbox pulled 17 Nov: 35 lines, 26 unique (HDFC 21, SBI 1, Indian 1, RBL 1, 2 unmatched); `tools/sms_corpus/pull_iphone_inbox.sh` repeats it. Other Indian banks are optional bonus samples
 - [x] Anonymisation script ([tools/sms_corpus/](../tools/sms_corpus/), 9 tests passing)
 - [ ] Anonymised corpus `testdata/sms_samples.json`
 - [ ] Labels `testdata/sms_labels.json`
@@ -112,7 +112,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Schema v1 and migrations (7 tables, paise + currency, indexes, foreign keys on, schema dump saved in mobile/drift_schemas for v2 migration tests; 6 tests)
 - [x] App lock: PIN, biometrics, auto-lock, create-PIN with recovery note (built 17 Nov, 27 tests pass, 4-digit PIN with lockout; iPhone 15 checked 18 Nov: Face ID, auto-lock, blank app switcher, lockout; vivo V29e passed all 9 checks on 18 Nov: PIN, fingerprint, auto-lock, blank recent-apps card, lockout)
 - [x] Android SMS disclosure and receiver plugin (done 19 Nov: Keystore-encrypted stage, drain into raw_messages, disclosure screen, RECEIVE_SMS only, 37 Dart + 7 Kotlin tests; real INDBNK alerts saved on vivo with the app open and with it closed)
-- [ ] iPhone App Intent and Shortcut guide
+- [x] iPhone App Intent and Shortcut guide (done 21 Nov: Log Bank Message action in the real app, encrypted per-message stage, Shortcut guide screen, drain into raw_messages, repeats merged; a real HDFC alert on the iPhone fired the Rs automation, was staged encrypted and saved after unlock; keep the Message field on the Shortcut Input variable, never "Ask Each Time"; free signing expires after 7 days)
 - [ ] OTP and promo filter, sender normalisation
 - [ ] Encrypted raw_messages with purge job
 - [ ] LlmEngine for the chosen model, manifest, bundled model
@@ -267,6 +267,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 21 Nov 2026 | iPhone route confirmed with a real HDFC alert: automation fired, message staged and saved after unlock. Earlier misses were automation setup (old Llm Bench action, Ask Each Time). Llm Bench removed from the iPhone; inbox saved in testdata/raw/iphone_inbox_all.jsonl. |
+| 20 Nov 2026 | iPhone Shortcut route built in the real app. Manual action proven end to end (found and fixed a lost-message bug in the first stage design). Real bank SMS automations are not triggering: under investigation. |
 | 19 Nov 2026 | Android SMS receiver done: bank alerts are encrypted-staged even with the app closed and saved to raw_messages on unlock; disclosure screen added. Old test database on the phones had to be wiped (same schema version, fewer tables). |
 | 18 Nov 2026 | App lock done and checked on iPhone 15 and vivo V29e. SMS tool reads the iPhone Shortcut inbox (35 lines, 26 unique; HDFC 21). |
 | 17 Nov 2026 | Schema v1 done: banks, accounts, raw_messages, transactions, pipeline_log, hidden_hash, settings. |

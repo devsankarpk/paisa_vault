@@ -10,6 +10,7 @@ import 'package:paisa_vault/core/db/key_store.dart';
 import 'package:paisa_vault/core/providers.dart';
 import 'package:paisa_vault/core/secret_store.dart';
 import 'package:paisa_vault/features/sms/raw_message_repository.dart';
+import 'package:paisa_vault/features/sms/shortcut_guide_screen.dart';
 import 'package:paisa_vault/features/sms/sms_disclosure_screen.dart';
 import 'package:paisa_vault/features/sms/sms_runner.dart';
 import 'package:paisa_vault/services/sms_source.dart';
@@ -114,6 +115,7 @@ void main() {
     Future<(ProviderContainer, FakeSmsSource, MemorySecretStore)> pump(
       WidgetTester t, {
       required bool granted,
+      bool iphone = false,
     }) async {
       final source = FakeSmsSource(granted: granted);
       final store = MemorySecretStore();
@@ -123,6 +125,7 @@ void main() {
           secretStoreProvider.overrideWithValue(store),
           clockProvider.overrideWithValue(clock),
           appDatabaseProvider.overrideWith((ref) async => db),
+          needsShortcutGuideProvider.overrideWithValue(iphone),
         ],
       );
       await t.pumpWidget(
@@ -161,6 +164,23 @@ void main() {
       expect(find.text('HOME'), findsOneWidget);
       expect(source.permissionRequests, 0);
       expect(store.map['pv_sms_disclosure_seen'], 'true');
+      c.dispose();
+    });
+
+    testWidgets('iPhone: shows the Shortcut guide once, then home', (t) async {
+      // A tall screen so the whole guide is built (the list is lazy).
+      t.view.physicalSize = const Size(800, 2400);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
+      final (c, source, store) = await pump(t, granted: true, iphone: true);
+      expect(find.byType(ShortcutGuideScreen), findsOneWidget);
+      expect(find.textContaining('Shortcut ran'), findsOneWidget);
+      expect(find.byType(SmsDisclosureScreen), findsNothing);
+      expect(source.permissionRequests, 0);
+      await t.tap(find.text('I have set it up'));
+      await t.pumpAndSettle();
+      expect(find.text('HOME'), findsOneWidget);
+      expect(store.map['pv_shortcut_guide_seen'], 'true');
       c.dispose();
     });
 
