@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart' show SizedBox;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -124,6 +125,33 @@ void main() {
     // Lock screen asks for biometrics straight away and it passes.
     expect(c.read(lockControllerProvider).status, LockStatus.unlocked);
     expect(bio.prompts, greaterThanOrEqualTo(2));
+  });
+
+  scenario('lock screen shows a face icon on Face ID phones, no text link', (
+    t,
+  ) async {
+    bio = FakeBiometrics(
+      available: true,
+      passes: false,
+      biometricKind: BiometricKind.face,
+    );
+    await PinService(store, clock, iterations: 1000).setPin('2468');
+    await store.write('pv_bio_enabled', 'true');
+    await start(t);
+    expect(find.byIcon(Icons.face_unlock_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.fingerprint), findsNothing);
+    expect(find.text('Use biometrics'), findsNothing);
+  });
+
+  scenario('lock screen shows a fingerprint icon on fingerprint phones', (
+    t,
+  ) async {
+    bio = FakeBiometrics(available: true, passes: false);
+    await PinService(store, clock, iterations: 1000).setPin('2468');
+    await store.write('pv_bio_enabled', 'true');
+    await start(t);
+    expect(find.byIcon(Icons.fingerprint), findsOneWidget);
+    expect(find.byIcon(Icons.face_unlock_outlined), findsNothing);
   });
 
   scenario('failed biometrics fall back to the PIN', (t) async {
