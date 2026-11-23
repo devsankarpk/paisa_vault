@@ -116,8 +116,8 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] OTP and promo filter, sender normalisation (built 21 Nov: rule classifier with 34 tests, OTP and promo dropped and never stored, reminders and declines stored as ignored; run on 31 real messages: 25 transaction, 4 other, 2 promo; 3 messages to review with the owner; sender normalisation done in the SMS tool only, not yet in the app)
 - [ ] Encrypted raw_messages with purge job
 - [ ] LlmEngine for the chosen model, manifest, bundled model
-- [ ] Extraction prompt and strict JSON schema
-- [ ] Amount safety check
+- [x] Extraction prompt and strict JSON schema (done 23 Nov: rules read amount, direction, bank, last 4, date, reference, channel and known merchant phrasings; model asked only for merchant, category, channel; strict reply check, one retry, then please confirm; 26 tests; on 25 real transaction messages rules found amount, direction, last 4 and date in all 25)
+- [x] Amount safety check (done 23 Nov: amount must literally appear in the SMS, tested with Indian number grouping)
 - [ ] Processing queue (WorkManager, next-open on iPhone)
 - [ ] Duplicate check
 - [ ] Bank, card and account mapping
@@ -129,7 +129,7 @@ Status values: Not started, In progress, Blocked, Done.
 **Exit gate**
 
 - [ ] Real SMS from each bank becomes a mapped transaction on Android and iPhone
-- [ ] Amount safety check proven
+- [x] Amount safety check (done 23 Nov: amount must literally appear in the SMS, tested with Indian number grouping) proven
 - [ ] Golden suite green and meets Phase 0 thresholds
 - [ ] Release build has no INTERNET permission
 - [ ] "Erase everything" works
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 23 Nov 2026 | AI pipeline logic built without the model: rule extractor, strict model-reply check, amount safety check, extraction pipeline around the LlmEngine interface (now text in, text out). Real model engine and bundling still to do. |
 | 21 Nov 2026 | Lock screen shows a Face ID or fingerprint icon instead of text. OTP and promo filter built and run on the real corpus (counts only); three messages left to review. |
 | 21 Nov 2026 | iPhone route confirmed with a real HDFC alert: automation fired, message staged and saved after unlock. Earlier misses were automation setup (old Llm Bench action, Ask Each Time). Llm Bench removed from the iPhone; inbox saved in testdata/raw/iphone_inbox_all.jsonl. |
 | 20 Nov 2026 | iPhone Shortcut route built in the real app. Manual action proven end to end (found and fixed a lost-message bug in the first stage design). Real bank SMS automations are not triggering: under investigation. |
