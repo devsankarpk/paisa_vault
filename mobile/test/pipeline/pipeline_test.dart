@@ -31,12 +31,6 @@ void main() {
         isNull,
       ); // not in list
       expect(
-        parse(
-          '{"merchant": "A", "category": "Food", "channel": "CARRIER PIGEON"}',
-        ),
-        isNull,
-      );
-      expect(
         parse('{"merchant": 5, "category": "Food", "channel": "UPI"}'),
         isNull,
       );
@@ -44,6 +38,19 @@ void main() {
       expect(parse('{"merchant": "${'x' * 200}", "category": "Food"}'), isNull);
       expect(parse('[1, 2]'), isNull);
       expect(parse('{"merchant": "A", "category": '), isNull);
+    });
+
+    test('capital letters do not matter and an unknown channel is ignored', () {
+      final r = parse(
+        '{"merchant": "A", "category": "food", "channel": "Online"}',
+      )!;
+      expect(r.category, 'Food');
+      expect(r.channel, 'online');
+      final u = parse(
+        '{"merchant": "A", "category": "Food", "channel": "CARRIER PIGEON"}',
+      )!;
+      expect(u.channel, isNull);
+      expect(u.merchant, 'A');
     });
 
     test('empty strings become null', () {

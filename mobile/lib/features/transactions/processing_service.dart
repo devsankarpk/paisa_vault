@@ -48,7 +48,11 @@ class ProcessingService {
       final recheck =
           await (_db.select(_db.transactions)..where(
                 (t) =>
-                    t.confirmReason.equals('no_model') &
+                    t.confirmReason.isIn(const [
+                      'no_model',
+                      'bad_reply',
+                      'model_error',
+                    ]) &
                     t.userCorrected.equals(false) &
                     t.rawMessageId.isNotNull(),
               ))
