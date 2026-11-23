@@ -5,7 +5,7 @@ class PvColors {
   static const background = Color(0xFFF6F8FD);
   static const primary = Color(0xFF6B8DFD);
   static const ink = Color(0xFF232B45);
-  static const muted = Color(0xFF8A93A8);
+  static const muted = Color(0xFF55607A); // readable on white (about 6:1)
   static const dotBorder = Color(0xFFCBD5EC);
   static const error = Color(0xFFD64545);
 }

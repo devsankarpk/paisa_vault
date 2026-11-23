@@ -15,8 +15,7 @@ const allowedChannels = {'UPI', 'NEFT', 'IMPS', 'ATM', 'POS', 'online'};
 /// caller can retry once and then fall back to "please confirm".
 ///
 /// Valid means: one JSON object, only the three known keys with string or null values, a
-/// category that is exactly one of [categories] (or null), a channel from [allowedChannels]
-/// (or null), and a merchant of sensible length.
+/// category that is exactly one of [categories] (or null), a channel (an unknown one is ignored), and a merchant of sensible length.
 ModelReply? parseModelReply(String reply, {required List<String> categories}) {
   // Some models add a think block before the answer.
   final clean = reply.replaceAll(RegExp(r'<think>[\s\S]*?</think>'), '');
@@ -48,9 +47,20 @@ ModelReply? parseModelReply(String reply, {required List<String> categories}) {
     final category = text('category');
     final channel = text('channel');
     if (merchant != null && merchant.length > 80) return null;
-    if (category != null && !categories.contains(category)) return null;
-    if (channel != null && !allowedChannels.contains(channel)) return null;
-    return ModelReply(merchant: merchant, category: category, channel: channel);
+    // Spelling in capitals or small letters is accepted ("Food", "upi").
+    final cat = category == null
+        ? null
+        : categories
+              .where((c) => c.toLowerCase() == category.toLowerCase())
+              .firstOrNull;
+    if (category != null && cat == null) return null;
+    // An unknown channel is dropped, not fatal: the rules read the channel from the SMS.
+    final ch = channel == null
+        ? null
+        : allowedChannels
+              .where((c) => c.toLowerCase() == channel.toLowerCase())
+              .firstOrNull;
+    return ModelReply(merchant: merchant, category: cat, channel: ch);
   } on FormatException {
     return null;
   }

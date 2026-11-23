@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/db/app_database.dart';
 import '../../core/providers.dart';
 import '../../services/llm_engine.dart';
+import '../pipeline/model_reply.dart';
 import '../model/llama_engine.dart';
 import '../model/model_diagnostics.dart';
 import '../model/model_locator.dart';
@@ -54,13 +55,30 @@ class _TimedEngine implements LlmEngine {
     try {
       final reply = await _inner.generate(prompt);
       await _diag.note(
-        'generated seconds=${(watch.elapsedMilliseconds / 1000).toStringAsFixed(1)} chars=${reply.length}',
+        'generated seconds=${(watch.elapsedMilliseconds / 1000).toStringAsFixed(1)} chars=${reply.length} ${_shape(reply)}',
       );
       return reply;
     } catch (e) {
       await _diag.note('generate_failed error=${e.runtimeType}');
       rethrow;
     }
+  }
+
+  /// Describes the reply's shape without its text: which keys, and whether the category and
+  /// channel are on the allowed lists. Used to see why a reply was rejected.
+  static String _shape(String r) {
+    final keys = RegExp(r'"(\w+)"\s*:')
+        .allMatches(r)
+        .map((m) => m[1])
+        .join('/');
+    String? val(String k) =>
+        RegExp('"$k"\\s*:\\s*"([^"]*)"').firstMatch(r)?.group(1);
+    final cat = val('category');
+    final ch = val('channel');
+    return 'think=${r.contains('<think>')} fence=${r.contains('```')} '
+        'start=${r.trimLeft().startsWith('{')} keys=$keys '
+        'catOk=${cat == null ? 'none' : defaultCategories.contains(cat)} '
+        'chOk=${ch == null ? 'none' : allowedChannels.contains(ch)}';
   }
 
   @override
