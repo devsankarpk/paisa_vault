@@ -49,16 +49,24 @@ class FakeSmsSource implements SmsSource {
 }
 
 class FakeLlmEngine implements LlmEngine {
-  FakeLlmEngine(this.result);
-  LlmExtraction result;
+  /// [replies] are returned in order; the last one repeats. An entry that is an Exception is thrown.
+  FakeLlmEngine(this.replies);
+  List<Object> replies;
+  final prompts = <String>[];
   bool loaded = false;
+
+  @override
+  String get modelId => 'fake-model';
   @override
   Future<void> load() async => loaded = true;
   @override
-  Future<LlmExtraction> extract(
-    String smsText, {
-    required List<String> categories,
-  }) async => result;
+  Future<String> generate(String prompt) async {
+    prompts.add(prompt);
+    final r = replies[(prompts.length - 1).clamp(0, replies.length - 1)];
+    if (r is Exception) throw r;
+    return r as String;
+  }
+
   @override
   Future<void> dispose() async => loaded = false;
 }
