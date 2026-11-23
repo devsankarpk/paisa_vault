@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:paisa_vault/core/providers.dart';
@@ -16,7 +17,9 @@ void main() {
             FakeBiometrics(available: false),
           ),
         ],
-        child: const PaisaVaultApp(),
+        child: const PaisaVaultApp(
+          home: Scaffold(body: Center(child: Text('Paisa Vault'))),
+        ),
       ),
     );
     await tester.pumpAndSettle();

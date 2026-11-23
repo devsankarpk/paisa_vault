@@ -65,7 +65,9 @@ class ExtractionPipeline {
     this.rules = const RuleExtractor(),
   });
 
-  final LlmEngine _llm;
+  /// Null while no model is available (before the model is installed). Rules still run, and the
+  /// transaction is marked please confirm unless the rules found the merchant.
+  final LlmEngine? _llm;
   final List<String> categories;
   final RuleExtractor rules;
 
@@ -87,10 +89,11 @@ class ExtractionPipeline {
 
     ModelReply? reply;
     String? modelError;
-    for (var i = 0; i < attempts && reply == null; i++) {
+    final llm = _llm;
+    for (var i = 0; llm != null && i < attempts && reply == null; i++) {
       try {
         reply = parseModelReply(
-          await _llm.generate(buildPrompt(sms, categories)),
+          await llm.generate(buildPrompt(sms, categories)),
           categories: categories,
         );
         if (reply == null) modelError = 'bad_reply';
@@ -102,7 +105,10 @@ class ExtractionPipeline {
     // A rule-found merchant is trusted over the model's guess.
     final merchant = fields.merchant ?? reply?.merchant;
     final channel = fields.channel ?? reply?.channel;
-    final confirm = reply == null;
+    // Without a model the rules alone must have found the merchant; with one, a bad reply twice
+    // means confirm.
+    final confirm = llm == null ? merchant == null : reply == null;
+    if (llm == null && confirm) modelError = 'no_model';
 
     return ExtractionResult.transaction(
       ExtractedTransaction(
@@ -120,8 +126,8 @@ class ExtractionPipeline {
             ? TransactionStatus.pleaseConfirm
             : TransactionStatus.confirmed,
         confirmReason: confirm ? modelError : null,
-        modelId: _llm.modelId,
-        promptVersion: promptVersion,
+        modelId: llm?.modelId,
+        promptVersion: llm == null ? null : promptVersion,
       ),
     );
   }

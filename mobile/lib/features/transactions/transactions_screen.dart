@@ -1,0 +1,134 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/db/app_database.dart';
+import '../../core/theme/app_theme.dart';
+import 'format.dart';
+import 'providers.dart';
+import 'transaction_detail_screen.dart';
+
+class TransactionsScreen extends ConsumerWidget {
+  const TransactionsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final list = ref.watch(transactionsProvider);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Transactions',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+        backgroundColor: PvColors.background,
+        surfaceTintColor: Colors.transparent,
+      ),
+      body: list.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, _) =>
+            const Center(child: Text('Could not load transactions')),
+        data: (items) => items.isEmpty
+            ? const _Empty()
+            : ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                itemCount: items.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 10),
+                itemBuilder: (_, i) => _Tile(items[i]),
+              ),
+      ),
+    );
+  }
+}
+
+class _Empty extends StatelessWidget {
+  const _Empty();
+
+  @override
+  Widget build(BuildContext context) => const Center(
+    child: Padding(
+      padding: EdgeInsets.all(32),
+      child: Text(
+        'No transactions yet.\nNew bank SMS will appear here.',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: PvColors.muted, fontSize: 16, height: 1.4),
+      ),
+    ),
+  );
+}
+
+class _Tile extends StatelessWidget {
+  const _Tile(this.t);
+  final Transaction t;
+
+  @override
+  Widget build(BuildContext context) {
+    final needs = t.status == TransactionStatus.pleaseConfirm;
+    final title = t.merchant ?? (needs ? 'Unknown merchant' : 'Transaction');
+    final sub = [
+      formatDate(t.occurredAt),
+      if (t.bankCode != null) t.bankCode!,
+      if (t.last4 != null) '••${t.last4}',
+    ].join(' · ');
+    final credit = t.direction == Direction.credit;
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => TransactionDetailScreen(id: t.id),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      sub,
+                      style: const TextStyle(
+                        color: PvColors.muted,
+                        fontSize: 13,
+                      ),
+                    ),
+                    if (needs)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 6),
+                        child: Text(
+                          'Please check',
+                          style: TextStyle(
+                            color: Color(0xFFA06A10),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Text(
+                signedAmount(t.amountPaise, t.direction),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: credit ? const Color(0xFF1E8E5A) : PvColors.ink,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

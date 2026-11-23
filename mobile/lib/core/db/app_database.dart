@@ -34,11 +34,21 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(transactions, transactions.bankCode);
+        await m.addColumn(transactions, transactions.last4);
+        await m.addColumn(transactions, transactions.accountKind);
+        await m.addColumn(transactions, transactions.categoryName);
+        await m.addColumn(transactions, transactions.confirmReason);
+        await m.addColumn(transactions, transactions.userCorrected);
+      }
+    },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
     },

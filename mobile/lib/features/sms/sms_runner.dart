@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import 'raw_message_repository.dart';
 import 'shortcut_guide_screen.dart';
+import '../transactions/providers.dart';
 import 'sms_disclosure_screen.dart';
 
 final smsIngestProvider = FutureProvider<SmsIngest>((ref) async {
@@ -54,7 +55,7 @@ class _SmsRunnerState extends ConsumerState<SmsRunner>
       _needsDisclosure = !granted && !seen;
       _needsGuide = ref.read(needsShortcutGuideProvider) && !guideSeen;
     });
-    if (granted) await _drain();
+    if (granted || ref.read(needsShortcutGuideProvider)) await _drain();
   }
 
   Future<void> _drain() async {
@@ -67,6 +68,14 @@ class _SmsRunnerState extends ConsumerState<SmsRunner>
             .map((e) => '${e.key.name}=${e.value}')
             .join(',');
         debugPrint('PV_INGEST saved=${r.saved} dropped=${r.dropped} $kinds');
+      }
+      // Turn newly saved transaction messages into transactions (rules now, model when installed).
+      final made = await (await ref.read(processingServiceProvider.future))
+          .processNew();
+      if (made.transactions + made.skipped > 0) {
+        debugPrint(
+          'PV_PROCESS transactions=${made.transactions} skipped=${made.skipped}',
+        );
       }
     } catch (e) {
       // Left staged; the next drain retries. Only the error type is logged, never its text.

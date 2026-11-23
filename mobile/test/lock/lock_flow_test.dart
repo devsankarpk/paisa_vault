@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart' show Icons;
-import 'package:flutter/widgets.dart' show SizedBox;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:paisa_vault/core/providers.dart';
@@ -50,7 +49,9 @@ void main() {
     await t.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const PaisaVaultApp(),
+        child: const PaisaVaultApp(
+          home: Scaffold(body: Center(child: Text('Paisa Vault'))),
+        ),
       ),
     );
     await t.pumpAndSettle();
