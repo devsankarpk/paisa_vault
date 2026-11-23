@@ -53,7 +53,8 @@ void main() {
   ProcessingService service({FakeLlmEngine? llm}) => ProcessingService(
     db,
     repo,
-    ExtractionPipeline(llm, categories: defaultCategories),
+    categories: defaultCategories,
+    engineFactory: llm == null ? null : () async => llm,
   );
 
   group('typed amounts', () {
@@ -144,6 +145,121 @@ void main() {
       await s.processNew();
       await s.processNew();
       expect((await db.select(db.transactions).get()).length, 1);
+    });
+  });
+
+  group('model lifetime', () {
+    test('the model is not loaded when nothing is waiting', () async {
+      var loads = 0;
+      final s = ProcessingService(
+        db,
+        repo,
+        categories: defaultCategories,
+        engineFactory: () async {
+          loads++;
+          return FakeLlmEngine([goodReply]);
+        },
+      );
+      await s.processNew();
+      expect(loads, 0);
+    });
+
+    test('the model is freed after the batch', () async {
+      await raw.save(sms(noMerchant, DateTime(2026, 11, 21, 10)));
+      final llm = FakeLlmEngine([goodReply]);
+      await service(llm: llm).processNew();
+      expect(llm.prompts.length, 1);
+      expect(llm.loaded, false);
+    });
+
+    test('the model is freed even if saving fails midway', () async {
+      await raw.save(sms(noMerchant, DateTime(2026, 11, 21, 10)));
+      final llm = FakeLlmEngine([goodReply]);
+      final s = ProcessingService(
+        db,
+        _FailingTransactionRepository(db, clock),
+        categories: defaultCategories,
+        engineFactory: () async => llm..loaded = true,
+      );
+      await expectLater(s.processNew(), throwsA(anything));
+      expect(llm.loaded, false);
+    });
+
+    test(
+      'a model that fails to load falls back to rules and needs checking',
+      () async {
+        await raw.save(sms(noMerchant, DateTime(2026, 11, 21, 10)));
+        final s = ProcessingService(
+          db,
+          repo,
+          categories: defaultCategories,
+          engineFactory: () async => throw Exception('out of memory'),
+        );
+        await s.processNew();
+        final t = await db.select(db.transactions).getSingle();
+        expect(t.status, TransactionStatus.pleaseConfirm);
+        expect(t.amountPaise, 49900);
+      },
+    );
+
+    test('a model answer that is just the bank name is dropped', () async {
+      await raw.save(sms(noMerchant, DateTime(2026, 11, 21, 10)));
+      final llm = FakeLlmEngine([
+        '{"merchant": "HDFC Bank", "category": "Other", "channel": "UPI"}',
+      ]);
+      await service(llm: llm).processNew();
+      final t = await db.select(db.transactions).getSingle();
+      expect(t.merchant, isNull);
+      expect(t.categoryName, 'Other');
+    });
+  });
+
+  group('re-check when a model arrives', () {
+    test(
+      'transactions made without a model are filled in once one is installed',
+      () async {
+        await raw.save(sms(noMerchant, DateTime(2026, 11, 21, 10)));
+        await service().processNew(); // no model
+        expect(
+          (await db.select(db.transactions).getSingle()).status,
+          TransactionStatus.pleaseConfirm,
+        );
+
+        await service(llm: FakeLlmEngine([goodReply]))
+            .processNew(); // model now available
+        final t = await db.select(db.transactions).getSingle();
+        expect(t.merchant, 'SOME SHOP');
+        expect(t.categoryName, 'Shopping');
+        expect(t.status, TransactionStatus.confirmed);
+        expect(t.confirmReason, isNull);
+        expect(t.modelId, 'fake-model');
+        expect(t.amountPaise, 49900); // rule fields unchanged
+      },
+    );
+
+    test('a transaction the user corrected is never overwritten', () async {
+      await raw.save(sms(noMerchant, DateTime(2026, 11, 21, 10)));
+      await service().processNew();
+      final id = (await db.select(db.transactions).getSingle()).id;
+      await repo.correct(
+        id,
+        merchant: 'RAJU STORES',
+        categoryName: 'Groceries',
+      );
+      await service(llm: FakeLlmEngine([goodReply])).processNew();
+      final t = await db.select(db.transactions).getSingle();
+      expect(t.merchant, 'RAJU STORES');
+      expect(t.categoryName, 'Groceries');
+    });
+
+    test('a model that fails leaves it to be tried again later', () async {
+      await raw.save(sms(noMerchant, DateTime(2026, 11, 21, 10)));
+      await service().processNew();
+      await service(llm: FakeLlmEngine([Exception('boom')])).processNew();
+      expect(
+        (await db.select(db.transactions).getSingle()).confirmReason,
+        'no_model',
+      );
     });
   });
 
@@ -273,4 +389,14 @@ void main() {
       },
     );
   });
+}
+
+class _FailingTransactionRepository extends TransactionRepository {
+  _FailingTransactionRepository(super.db, super.clock);
+  @override
+  Future<int> insertExtracted(
+    ExtractedTransaction t, {
+    required int rawMessageId,
+    required DateTime receivedAt,
+  }) async => throw StateError('disk full');
 }

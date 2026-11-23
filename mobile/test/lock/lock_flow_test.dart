@@ -166,7 +166,7 @@ void main() {
     expect(c.read(lockControllerProvider).status, LockStatus.unlocked);
   });
 
-  scenario('locks after the idle time and when away from the app too long', (
+  scenario('locks after the idle time and as soon as the app is left', (
     t,
   ) async {
     await PinService(store, clock, iterations: 1000).setPin('2468');
@@ -179,16 +179,10 @@ void main() {
     await t.pump(const Duration(minutes: 1, seconds: 1));
     expect(c.read(lockControllerProvider).status, LockStatus.locked);
 
-    // Short trip to another app: stays unlocked
+    // Leaving the app (or the phone locking) locks it straight away
     await enter(t, '2468');
     n.appBackgrounded();
-    clock.current = clock.current.add(const Duration(seconds: 20));
-    n.appResumed();
-    expect(c.read(lockControllerProvider).status, LockStatus.unlocked);
-
-    // Long trip: locks
-    n.appBackgrounded();
-    clock.current = clock.current.add(const Duration(minutes: 2));
+    clock.current = clock.current.add(const Duration(seconds: 5));
     n.appResumed();
     await t.pump();
     expect(c.read(lockControllerProvider).status, LockStatus.locked);

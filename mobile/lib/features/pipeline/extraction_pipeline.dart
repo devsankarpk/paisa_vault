@@ -103,7 +103,10 @@ class ExtractionPipeline {
     }
 
     // A rule-found merchant is trusted over the model's guess.
-    final merchant = fields.merchant ?? reply?.merchant;
+    final modelMerchant = looksLikeBankName(reply?.merchant)
+        ? null
+        : reply?.merchant;
+    final merchant = fields.merchant ?? modelMerchant;
     final channel = fields.channel ?? reply?.channel;
     // Without a model the rules alone must have found the merchant; with one, a bad reply twice
     // means confirm.

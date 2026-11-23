@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 23 Nov 2026 | On-device model engine added (Qwen3 1.7B via llamadart, loaded from the app folder, freed after each batch) with a diagnostics log; not yet confirmed running on a real transaction. Lock fixes tested on iPhone: every touch resets the idle timer, the app locks as soon as it is left, and Face ID prompts again when the app returns to the front. |
 | 23 Nov 2026 | Schema v2 (bank, last 4, account kind, category name, confirm reason, corrected flag) with migration tests; the v1 to v2 upgrade ran on the owner's iPhone with real data. Messages are now processed into transactions; Transactions list, detail with the original message, and an edit sheet added. |
 | 23 Nov 2026 | AI pipeline logic built without the model: rule extractor, strict model-reply check, amount safety check, extraction pipeline around the LlmEngine interface (now text in, text out). Real model engine and bundling still to do. |
 | 21 Nov 2026 | Lock screen shows a Face ID or fingerprint icon instead of text. OTP and promo filter built and run on the real corpus (counts only); three messages left to review. |

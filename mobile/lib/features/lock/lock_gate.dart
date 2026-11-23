@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,11 +23,21 @@ class _LockGateState extends ConsumerState<LockGate>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Every touch anywhere in the app (including pushed screens and sheets, which sit
+    // above this widget) counts as activity and restarts the idle timer.
+    GestureBinding.instance.pointerRouter.addGlobalRoute(_onPointer);
     Future.microtask(() => ref.read(lockControllerProvider.notifier).load());
+  }
+
+  void _onPointer(PointerEvent e) {
+    if (e is PointerDownEvent || e is PointerUpEvent) {
+      ref.read(lockControllerProvider.notifier).touch();
+    }
   }
 
   @override
   void dispose() {
+    GestureBinding.instance.pointerRouter.removeGlobalRoute(_onPointer);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -49,11 +60,7 @@ class _LockGateState extends ConsumerState<LockGate>
       LockStatus.loading => const Scaffold(body: SizedBox.shrink()),
       LockStatus.needsSetup => const SetupScreen(),
       LockStatus.locked => const LockScreen(),
-      LockStatus.unlocked => Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerDown: (_) => ref.read(lockControllerProvider.notifier).touch(),
-        child: widget.child,
-      ),
+      LockStatus.unlocked => widget.child,
     };
     // Blank cover while the app is in the app switcher.
     return Stack(
