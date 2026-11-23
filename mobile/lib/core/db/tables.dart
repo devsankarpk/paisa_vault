@@ -94,6 +94,23 @@ class Transactions extends Table {
   TextColumn get reference => text().nullable()();
   TextColumn get note => text().nullable()();
 
+  // Added in schema v2: what the extraction read, kept on the transaction until accounts and
+  // categories are linked (Phase 1A week 4 and Phase 1B).
+  /// Short bank code such as HDFC, or null when the message did not name the bank.
+  TextColumn get bankCode => text().nullable()();
+  TextColumn get last4 => text().nullable()();
+  TextColumn get accountKind => text().nullable()();
+
+  /// Category name until the categories table exists.
+  TextColumn get categoryName => text().nullable()();
+
+  /// Why the transaction needs confirming (a short code, never message text).
+  TextColumn get confirmReason => text().nullable()();
+
+  /// True once the user edited a field, so a later re-check never overwrites it.
+  BoolColumn get userCorrected =>
+      boolean().withDefault(const Constant(false))();
+
   /// Hash of bank, last 4, amount, reference and date for duplicate checks.
   TextColumn get fingerprint => text()();
   DateTimeColumn get occurredAt => dateTime()();

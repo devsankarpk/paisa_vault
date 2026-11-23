@@ -1673,6 +1673,74 @@ class $TransactionsTable extends Transactions
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _bankCodeMeta = const VerificationMeta(
+    'bankCode',
+  );
+  @override
+  late final GeneratedColumn<String> bankCode = GeneratedColumn<String>(
+    'bank_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _last4Meta = const VerificationMeta('last4');
+  @override
+  late final GeneratedColumn<String> last4 = GeneratedColumn<String>(
+    'last4',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accountKindMeta = const VerificationMeta(
+    'accountKind',
+  );
+  @override
+  late final GeneratedColumn<String> accountKind = GeneratedColumn<String>(
+    'account_kind',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _categoryNameMeta = const VerificationMeta(
+    'categoryName',
+  );
+  @override
+  late final GeneratedColumn<String> categoryName = GeneratedColumn<String>(
+    'category_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _confirmReasonMeta = const VerificationMeta(
+    'confirmReason',
+  );
+  @override
+  late final GeneratedColumn<String> confirmReason = GeneratedColumn<String>(
+    'confirm_reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _userCorrectedMeta = const VerificationMeta(
+    'userCorrected',
+  );
+  @override
+  late final GeneratedColumn<bool> userCorrected = GeneratedColumn<bool>(
+    'user_corrected',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("user_corrected" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _fingerprintMeta = const VerificationMeta(
     'fingerprint',
   );
@@ -1770,6 +1838,12 @@ class $TransactionsTable extends Transactions
     status,
     reference,
     note,
+    bankCode,
+    last4,
+    accountKind,
+    categoryName,
+    confirmReason,
+    userCorrected,
     fingerprint,
     occurredAt,
     shared,
@@ -1853,6 +1927,54 @@ class $TransactionsTable extends Transactions
       context.handle(
         _noteMeta,
         note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('bank_code')) {
+      context.handle(
+        _bankCodeMeta,
+        bankCode.isAcceptableOrUnknown(data['bank_code']!, _bankCodeMeta),
+      );
+    }
+    if (data.containsKey('last4')) {
+      context.handle(
+        _last4Meta,
+        last4.isAcceptableOrUnknown(data['last4']!, _last4Meta),
+      );
+    }
+    if (data.containsKey('account_kind')) {
+      context.handle(
+        _accountKindMeta,
+        accountKind.isAcceptableOrUnknown(
+          data['account_kind']!,
+          _accountKindMeta,
+        ),
+      );
+    }
+    if (data.containsKey('category_name')) {
+      context.handle(
+        _categoryNameMeta,
+        categoryName.isAcceptableOrUnknown(
+          data['category_name']!,
+          _categoryNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('confirm_reason')) {
+      context.handle(
+        _confirmReasonMeta,
+        confirmReason.isAcceptableOrUnknown(
+          data['confirm_reason']!,
+          _confirmReasonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('user_corrected')) {
+      context.handle(
+        _userCorrectedMeta,
+        userCorrected.isAcceptableOrUnknown(
+          data['user_corrected']!,
+          _userCorrectedMeta,
+        ),
       );
     }
     if (data.containsKey('fingerprint')) {
@@ -1973,6 +2095,30 @@ class $TransactionsTable extends Transactions
         DriftSqlType.string,
         data['${effectivePrefix}note'],
       ),
+      bankCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_code'],
+      ),
+      last4: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last4'],
+      ),
+      accountKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_kind'],
+      ),
+      categoryName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category_name'],
+      ),
+      confirmReason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}confirm_reason'],
+      ),
+      userCorrected: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}user_corrected'],
+      )!,
       fingerprint: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}fingerprint'],
@@ -2035,6 +2181,20 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String? reference;
   final String? note;
 
+  /// Short bank code such as HDFC, or null when the message did not name the bank.
+  final String? bankCode;
+  final String? last4;
+  final String? accountKind;
+
+  /// Category name until the categories table exists.
+  final String? categoryName;
+
+  /// Why the transaction needs confirming (a short code, never message text).
+  final String? confirmReason;
+
+  /// True once the user edited a field, so a later re-check never overwrites it.
+  final bool userCorrected;
+
   /// Hash of bank, last 4, amount, reference and date for duplicate checks.
   final String fingerprint;
   final DateTime occurredAt;
@@ -2056,6 +2216,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     required this.status,
     this.reference,
     this.note,
+    this.bankCode,
+    this.last4,
+    this.accountKind,
+    this.categoryName,
+    this.confirmReason,
+    required this.userCorrected,
     required this.fingerprint,
     required this.occurredAt,
     required this.shared,
@@ -2101,6 +2267,22 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
+    if (!nullToAbsent || bankCode != null) {
+      map['bank_code'] = Variable<String>(bankCode);
+    }
+    if (!nullToAbsent || last4 != null) {
+      map['last4'] = Variable<String>(last4);
+    }
+    if (!nullToAbsent || accountKind != null) {
+      map['account_kind'] = Variable<String>(accountKind);
+    }
+    if (!nullToAbsent || categoryName != null) {
+      map['category_name'] = Variable<String>(categoryName);
+    }
+    if (!nullToAbsent || confirmReason != null) {
+      map['confirm_reason'] = Variable<String>(confirmReason);
+    }
+    map['user_corrected'] = Variable<bool>(userCorrected);
     map['fingerprint'] = Variable<String>(fingerprint);
     map['occurred_at'] = Variable<DateTime>(occurredAt);
     map['shared'] = Variable<bool>(shared);
@@ -2141,6 +2323,22 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ? const Value.absent()
           : Value(reference),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      bankCode: bankCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankCode),
+      last4: last4 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(last4),
+      accountKind: accountKind == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountKind),
+      categoryName: categoryName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(categoryName),
+      confirmReason: confirmReason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(confirmReason),
+      userCorrected: Value(userCorrected),
       fingerprint: Value(fingerprint),
       occurredAt: Value(occurredAt),
       shared: Value(shared),
@@ -2177,6 +2375,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       ),
       reference: serializer.fromJson<String?>(json['reference']),
       note: serializer.fromJson<String?>(json['note']),
+      bankCode: serializer.fromJson<String?>(json['bankCode']),
+      last4: serializer.fromJson<String?>(json['last4']),
+      accountKind: serializer.fromJson<String?>(json['accountKind']),
+      categoryName: serializer.fromJson<String?>(json['categoryName']),
+      confirmReason: serializer.fromJson<String?>(json['confirmReason']),
+      userCorrected: serializer.fromJson<bool>(json['userCorrected']),
       fingerprint: serializer.fromJson<String>(json['fingerprint']),
       occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
       shared: serializer.fromJson<bool>(json['shared']),
@@ -2206,6 +2410,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       ),
       'reference': serializer.toJson<String?>(reference),
       'note': serializer.toJson<String?>(note),
+      'bankCode': serializer.toJson<String?>(bankCode),
+      'last4': serializer.toJson<String?>(last4),
+      'accountKind': serializer.toJson<String?>(accountKind),
+      'categoryName': serializer.toJson<String?>(categoryName),
+      'confirmReason': serializer.toJson<String?>(confirmReason),
+      'userCorrected': serializer.toJson<bool>(userCorrected),
       'fingerprint': serializer.toJson<String>(fingerprint),
       'occurredAt': serializer.toJson<DateTime>(occurredAt),
       'shared': serializer.toJson<bool>(shared),
@@ -2229,6 +2439,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     TransactionStatus? status,
     Value<String?> reference = const Value.absent(),
     Value<String?> note = const Value.absent(),
+    Value<String?> bankCode = const Value.absent(),
+    Value<String?> last4 = const Value.absent(),
+    Value<String?> accountKind = const Value.absent(),
+    Value<String?> categoryName = const Value.absent(),
+    Value<String?> confirmReason = const Value.absent(),
+    bool? userCorrected,
     String? fingerprint,
     DateTime? occurredAt,
     bool? shared,
@@ -2249,6 +2465,14 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     status: status ?? this.status,
     reference: reference.present ? reference.value : this.reference,
     note: note.present ? note.value : this.note,
+    bankCode: bankCode.present ? bankCode.value : this.bankCode,
+    last4: last4.present ? last4.value : this.last4,
+    accountKind: accountKind.present ? accountKind.value : this.accountKind,
+    categoryName: categoryName.present ? categoryName.value : this.categoryName,
+    confirmReason: confirmReason.present
+        ? confirmReason.value
+        : this.confirmReason,
+    userCorrected: userCorrected ?? this.userCorrected,
     fingerprint: fingerprint ?? this.fingerprint,
     occurredAt: occurredAt ?? this.occurredAt,
     shared: shared ?? this.shared,
@@ -2279,6 +2503,20 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       status: data.status.present ? data.status.value : this.status,
       reference: data.reference.present ? data.reference.value : this.reference,
       note: data.note.present ? data.note.value : this.note,
+      bankCode: data.bankCode.present ? data.bankCode.value : this.bankCode,
+      last4: data.last4.present ? data.last4.value : this.last4,
+      accountKind: data.accountKind.present
+          ? data.accountKind.value
+          : this.accountKind,
+      categoryName: data.categoryName.present
+          ? data.categoryName.value
+          : this.categoryName,
+      confirmReason: data.confirmReason.present
+          ? data.confirmReason.value
+          : this.confirmReason,
+      userCorrected: data.userCorrected.present
+          ? data.userCorrected.value
+          : this.userCorrected,
       fingerprint: data.fingerprint.present
           ? data.fingerprint.value
           : this.fingerprint,
@@ -2312,6 +2550,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('status: $status, ')
           ..write('reference: $reference, ')
           ..write('note: $note, ')
+          ..write('bankCode: $bankCode, ')
+          ..write('last4: $last4, ')
+          ..write('accountKind: $accountKind, ')
+          ..write('categoryName: $categoryName, ')
+          ..write('confirmReason: $confirmReason, ')
+          ..write('userCorrected: $userCorrected, ')
           ..write('fingerprint: $fingerprint, ')
           ..write('occurredAt: $occurredAt, ')
           ..write('shared: $shared, ')
@@ -2324,7 +2568,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     rawMessageId,
     amountPaise,
@@ -2337,6 +2581,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     status,
     reference,
     note,
+    bankCode,
+    last4,
+    accountKind,
+    categoryName,
+    confirmReason,
+    userCorrected,
     fingerprint,
     occurredAt,
     shared,
@@ -2344,7 +2594,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     modelId,
     promptVersion,
     createdAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2361,6 +2611,12 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.status == this.status &&
           other.reference == this.reference &&
           other.note == this.note &&
+          other.bankCode == this.bankCode &&
+          other.last4 == this.last4 &&
+          other.accountKind == this.accountKind &&
+          other.categoryName == this.categoryName &&
+          other.confirmReason == this.confirmReason &&
+          other.userCorrected == this.userCorrected &&
           other.fingerprint == this.fingerprint &&
           other.occurredAt == this.occurredAt &&
           other.shared == this.shared &&
@@ -2383,6 +2639,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<TransactionStatus> status;
   final Value<String?> reference;
   final Value<String?> note;
+  final Value<String?> bankCode;
+  final Value<String?> last4;
+  final Value<String?> accountKind;
+  final Value<String?> categoryName;
+  final Value<String?> confirmReason;
+  final Value<bool> userCorrected;
   final Value<String> fingerprint;
   final Value<DateTime> occurredAt;
   final Value<bool> shared;
@@ -2403,6 +2665,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.status = const Value.absent(),
     this.reference = const Value.absent(),
     this.note = const Value.absent(),
+    this.bankCode = const Value.absent(),
+    this.last4 = const Value.absent(),
+    this.accountKind = const Value.absent(),
+    this.categoryName = const Value.absent(),
+    this.confirmReason = const Value.absent(),
+    this.userCorrected = const Value.absent(),
     this.fingerprint = const Value.absent(),
     this.occurredAt = const Value.absent(),
     this.shared = const Value.absent(),
@@ -2424,6 +2692,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.status = const Value.absent(),
     this.reference = const Value.absent(),
     this.note = const Value.absent(),
+    this.bankCode = const Value.absent(),
+    this.last4 = const Value.absent(),
+    this.accountKind = const Value.absent(),
+    this.categoryName = const Value.absent(),
+    this.confirmReason = const Value.absent(),
+    this.userCorrected = const Value.absent(),
     required String fingerprint,
     required DateTime occurredAt,
     this.shared = const Value.absent(),
@@ -2449,6 +2723,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Expression<String>? status,
     Expression<String>? reference,
     Expression<String>? note,
+    Expression<String>? bankCode,
+    Expression<String>? last4,
+    Expression<String>? accountKind,
+    Expression<String>? categoryName,
+    Expression<String>? confirmReason,
+    Expression<bool>? userCorrected,
     Expression<String>? fingerprint,
     Expression<DateTime>? occurredAt,
     Expression<bool>? shared,
@@ -2470,6 +2750,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       if (status != null) 'status': status,
       if (reference != null) 'reference': reference,
       if (note != null) 'note': note,
+      if (bankCode != null) 'bank_code': bankCode,
+      if (last4 != null) 'last4': last4,
+      if (accountKind != null) 'account_kind': accountKind,
+      if (categoryName != null) 'category_name': categoryName,
+      if (confirmReason != null) 'confirm_reason': confirmReason,
+      if (userCorrected != null) 'user_corrected': userCorrected,
       if (fingerprint != null) 'fingerprint': fingerprint,
       if (occurredAt != null) 'occurred_at': occurredAt,
       if (shared != null) 'shared': shared,
@@ -2493,6 +2779,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Value<TransactionStatus>? status,
     Value<String?>? reference,
     Value<String?>? note,
+    Value<String?>? bankCode,
+    Value<String?>? last4,
+    Value<String?>? accountKind,
+    Value<String?>? categoryName,
+    Value<String?>? confirmReason,
+    Value<bool>? userCorrected,
     Value<String>? fingerprint,
     Value<DateTime>? occurredAt,
     Value<bool>? shared,
@@ -2514,6 +2806,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       status: status ?? this.status,
       reference: reference ?? this.reference,
       note: note ?? this.note,
+      bankCode: bankCode ?? this.bankCode,
+      last4: last4 ?? this.last4,
+      accountKind: accountKind ?? this.accountKind,
+      categoryName: categoryName ?? this.categoryName,
+      confirmReason: confirmReason ?? this.confirmReason,
+      userCorrected: userCorrected ?? this.userCorrected,
       fingerprint: fingerprint ?? this.fingerprint,
       occurredAt: occurredAt ?? this.occurredAt,
       shared: shared ?? this.shared,
@@ -2567,6 +2865,24 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
+    if (bankCode.present) {
+      map['bank_code'] = Variable<String>(bankCode.value);
+    }
+    if (last4.present) {
+      map['last4'] = Variable<String>(last4.value);
+    }
+    if (accountKind.present) {
+      map['account_kind'] = Variable<String>(accountKind.value);
+    }
+    if (categoryName.present) {
+      map['category_name'] = Variable<String>(categoryName.value);
+    }
+    if (confirmReason.present) {
+      map['confirm_reason'] = Variable<String>(confirmReason.value);
+    }
+    if (userCorrected.present) {
+      map['user_corrected'] = Variable<bool>(userCorrected.value);
+    }
     if (fingerprint.present) {
       map['fingerprint'] = Variable<String>(fingerprint.value);
     }
@@ -2606,6 +2922,12 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           ..write('status: $status, ')
           ..write('reference: $reference, ')
           ..write('note: $note, ')
+          ..write('bankCode: $bankCode, ')
+          ..write('last4: $last4, ')
+          ..write('accountKind: $accountKind, ')
+          ..write('categoryName: $categoryName, ')
+          ..write('confirmReason: $confirmReason, ')
+          ..write('userCorrected: $userCorrected, ')
           ..write('fingerprint: $fingerprint, ')
           ..write('occurredAt: $occurredAt, ')
           ..write('shared: $shared, ')
@@ -4516,6 +4838,12 @@ typedef $$TransactionsTableCreateCompanionBuilder =
       Value<TransactionStatus> status,
       Value<String?> reference,
       Value<String?> note,
+      Value<String?> bankCode,
+      Value<String?> last4,
+      Value<String?> accountKind,
+      Value<String?> categoryName,
+      Value<String?> confirmReason,
+      Value<bool> userCorrected,
       required String fingerprint,
       required DateTime occurredAt,
       Value<bool> shared,
@@ -4538,6 +4866,12 @@ typedef $$TransactionsTableUpdateCompanionBuilder =
       Value<TransactionStatus> status,
       Value<String?> reference,
       Value<String?> note,
+      Value<String?> bankCode,
+      Value<String?> last4,
+      Value<String?> accountKind,
+      Value<String?> categoryName,
+      Value<String?> confirmReason,
+      Value<bool> userCorrected,
       Value<String> fingerprint,
       Value<DateTime> occurredAt,
       Value<bool> shared,
@@ -4645,6 +4979,36 @@ class $$TransactionsTableFilterComposer
 
   ColumnFilters<String> get note => $composableBuilder(
     column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankCode => $composableBuilder(
+    column: $table.bankCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get last4 => $composableBuilder(
+    column: $table.last4,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountKind => $composableBuilder(
+    column: $table.accountKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get confirmReason => $composableBuilder(
+    column: $table.confirmReason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get userCorrected => $composableBuilder(
+    column: $table.userCorrected,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4789,6 +5153,36 @@ class $$TransactionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get bankCode => $composableBuilder(
+    column: $table.bankCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get last4 => $composableBuilder(
+    column: $table.last4,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountKind => $composableBuilder(
+    column: $table.accountKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get confirmReason => $composableBuilder(
+    column: $table.confirmReason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get userCorrected => $composableBuilder(
+    column: $table.userCorrected,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get fingerprint => $composableBuilder(
     column: $table.fingerprint,
     builder: (column) => ColumnOrderings(column),
@@ -4914,6 +5308,32 @@ class $$TransactionsTableAnnotationComposer
   GeneratedColumn<String> get note =>
       $composableBuilder(column: $table.note, builder: (column) => column);
 
+  GeneratedColumn<String> get bankCode =>
+      $composableBuilder(column: $table.bankCode, builder: (column) => column);
+
+  GeneratedColumn<String> get last4 =>
+      $composableBuilder(column: $table.last4, builder: (column) => column);
+
+  GeneratedColumn<String> get accountKind => $composableBuilder(
+    column: $table.accountKind,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get confirmReason => $composableBuilder(
+    column: $table.confirmReason,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get userCorrected => $composableBuilder(
+    column: $table.userCorrected,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get fingerprint => $composableBuilder(
     column: $table.fingerprint,
     builder: (column) => column,
@@ -5030,6 +5450,12 @@ class $$TransactionsTableTableManager
                 Value<TransactionStatus> status = const Value.absent(),
                 Value<String?> reference = const Value.absent(),
                 Value<String?> note = const Value.absent(),
+                Value<String?> bankCode = const Value.absent(),
+                Value<String?> last4 = const Value.absent(),
+                Value<String?> accountKind = const Value.absent(),
+                Value<String?> categoryName = const Value.absent(),
+                Value<String?> confirmReason = const Value.absent(),
+                Value<bool> userCorrected = const Value.absent(),
                 Value<String> fingerprint = const Value.absent(),
                 Value<DateTime> occurredAt = const Value.absent(),
                 Value<bool> shared = const Value.absent(),
@@ -5050,6 +5476,12 @@ class $$TransactionsTableTableManager
                 status: status,
                 reference: reference,
                 note: note,
+                bankCode: bankCode,
+                last4: last4,
+                accountKind: accountKind,
+                categoryName: categoryName,
+                confirmReason: confirmReason,
+                userCorrected: userCorrected,
                 fingerprint: fingerprint,
                 occurredAt: occurredAt,
                 shared: shared,
@@ -5072,6 +5504,12 @@ class $$TransactionsTableTableManager
                 Value<TransactionStatus> status = const Value.absent(),
                 Value<String?> reference = const Value.absent(),
                 Value<String?> note = const Value.absent(),
+                Value<String?> bankCode = const Value.absent(),
+                Value<String?> last4 = const Value.absent(),
+                Value<String?> accountKind = const Value.absent(),
+                Value<String?> categoryName = const Value.absent(),
+                Value<String?> confirmReason = const Value.absent(),
+                Value<bool> userCorrected = const Value.absent(),
                 required String fingerprint,
                 required DateTime occurredAt,
                 Value<bool> shared = const Value.absent(),
@@ -5092,6 +5530,12 @@ class $$TransactionsTableTableManager
                 status: status,
                 reference: reference,
                 note: note,
+                bankCode: bankCode,
+                last4: last4,
+                accountKind: accountKind,
+                categoryName: categoryName,
+                confirmReason: confirmReason,
+                userCorrected: userCorrected,
                 fingerprint: fingerprint,
                 occurredAt: occurredAt,
                 shared: shared,

@@ -58,7 +58,8 @@ class LockScreen extends ConsumerStatefulWidget {
   ConsumerState<LockScreen> createState() => _LockScreenState();
 }
 
-class _LockScreenState extends ConsumerState<LockScreen> {
+class _LockScreenState extends ConsumerState<LockScreen>
+    with WidgetsBindingObserver {
   String _message = 'Enter your PIN to unlock';
   bool _error = false;
   bool _blocked = false;
@@ -67,14 +68,42 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _bio());
     ref.read(biometricsProvider).kind.then((k) {
       if (mounted) setState(() => _kind = k);
     });
   }
 
-  Future<void> _bio() async {
-    await ref.read(lockControllerProvider.notifier).tryBiometrics();
+  bool _prompting = false;
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// iOS refuses the Face ID prompt while the app is in the background, so the
+  /// automatic prompt is retried each time the app comes back to the front.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _bio(settle: true);
+  }
+
+  Future<void> _bio({bool settle = false}) async {
+    if (_prompting || !mounted) return;
+    final life = WidgetsBinding.instance.lifecycleState;
+    if (life != null && life != AppLifecycleState.resumed) return;
+    _prompting = true;
+    // Give iOS a moment to finish bringing the app to the front.
+    if (settle) await Future<void>.delayed(const Duration(milliseconds: 400));
+    try {
+      if (mounted) {
+        await ref.read(lockControllerProvider.notifier).tryBiometrics();
+      }
+    } finally {
+      _prompting = false;
+    }
   }
 
   String _wait(Duration d) => d.inMinutes >= 1

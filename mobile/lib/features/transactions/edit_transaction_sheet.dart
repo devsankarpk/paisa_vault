@@ -1,0 +1,131 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/db/app_database.dart';
+import 'format.dart';
+import 'providers.dart';
+import 'rule_amount.dart';
+import 'transaction_repository.dart';
+
+Future<void> showEditTransactionSheet(BuildContext context, Transaction tx) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => _EditSheet(tx),
+  );
+}
+
+class _EditSheet extends ConsumerStatefulWidget {
+  const _EditSheet(this.tx);
+  final Transaction tx;
+
+  @override
+  ConsumerState<_EditSheet> createState() => _EditSheetState();
+}
+
+class _EditSheetState extends ConsumerState<_EditSheet> {
+  late final _merchant = TextEditingController(text: widget.tx.merchant ?? '');
+  late final _amount = TextEditingController(
+    text: formatRupees(widget.tx.amountPaise).replaceAll(',', ''),
+  );
+  late final _note = TextEditingController(text: widget.tx.note ?? '');
+  late String? _category = defaultCategories.contains(widget.tx.categoryName)
+      ? widget.tx.categoryName
+      : null;
+  late Direction _direction = widget.tx.direction;
+  String? _error;
+
+  @override
+  void dispose() {
+    _merchant.dispose();
+    _amount.dispose();
+    _note.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final paise = rupeesToPaise(_amount.text);
+    if (paise == null || paise <= 0) {
+      setState(() => _error = 'Enter an amount like 499 or 499.50');
+      return;
+    }
+    final repo = await ref.read(transactionRepositoryProvider.future);
+    await repo.correct(
+      widget.tx.id,
+      merchant: _merchant.text.trim(),
+      categoryName: _category,
+      direction: _direction,
+      amountPaise: paise,
+      note: _note.text.trim(),
+    );
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        0,
+        20,
+        MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Correct transaction',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 16),
+            SegmentedButton<Direction>(
+              segments: const [
+                ButtonSegment(value: Direction.debit, label: Text('Money out')),
+                ButtonSegment(value: Direction.credit, label: Text('Money in')),
+              ],
+              selected: {_direction},
+              onSelectionChanged: (s) => setState(() => _direction = s.first),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _amount,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: InputDecoration(
+                labelText: 'Amount (₹)',
+                errorText: _error,
+              ),
+            ),
+            TextField(
+              controller: _merchant,
+              decoration: const InputDecoration(labelText: 'Merchant'),
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(
+              initialValue: _category,
+              decoration: const InputDecoration(labelText: 'Category'),
+              items: [
+                for (final c in defaultCategories)
+                  DropdownMenuItem(value: c, child: Text(c)),
+              ],
+              onChanged: (v) => setState(() => _category = v),
+            ),
+            TextField(
+              controller: _note,
+              decoration: const InputDecoration(labelText: 'Note (optional)'),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(onPressed: _save, child: const Text('Save')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

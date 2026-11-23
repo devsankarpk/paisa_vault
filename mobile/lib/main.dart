@@ -9,7 +9,7 @@ import 'features/lock/lock_controller.dart';
 import 'features/lock/lock_gate.dart';
 import 'features/sms/native_sms_source.dart';
 import 'features/sms/sms_runner.dart';
-import 'features/sms/saved_count.dart';
+import 'features/transactions/transactions_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ void main() {
 }
 
 class PaisaVaultApp extends StatelessWidget {
-  const PaisaVaultApp({super.key, this.home = const _Home()});
+  const PaisaVaultApp({super.key, this.home = const TransactionsScreen()});
 
   final Widget home;
 
@@ -37,41 +37,6 @@ class PaisaVaultApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
       home: LockGate(child: SmsRunner(child: home)),
-    );
-  }
-}
-
-/// Placeholder home until the transaction list exists. Shows only how many messages are saved.
-class _Home extends ConsumerWidget {
-  const _Home();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final count = ref.watch(savedMessageCountProvider);
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Paisa Vault'),
-            const SizedBox(height: 8),
-            Text(
-              count.when(
-                data: (n) => 'Saved messages: $n',
-                loading: () => 'Saved messages: ...',
-                error: (_, _) => 'Saved messages: error',
-              ),
-              style: const TextStyle(color: Colors.grey),
-            ),
-            for (final t
-                in ref.watch(savedTimesProvider).value ?? const <DateTime>[])
-              Text(
-                t.toLocal().toString().substring(0, 19),
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-          ],
-        ),
-      ),
     );
   }
 }

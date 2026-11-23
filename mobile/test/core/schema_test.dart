@@ -33,8 +33,8 @@ void main() {
     return rows.map((r) => r.read<String>('name')).toSet();
   }
 
-  test('schema v1 creates the planned tables', () async {
-    expect(db.schemaVersion, 1);
+  test('schema creates the planned tables', () async {
+    expect(db.schemaVersion, 2);
     expect(
       await names('table'),
       containsAll([
@@ -62,7 +62,7 @@ void main() {
     );
   });
 
-  test('migration from an older file keeps data (v1 reopen)', () async {
+  test('migration from an older file keeps data (reopen)', () async {
     await db
         .into(db.banks)
         .insert(BanksCompanion.insert(code: 'HDFC', name: 'HDFC Bank'));
@@ -70,7 +70,7 @@ void main() {
     db = AppDatabase(openEncrypted(file, key));
     expect((await db.select(db.banks).get()).single.code, 'HDFC');
     final v = await db.customSelect('pragma user_version').getSingle();
-    expect(v.read<int>('user_version'), 1);
+    expect(v.read<int>('user_version'), 2);
   });
 
   test('transaction stores paise and currency, with safe defaults', () async {

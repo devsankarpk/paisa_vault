@@ -121,9 +121,10 @@ class LockController extends Notifier<LockState> {
     _idle = Timer(state.autoLock, lock);
   }
 
+  /// Leaving the app (home button, app switcher, phone locking) locks it straight away.
   void appBackgrounded() {
     _backgroundedAt = ref.read(clockProvider).now();
-    _idle?.cancel();
+    lock();
   }
 
   void appResumed() {

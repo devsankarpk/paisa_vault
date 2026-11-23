@@ -89,6 +89,15 @@ int? parsePaise(String text) {
   return rupees * 100 + paise + roundUp;
 }
 
+/// True when a name is a bank, not a shop. Small models sometimes answer with the bank that sent
+/// the SMS, which is never the merchant.
+bool looksLikeBankName(String? name) {
+  if (name == null) return false;
+  final low = name.toLowerCase();
+  return low.contains('bank') ||
+      _bankWords.values.any((p) => RegExp(p).hasMatch(low));
+}
+
 class RuleExtractor {
   const RuleExtractor();
 
