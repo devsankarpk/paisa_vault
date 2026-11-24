@@ -143,9 +143,30 @@ enum SmsChannel {
         let args = call.arguments as? [String: Any]
         SmsStage.acknowledge(Set((args?["ids"] as? [String]) ?? []))
         result(nil)
+      case "signingExpiry":
+        result(SigningInfo.expiryMillis())
       default:
         result(FlutterMethodNotImplemented)
       }
     }
+  }
+}
+
+/// When the signing profile embedded in the app stops working (free Apple ID: 7 days).
+enum SigningInfo {
+  static func expiryMillis() -> Int? {
+    guard let path = Bundle.main.path(forResource: "embedded", ofType: "mobileprovision"),
+      let data = FileManager.default.contents(atPath: path)
+    else { return nil }
+    let text = String(decoding: data, as: UTF8.self)
+    guard let start = text.range(of: "<?xml"), let end = text.range(of: "</plist>") else {
+      return nil
+    }
+    let plist = String(text[start.lowerBound..<end.upperBound])
+    guard let plistData = plist.data(using: .utf8),
+      let object = try? PropertyListSerialization.propertyList(from: plistData, format: nil),
+      let dict = object as? [String: Any], let date = dict["ExpirationDate"] as? Date
+    else { return nil }
+    return Int(date.timeIntervalSince1970 * 1000)
   }
 }

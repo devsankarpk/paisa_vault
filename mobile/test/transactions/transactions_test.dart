@@ -10,7 +10,10 @@ import 'package:paisa_vault/core/db/key_store.dart';
 import 'package:paisa_vault/core/providers.dart';
 import 'package:paisa_vault/features/pipeline/extraction_pipeline.dart';
 import 'package:paisa_vault/features/sms/raw_message_repository.dart';
+import 'package:paisa_vault/features/transactions/add_message_screen.dart';
 import 'package:paisa_vault/features/transactions/format.dart';
+import 'package:paisa_vault/features/transactions/providers.dart';
+import 'package:paisa_vault/features/transactions/signing_expiry.dart';
 import 'package:paisa_vault/features/transactions/processing_service.dart';
 import 'package:paisa_vault/features/transactions/rule_amount.dart';
 import 'package:paisa_vault/features/transactions/transaction_detail_screen.dart';
@@ -330,6 +333,22 @@ void main() {
       expect(await db.select(db.transactions).get(), hasLength(2));
     });
 
+    test('a missing last 4 is filled in once the rules can read it', () async {
+      await run([
+        'Rs 250.00 spent on HDFC Bank Card (1234) at ZOMATO on 12-10-26.',
+      ]);
+      await (db.update(db.transactions)).write(
+        const TransactionsCompanion(last4: Value(null), accountId: Value(null)),
+      );
+      expect(await repo.refillRuleFields(), 1);
+      expect(await repo.linkUnlinked(), 1);
+      final t = (await db.select(db.transactions).get()).single;
+      expect(t.last4, '1234');
+      expect(t.accountId, isNotNull);
+      // nothing left to fill
+      expect(await repo.refillRuleFields(), 0);
+    });
+
     test('earlier transactions without an account get linked', () async {
       await run([withMerchant]);
       await (db.update(db.transactions))
@@ -339,6 +358,67 @@ void main() {
         (await db.select(db.transactions).get()).single.accountId,
         isNotNull,
       );
+    });
+  });
+
+  group('signing expiry', () {
+    test('whole days left', () {
+      final now = DateTime(2026, 11, 24, 12);
+      expect(daysUntil(DateTime(2026, 12, 1, 12), now), 7);
+      expect(daysUntil(DateTime(2026, 11, 26, 6), now), 1);
+      expect(daysUntil(DateTime(2026, 11, 24, 18), now), 0);
+      expect(daysUntil(DateTime(2026, 11, 23, 12), now), -1);
+    });
+  });
+
+  group('add a pasted message', () {
+    testWidgets('a pasted bank SMS becomes a transaction', (t) async {
+      late ProviderContainer c;
+      c = ProviderContainer(
+        overrides: [
+          appDatabaseProvider.overrideWith((ref) async => db),
+          clockProvider.overrideWithValue(clock),
+          processingServiceProvider.overrideWith(
+            (ref) async => service(llm: FakeLlmEngine([goodReply])),
+          ),
+        ],
+      );
+      late WidgetRef captured;
+      await t.pumpWidget(
+        UncontrolledProviderScope(
+          container: c,
+          child: MaterialApp(
+            home: Consumer(
+              builder: (_, ref, _) {
+                captured = ref;
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+      Future<AddMessageResult> add(String text) async =>
+          (await t.runAsync(() => addPastedMessage(captured, text)))!;
+
+      expect(await add('   '), AddMessageResult.empty);
+      expect(await add('Your OTP is 123456'), AddMessageResult.notATransaction);
+      expect(await add(withMerchant), AddMessageResult.added);
+      final rows = await t.runAsync(() => db.select(db.transactions).get());
+      expect(rows, hasLength(1));
+      expect(rows!.single.merchant, 'ZOMATO');
+      // the same text again right away is not added twice
+      expect(await add(withMerchant), AddMessageResult.repeat);
+      expect(
+        await t.runAsync(() => db.select(db.transactions).get()),
+        hasLength(1),
+      );
+
+      await t.pumpWidget(const SizedBox());
+      c.dispose();
+      await t.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await t.pump(const Duration(seconds: 1));
     });
   });
 

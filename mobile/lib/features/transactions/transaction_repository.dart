@@ -6,6 +6,7 @@ import 'package:drift/drift.dart';
 import '../../core/clock.dart';
 import '../../core/db/app_database.dart';
 import '../pipeline/extraction_pipeline.dart';
+import '../pipeline/rule_extractor.dart';
 
 /// The default category list (decision D4). Becomes user-editable in Phase 1B.
 const defaultCategories = [
@@ -132,6 +133,37 @@ class TransactionRepository {
             createdAt: _clock.now(),
           ),
         );
+  }
+
+  /// Re-reads bank and last 4 from the saved message for transactions that are missing them,
+  /// after the rules got better. Fills only empty fields; never changes a value that is there.
+  /// Returns how many transactions were updated.
+  Future<int> refillRuleFields() async {
+    final rows =
+        await (_db.select(_db.transactions)..where(
+              (t) =>
+                  (t.last4.isNull() | t.bankCode.isNull()) &
+                  t.rawMessageId.isNotNull(),
+            ))
+            .get();
+    var n = 0;
+    for (final t in rows) {
+      final raw = await (_db.select(
+        _db.rawMessages,
+      )..where((m) => m.id.equals(t.rawMessageId!))).getSingleOrNull();
+      if (raw == null) continue;
+      final f = const RuleExtractor().extract(raw.body);
+      final bank = t.bankCode ?? f.bank;
+      final last4 = t.last4 ?? f.last4;
+      if (bank == t.bankCode && last4 == t.last4) continue;
+      await (_db.update(
+        _db.transactions,
+      )..where((x) => x.id.equals(t.id))).write(
+        TransactionsCompanion(bankCode: Value(bank), last4: Value(last4)),
+      );
+      n++;
+    }
+    return n;
   }
 
   /// Links transactions saved before accounts existed. Returns how many were linked.
