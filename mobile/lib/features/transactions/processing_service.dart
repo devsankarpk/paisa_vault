@@ -45,6 +45,7 @@ class ProcessingService {
                 ..orderBy([(m) => OrderingTerm.asc(m.receivedAt)]))
               .get();
       // Transactions made while no model was installed can be re-checked once one is.
+      await _repo.linkUnlinked();
       final recheck =
           await (_db.select(_db.transactions)..where(
                 (t) =>
@@ -91,15 +92,21 @@ class ProcessingService {
             await _mark(m.id, RawMessageStatus.ignored);
             continue;
           }
+          var duplicate = false;
           await _db.transaction(() async {
-            await _repo.insertExtracted(
+            final id = await _repo.insertExtracted(
               t,
               rawMessageId: m.id,
               receivedAt: m.receivedAt,
             );
+            duplicate = id == null;
             await _mark(m.id, RawMessageStatus.processed);
           });
-          made++;
+          if (duplicate) {
+            skipped++;
+          } else {
+            made++;
+          }
         }
         if (engine != null) {
           for (final t in recheck) {

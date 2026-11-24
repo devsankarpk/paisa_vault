@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:drift/drift.dart' show driftRuntimeOptions;
+import 'package:drift/drift.dart' show Value, driftRuntimeOptions;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -259,6 +259,85 @@ void main() {
       expect(
         (await db.select(db.transactions).getSingle()).confirmReason,
         'no_model',
+      );
+    });
+  });
+
+  group('accounts and duplicates', () {
+    const upiA =
+        'Rs 499.00 debited from HDFC Bank A/c XX1234 on 20-11-26. UPI Ref 123456789012';
+    const upiB =
+        'HDFC Bank: Rs 499.00 debited from A/c XX1234 on 20-11-26 UPI Ref 123456789012. Not you? Call support';
+
+    Future<void> run(List<String> bodies) async {
+      var i = 0;
+      for (final b in bodies) {
+        await raw.save(sms(b, DateTime(2026, 11, 21, 10, i++ * 10)));
+      }
+      await service(llm: FakeLlmEngine([goodReply, goodReply, goodReply]))
+          .processNew();
+    }
+
+    test('transactions are linked to one account by bank and last 4', () async {
+      await run([
+        withMerchant,
+        upiA.replaceAll('123456789012', '999999999999'),
+      ]);
+      final txns = await db.select(db.transactions).get();
+      expect(txns, hasLength(2));
+      expect(txns.every((t) => t.accountId != null), isTrue);
+      expect(txns[0].accountId, txns[1].accountId);
+      final accounts = await db.select(db.accounts).get();
+      expect(accounts, hasLength(1));
+      expect(accounts.single.last4, '1234');
+      expect(accounts.single.status, AccountStatus.pending);
+      final banks = await db.select(db.banks).get();
+      expect(banks.single.code, 'HDFC');
+    });
+
+    test('a different last 4 is a different account', () async {
+      await run([withMerchant, withMerchant.replaceAll('1234', '5678')]);
+      expect(await db.select(db.accounts).get(), hasLength(2));
+    });
+
+    test('a message without bank or last 4 has no account', () async {
+      await run(['Rs 120.00 spent at SOME SHOP on 12-10-26.']);
+      final t = (await db.select(db.transactions).get()).single;
+      expect(t.accountId, isNull);
+      expect(await db.select(db.accounts).get(), isEmpty);
+    });
+
+    test(
+      'the same transaction reported twice with a reference is stored once',
+      () async {
+        await run([upiA, upiB]);
+        expect(await db.select(db.transactions).get(), hasLength(1));
+        // both messages are finished, none left waiting
+        final left =
+            await (db.select(db.rawMessages)..where(
+                  (m) => m.status.equals(RawMessageStatus.newMessage.name),
+                ))
+                .get();
+        expect(left, isEmpty);
+      },
+    );
+
+    test('identical payments without a reference are both kept', () async {
+      await run([
+        'Rs 50.00 spent on HDFC Bank Card x1234 at CHAI on 12-10-26.',
+        'Rs 50.00 spent on HDFC Bank Card x1234 at CHAI stall on 12-10-26.',
+      ]);
+      expect(await db.select(db.transactions).get(), hasLength(2));
+    });
+
+    test('earlier transactions without an account get linked', () async {
+      await run([withMerchant]);
+      await (db.update(db.transactions))
+          .write(const TransactionsCompanion(accountId: Value(null)));
+      expect(await repo.linkUnlinked(), 1);
+      expect(
+        (await db.select(db.transactions).get()).single.accountId,
+        isNotNull,
       );
     });
   });
