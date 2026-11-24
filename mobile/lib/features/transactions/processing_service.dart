@@ -6,9 +6,16 @@ import '../pipeline/extraction_pipeline.dart';
 import 'transaction_repository.dart';
 
 class ProcessingResult {
-  const ProcessingResult({required this.transactions, required this.skipped});
+  const ProcessingResult({
+    required this.transactions,
+    required this.skipped,
+    this.duplicates = 0,
+  });
   final int transactions;
   final int skipped;
+
+  /// Messages for a transaction that was already stored.
+  final int duplicates;
 }
 
 /// Turns saved messages marked "new" into transactions. A message that gives no amount or
@@ -45,6 +52,8 @@ class ProcessingService {
                 ..orderBy([(m) => OrderingTerm.asc(m.receivedAt)]))
               .get();
       // Transactions made while no model was installed can be re-checked once one is.
+      await _repo.refillRuleFields();
+      await _repo.linkUnlinked();
       final recheck =
           await (_db.select(_db.transactions)..where(
                 (t) =>
@@ -83,6 +92,7 @@ class ProcessingService {
       try {
         var made = 0;
         var skipped = 0;
+        var duplicates = 0;
         for (final m in pending) {
           final result = await pipeline.process(m.body);
           final t = result.transaction;
@@ -91,22 +101,32 @@ class ProcessingService {
             await _mark(m.id, RawMessageStatus.ignored);
             continue;
           }
+          var duplicate = false;
           await _db.transaction(() async {
-            await _repo.insertExtracted(
+            final id = await _repo.insertExtracted(
               t,
               rawMessageId: m.id,
               receivedAt: m.receivedAt,
             );
+            duplicate = id == null;
             await _mark(m.id, RawMessageStatus.processed);
           });
-          made++;
+          if (duplicate) {
+            duplicates++;
+          } else {
+            made++;
+          }
         }
         if (engine != null) {
           for (final t in recheck) {
             await _recheck(t, pipeline);
           }
         }
-        return ProcessingResult(transactions: made, skipped: skipped);
+        return ProcessingResult(
+          transactions: made,
+          skipped: skipped,
+          duplicates: duplicates,
+        );
       } finally {
         await engine?.dispose();
       }

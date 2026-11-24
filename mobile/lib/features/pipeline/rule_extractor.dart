@@ -72,7 +72,13 @@ final _amountRs = RegExp(
 );
 final _amountBy = RegExp(r'\b(?:by|of)\s+([\d,]+\.\d+)', caseSensitive: false);
 final _last4 = RegExp(
-  r'(?:a/c|acct|card|ending)(?:\s+no\.?)?\s*[*x]*(\d{4,})',
+  r'(?:a/c|acct|card|ending)(?:\s+(?:no\.?|with|is))?\s*[(\[]?\s*[*x]*(\d{4,})',
+  caseSensitive: false,
+);
+
+/// A masked number alone in brackets: "(XX1234)", "(xxxx1234)", "(****1234)".
+final _last4Masked = RegExp(
+  r'[(\[]\s*[*x]{2,}\s*(\d{4})\s*[)\]]',
   caseSensitive: false,
 );
 
@@ -157,7 +163,9 @@ class RuleExtractor {
   }
 
   String? _lastFour(String sms) {
-    final digits = _last4.firstMatch(sms)?.group(1);
+    final digits =
+        _last4.firstMatch(sms)?.group(1) ??
+        _last4Masked.firstMatch(sms)?.group(1);
     if (digits == null || digits.length < 4) return null;
     return digits.substring(digits.length - 4);
   }

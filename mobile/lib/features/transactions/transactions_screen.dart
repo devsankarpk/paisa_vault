@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/app_database.dart';
 import '../../core/theme/app_theme.dart';
+import 'add_message_screen.dart';
 import 'format.dart';
 import 'providers.dart';
+import 'signing_expiry.dart';
 import 'transaction_detail_screen.dart';
 
 class TransactionsScreen extends ConsumerWidget {
@@ -21,19 +23,64 @@ class TransactionsScreen extends ConsumerWidget {
         ),
         backgroundColor: PvColors.background,
         surfaceTintColor: Colors.transparent,
+        actions: [
+          IconButton(
+            tooltip: 'Add a bank SMS',
+            icon: const Icon(Icons.add),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const AddMessageScreen()),
+            ),
+          ),
+        ],
       ),
-      body: list.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) =>
-            const Center(child: Text('Could not load transactions')),
-        data: (items) => items.isEmpty
-            ? const _Empty()
-            : ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                itemCount: items.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (_, i) => _Tile(items[i]),
-              ),
+      body: Column(
+        children: [
+          const _SigningBanner(),
+          Expanded(child: _body(list)),
+        ],
+      ),
+    );
+  }
+
+  Widget _body(AsyncValue<List<Transaction>> list) {
+    return list.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, _) => const Center(child: Text('Could not load transactions')),
+      data: (items) => items.isEmpty
+          ? const _Empty()
+          : ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              itemCount: items.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (_, i) => _Tile(items[i]),
+            ),
+    );
+  }
+}
+
+/// Warns before a free-account build stops working (7 days after it was signed).
+class _SigningBanner extends ConsumerWidget {
+  const _SigningBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final days = ref.watch(signingDaysLeftProvider).asData?.value;
+    if (days == null || days > signingWarnDays) return const SizedBox.shrink();
+    final text = days < 0
+        ? 'This build has expired. New bank SMS are not being saved. Reinstall it from the Mac.'
+        : days == 0
+        ? 'This build expires today. Reinstall it from the Mac.'
+        : 'This build expires in $days day${days == 1 ? '' : 's'}. Reinstall it from the Mac.';
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFFFDEBEB),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: PvColors.error,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

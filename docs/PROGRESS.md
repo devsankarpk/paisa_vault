@@ -119,8 +119,8 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Extraction prompt and strict JSON schema (done 23 Nov: rules read amount, direction, bank, last 4, date, reference, channel and known merchant phrasings; model asked only for merchant, category, channel; strict reply check, one retry, then please confirm; 26 tests; on 25 real transaction messages rules found amount, direction, last 4 and date in all 25)
 - [x] Amount safety check (done 23 Nov: amount must literally appear in the SMS, tested with Indian number grouping)
 - [ ] Processing queue (WorkManager, next-open on iPhone)
-- [ ] Duplicate check
-- [ ] Bank, card and account mapping
+- [x] Duplicate check (same bank, last 4, amount, day and reference; none without a reference)
+- [x] Bank, card and account mapping (bank + last 4; new ones saved as pending until confirmed in the accounts screen)
 - [ ] Pipeline log, local crash capture, redaction test
 - [ ] Consent screens and "Erase everything"
 - [ ] Backup key design note
@@ -267,6 +267,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 24 Nov 2026 | Added "Add a bank SMS" (paste a missed message, + button on Transactions), an in-app banner that warns 3 days before the free Apple signing expires, and last 4 digits are now read when written in brackets. Stored transactions missing bank or last 4 are filled in again when the rules improve. Tested on iPhone; vivo not updated yet. |
+| 24 Nov 2026 | Transactions are linked to an account by bank and last 4 (new accounts saved as pending), and a repeat of the same transaction with the same reference number is stored once. Existing rows get linked. iPhone app stopped working because the free Apple signing expired after 7 days; reinstalled (next expiry 1 Dec) until the paid account is set up. |
 | 23 Nov 2026 | On-device model confirmed on both phones: iPhone 15 about 3.3 s per message, vivo 5 to 16 s. Fixed three problems found on real data: earlier failed rows were never re-checked, a model channel word like "Online" caused the whole reply to be rejected (now matched ignoring capitals; unknown channel ignored), and grey label text was too faint (darker). |
 | 23 Nov 2026 | On-device model engine added (Qwen3 1.7B via llamadart, loaded from the app folder, freed after each batch) with a diagnostics log; not yet confirmed running on a real transaction. Lock fixes tested on iPhone: every touch resets the idle timer, the app locks as soon as it is left, and Face ID prompts again when the app returns to the front. |
 | 23 Nov 2026 | Schema v2 (bank, last 4, account kind, category name, confirm reason, corrected flag) with migration tests; the v1 to v2 upgrade ran on the owner's iPhone with real data. Messages are now processed into transactions; Transactions list, detail with the original message, and an edit sheet added. |

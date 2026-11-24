@@ -209,4 +209,17 @@ void main() {
       expect(rules.extract('Rs 2000 withdrawn at SBI ATM').merchant, isNull);
     });
   });
+
+  group('last 4 digits in brackets', () {
+    for (final (text, want) in [
+      ('Rs 5 spent on HDFC Bank Card (1234) at SHOP', '1234'),
+      ('Rs 5 spent on Credit Card ending (XX1234) at SHOP', '1234'),
+      ('Rs 5 debited from A/c (XXXX1234) on 12-10-26', '1234'),
+      ('Rs 5 spent on card no. [x5678] at SHOP', '5678'),
+      ('Rs 5 spent on your card ending with (4321)', '4321'),
+      ('Rs 5 spent at SHOP using (XX9876) on 12-10-26', '9876'),
+    ]) {
+      test(text, () => expect(const RuleExtractor().extract(text).last4, want));
+    }
+  });
 }

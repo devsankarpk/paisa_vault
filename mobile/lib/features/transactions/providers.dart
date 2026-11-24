@@ -5,6 +5,7 @@ import '../../core/providers.dart';
 import '../../services/llm_engine.dart';
 import '../pipeline/model_reply.dart';
 import '../model/llama_engine.dart';
+import '../sms/raw_message_repository.dart';
 import '../model/model_diagnostics.dart';
 import '../model/model_locator.dart';
 import '../model/model_manifest.dart';
@@ -93,6 +94,13 @@ final transactionRepositoryProvider = FutureProvider<TransactionRepository>((
 ) async {
   final db = await ref.watch(appDatabaseProvider.future);
   return TransactionRepository(db, ref.watch(clockProvider));
+});
+
+final rawMessageRepositoryProvider = FutureProvider<RawMessageRepository>((
+  ref,
+) async {
+  final db = await ref.watch(appDatabaseProvider.future);
+  return RawMessageRepository(db, ref.watch(clockProvider));
 });
 
 final processingServiceProvider = FutureProvider<ProcessingService>((
