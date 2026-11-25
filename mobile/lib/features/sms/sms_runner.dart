@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import 'raw_message_repository.dart';
 import 'shortcut_guide_screen.dart';
+import 'shortcut_health.dart';
 import '../model/model_diagnostics.dart';
 import '../transactions/providers.dart';
 import 'sms_disclosure_screen.dart';
@@ -80,6 +81,7 @@ class _SmsRunnerState extends ConsumerState<SmsRunner>
                 .now()
                 .subtract(RawMessageRepository.retention),
           );
+      ref.invalidate(lastBankMessageProvider);
       if (purged > 0) debugPrint('PV_PURGE deleted=$purged');
       if (made.transactions + made.skipped > 0) {
         debugPrint(
