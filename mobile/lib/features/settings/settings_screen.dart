@@ -109,7 +109,11 @@ class SettingsScreen extends ConsumerWidget {
 String _lastText(DateTime? last, DateTime now) {
   if (last == null) return 'No bank message has reached the app yet.';
   final d = daysSince(last, now);
-  return 'Last bank message received ${d == 0 ? 'today' : d == 1 ? 'yesterday' : '$d days ago'}.';
+  return 'Last bank message received ${d == 0
+      ? 'today'
+      : d == 1
+      ? 'yesterday'
+      : '$d days ago'}.';
 }
 
 final _days = RawMessageRepository.retention.inDays;

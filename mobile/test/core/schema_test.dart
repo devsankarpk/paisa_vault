@@ -34,7 +34,7 @@ void main() {
   }
 
   test('schema creates the planned tables', () async {
-    expect(db.schemaVersion, 2);
+    expect(db.schemaVersion, 3);
     expect(
       await names('table'),
       containsAll([
@@ -43,6 +43,7 @@ void main() {
         'accounts',
         'raw_messages',
         'transactions',
+        'merchant_rules',
         'pipeline_log',
         'hidden_hash',
       ]),
@@ -70,7 +71,7 @@ void main() {
     db = AppDatabase(openEncrypted(file, key));
     expect((await db.select(db.banks).get()).single.code, 'HDFC');
     final v = await db.customSelect('pragma user_version').getSingle();
-    expect(v.read<int>('user_version'), 2);
+    expect(v.read<int>('user_version'), 3);
   });
 
   test('transaction stores paise and currency, with safe defaults', () async {

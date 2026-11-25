@@ -44,8 +44,9 @@ class RawMessageRepository {
   /// Shortcuts automation that has stopped running.
   Future<DateTime?> lastSavedAt() async {
     final latest = _db.rawMessages.createdAt.max();
-    final row = await (_db.selectOnly(_db.rawMessages)..addColumns([latest]))
-        .getSingle();
+    final row = await (_db.selectOnly(
+      _db.rawMessages,
+    )..addColumns([latest])).getSingle();
     return row.read(latest);
   }
 
