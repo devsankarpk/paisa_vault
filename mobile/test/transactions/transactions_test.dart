@@ -361,6 +361,32 @@ void main() {
     });
   });
 
+  group('purge of old message text', () {
+    test(
+      'old processed messages are deleted, transactions stay unlinked',
+      () async {
+        final oldAt = DateTime(2026, 8, 1, 10);
+        await raw.save(sms(withMerchant, oldAt));
+        await raw.save(sms(noMerchant, DateTime(2026, 11, 20, 10)));
+        await service().processNew();
+        // a very old message still waiting to be processed must not be thrown away
+        await raw.save(
+          sms('Rs 77.00 debited from A/c XX1111', DateTime(2026, 7, 1)),
+        );
+
+        final deleted = await raw.purgeOlderThan(
+          DateTime(2026, 11, 21).subtract(RawMessageRepository.retention),
+        );
+        expect(deleted, 1);
+        final left = await db.select(db.rawMessages).get();
+        expect(left, hasLength(2));
+        final txns = await db.select(db.transactions).get();
+        expect(txns, hasLength(2)); // both transactions stay
+        expect(txns.where((t) => t.rawMessageId == null), hasLength(1));
+      },
+    );
+  });
+
   group('signing expiry', () {
     test('whole days left', () {
       final now = DateTime(2026, 11, 24, 12);

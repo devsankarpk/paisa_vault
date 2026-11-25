@@ -114,7 +114,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Android SMS disclosure and receiver plugin (done 19 Nov: Keystore-encrypted stage, drain into raw_messages, disclosure screen, RECEIVE_SMS only, 37 Dart + 7 Kotlin tests; real INDBNK alerts saved on vivo with the app open and with it closed)
 - [x] iPhone App Intent and Shortcut guide (done 21 Nov: Log Bank Message action in the real app, encrypted per-message stage, Shortcut guide screen, drain into raw_messages, repeats merged; a real HDFC alert on the iPhone fired the Rs automation, was staged encrypted and saved after unlock; keep the Message field on the Shortcut Input variable, never "Ask Each Time"; free signing expires after 7 days)
 - [ ] OTP and promo filter, sender normalisation (built 21 Nov: rule classifier with 34 tests, OTP and promo dropped and never stored, reminders and declines stored as ignored; run on 31 real messages: 25 transaction, 4 other, 2 promo; 3 messages to review with the owner; sender normalisation done in the SMS tool only, not yet in the app)
-- [ ] Encrypted raw_messages with purge job
+- [x] Encrypted raw_messages with purge job (done 25 Nov: whole database encrypted; original message text deleted 60 days after it arrived, transactions stay; unprocessed messages never deleted; tested)
 - [ ] LlmEngine for the chosen model, manifest, bundled model
 - [x] Extraction prompt and strict JSON schema (done 23 Nov: rules read amount, direction, bank, last 4, date, reference, channel and known merchant phrasings; model asked only for merchant, category, channel; strict reply check, one retry, then please confirm; 26 tests; on 25 real transaction messages rules found amount, direction, last 4 and date in all 25)
 - [x] Amount safety check (done 23 Nov: amount must literally appear in the SMS, tested with Indian number grouping)
@@ -122,7 +122,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Duplicate check (same bank, last 4, amount, day and reference; none without a reference)
 - [x] Bank, card and account mapping (bank + last 4; new ones saved as pending until confirmed in the accounts screen)
 - [ ] Pipeline log, local crash capture, redaction test
-- [ ] Consent screens and "Erase everything"
+- [x] Consent screens and "Erase everything" (done 25 Nov: SMS disclosure on Android, Shortcut guide on iPhone, new Settings screen with privacy note and Erase everything; erase checked on the iPhone, not yet on the vivo)
 - [ ] Backup key design note
 - [ ] Golden-SMS suite in CI, real SMS from all five banks on both phones
 
@@ -132,7 +132,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Amount safety check (done 23 Nov: amount must literally appear in the SMS, tested with Indian number grouping) proven
 - [ ] Golden suite green and meets Phase 0 thresholds
 - [ ] Release build has no INTERNET permission
-- [ ] "Erase everything" works
+- [ ] "Erase everything" works (iPhone checked 25 Nov; vivo still to check)
 - [ ] Redaction test passes
 
 ## Phase 1B: Categorise, search, budgets, backup
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 25 Nov 2026 | Settings screen with privacy note and "Erase everything" (checked on the iPhone: app returns to PIN setup with an empty list). Original message text is deleted after 60 days; transactions stay, so 3 and 6 month reports are unaffected. |
 | 24 Nov 2026 | Added "Add a bank SMS" (paste a missed message, + button on Transactions), an in-app banner that warns 3 days before the free Apple signing expires, and last 4 digits are now read when written in brackets. Stored transactions missing bank or last 4 are filled in again when the rules improve. Tested on iPhone; vivo not updated yet. |
 | 24 Nov 2026 | Transactions are linked to an account by bank and last 4 (new accounts saved as pending), and a repeat of the same transaction with the same reference number is stored once. Existing rows get linked. iPhone app stopped working because the free Apple signing expired after 7 days; reinstalled (next expiry 1 Dec) until the paid account is set up. |
 | 23 Nov 2026 | On-device model confirmed on both phones: iPhone 15 about 3.3 s per message, vivo 5 to 16 s. Fixed three problems found on real data: earlier failed rows were never re-checked, a model channel word like "Online" caused the whole reply to be rejected (now matched ignoring capitals; unknown channel ignored), and grey label text was too faint (darker). |
