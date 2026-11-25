@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/db/app_database.dart';
 import '../../core/theme/app_theme.dart';
 import 'add_message_screen.dart';
+import '../settings/settings_screen.dart';
 import 'format.dart';
 import 'providers.dart';
 import 'signing_expiry.dart';
@@ -24,6 +25,13 @@ class TransactionsScreen extends ConsumerWidget {
         backgroundColor: PvColors.background,
         surfaceTintColor: Colors.transparent,
         actions: [
+          IconButton(
+            tooltip: 'Settings',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+            ),
+          ),
           IconButton(
             tooltip: 'Add a bank SMS',
             icon: const Icon(Icons.add),

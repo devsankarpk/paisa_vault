@@ -73,6 +73,14 @@ class _SmsRunnerState extends ConsumerState<SmsRunner>
       // Turn newly saved transaction messages into transactions (rules now, model when installed).
       final made = await (await ref.read(processingServiceProvider.future))
           .processNew();
+      final purged = await (await ref.read(rawMessageRepositoryProvider.future))
+          .purgeOlderThan(
+            ref
+                .read(clockProvider)
+                .now()
+                .subtract(RawMessageRepository.retention),
+          );
+      if (purged > 0) debugPrint('PV_PURGE deleted=$purged');
       if (made.transactions + made.skipped > 0) {
         debugPrint(
           'PV_PROCESS transactions=${made.transactions} skipped=${made.skipped}',

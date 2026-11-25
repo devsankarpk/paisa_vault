@@ -16,6 +16,30 @@ class RawMessageRepository {
   /// Two saves of the same text this close together are one SMS (two Shortcut automations).
   static const duplicateWindow = Duration(minutes: 2);
 
+  /// Saved message text is kept this long for re-checks, then deleted (policy: 30 to 90 days).
+  static const retention = Duration(days: 60);
+
+  /// Deletes message text received before [cutoff] that is already processed or ignored. The
+  /// transactions made from it stay, and just lose the link to the original text. Returns how
+  /// many messages were deleted.
+  Future<int> purgeOlderThan(DateTime cutoff) async {
+    final old =
+        await (_db.select(_db.rawMessages)..where(
+              (m) =>
+                  m.receivedAt.isSmallerThanValue(cutoff) &
+                  m.status.equals(RawMessageStatus.newMessage.name).not(),
+            ))
+            .get();
+    if (old.isEmpty) return 0;
+    final ids = old.map((m) => m.id).toList();
+    return _db.transaction(() async {
+      await (_db.update(_db.transactions)
+            ..where((t) => t.rawMessageId.isIn(ids)))
+          .write(const TransactionsCompanion(rawMessageId: Value(null)));
+      return (_db.delete(_db.rawMessages)..where((m) => m.id.isIn(ids))).go();
+    });
+  }
+
   static String hashOf(String sender, String body) =>
       sha256.convert(utf8.encode('${sender.toUpperCase()}\n$body')).toString();
 
