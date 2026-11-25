@@ -10,6 +10,7 @@ import 'package:paisa_vault/core/db/key_store.dart';
 import 'package:paisa_vault/core/providers.dart';
 import 'package:paisa_vault/features/pipeline/extraction_pipeline.dart';
 import 'package:paisa_vault/features/sms/raw_message_repository.dart';
+import 'package:paisa_vault/features/sms/shortcut_health.dart';
 import 'package:paisa_vault/features/transactions/add_message_screen.dart';
 import 'package:paisa_vault/features/transactions/format.dart';
 import 'package:paisa_vault/features/transactions/providers.dart';
@@ -425,6 +426,34 @@ void main() {
       expect(daysUntil(DateTime(2026, 11, 26, 6), now), 1);
       expect(daysUntil(DateTime(2026, 11, 24, 18), now), 0);
       expect(daysUntil(DateTime(2026, 11, 23, 12), now), -1);
+    });
+  });
+
+  group('shortcut health', () {
+    final now = DateTime(2026, 11, 25, 12);
+    test('never received, fine, and stale', () {
+      expect(shortcutHealth(null, now), ShortcutHealth.neverReceived);
+      expect(
+        shortcutHealth(now.subtract(const Duration(days: 3)), now),
+        ShortcutHealth.ok,
+      );
+      expect(
+        shortcutHealth(now.subtract(const Duration(days: 7)), now),
+        ShortcutHealth.ok,
+      );
+      expect(
+        shortcutHealth(now.subtract(const Duration(days: 8)), now),
+        ShortcutHealth.stale,
+      );
+      expect(daysSince(now.subtract(const Duration(days: 9)), now), 9);
+    });
+
+    test('last saved time follows the newest saved message', () async {
+      expect(await raw.lastSavedAt(), isNull);
+      await raw.save(sms('first message', clock.now()));
+      clock.current = clock.current.add(const Duration(days: 2));
+      await raw.save(sms('second message', clock.now()));
+      expect(await raw.lastSavedAt(), clock.now());
     });
   });
 

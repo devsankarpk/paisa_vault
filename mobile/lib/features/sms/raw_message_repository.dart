@@ -40,6 +40,15 @@ class RawMessageRepository {
     });
   }
 
+  /// When the app last saved a message from the phone, or null if it never has. Used to spot a
+  /// Shortcuts automation that has stopped running.
+  Future<DateTime?> lastSavedAt() async {
+    final latest = _db.rawMessages.createdAt.max();
+    final row = await (_db.selectOnly(_db.rawMessages)..addColumns([latest]))
+        .getSingle();
+    return row.read(latest);
+  }
+
   static String hashOf(String sender, String body) =>
       sha256.convert(utf8.encode('${sender.toUpperCase()}\n$body')).toString();
 

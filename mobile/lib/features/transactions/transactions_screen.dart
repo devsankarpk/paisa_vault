@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/app_database.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/providers.dart';
+import '../sms/shortcut_guide_screen.dart';
+import '../sms/shortcut_health.dart';
 import 'add_message_screen.dart';
 import '../settings/settings_screen.dart';
 import 'format.dart';
@@ -44,6 +47,7 @@ class TransactionsScreen extends ConsumerWidget {
       body: Column(
         children: [
           const _SigningBanner(),
+          const _ShortcutBanner(),
           Expanded(child: _body(list)),
         ],
       ),
@@ -88,6 +92,44 @@ class _SigningBanner extends ConsumerWidget {
         style: const TextStyle(
           color: PvColors.error,
           fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+/// iPhone only: warns when no bank SMS has reached the app, or none for a week, since a
+/// Shortcuts automation that stops running gives no error.
+class _ShortcutBanner extends ConsumerWidget {
+  const _ShortcutBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!ref.watch(needsShortcutGuideProvider)) return const SizedBox.shrink();
+    final loaded = ref.watch(lastBankMessageProvider);
+    if (!loaded.hasValue) return const SizedBox.shrink();
+    final last = loaded.value;
+    final now = ref.watch(clockProvider).now();
+    final text = switch (shortcutHealth(last, now)) {
+      ShortcutHealth.ok => null,
+      ShortcutHealth.neverReceived =>
+        'No bank SMS has reached the app yet. Tap to check your Shortcuts setup.',
+      ShortcutHealth.stale =>
+        'No bank SMS for ${daysSince(last!, now)} days. If you had bank transactions, tap to check your Shortcuts setup.',
+    };
+    if (text == null) return const SizedBox.shrink();
+    return InkWell(
+      onTap: () => openShortcutGuide(context),
+      child: Container(
+        width: double.infinity,
+        color: const Color(0xFFFDF6E3),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Color(0xFFA06A10),
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

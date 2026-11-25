@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
+import 'shortcut_health.dart';
 
 /// iPhone only: how to set up the Shortcuts automation that sends each bank SMS to the app.
 class ShortcutGuideScreen extends StatelessWidget {
@@ -89,6 +92,7 @@ class ShortcutGuideScreen extends StatelessWidget {
                 ),
               ),
             ),
+            const _TestCard(),
             const SizedBox(height: 8),
             FilledButton(
               onPressed: onDone,
@@ -118,3 +122,54 @@ class _Card extends StatelessWidget {
     child: child,
   );
 }
+
+/// Step 6: proves the automation works. Ask someone to text you a message with the word
+/// "debited" (for example "test debited"). It turns green when the app receives one.
+class _TestCard extends ConsumerStatefulWidget {
+  const _TestCard();
+
+  @override
+  ConsumerState<_TestCard> createState() => _TestCardState();
+}
+
+class _TestCardState extends ConsumerState<_TestCard> {
+  late final DateTime _openedAt = ref.read(clockProvider).now();
+
+  @override
+  Widget build(BuildContext context) {
+    final last = ref.watch(lastBankMessageProvider).asData?.value;
+    final got = last != null && !last.isBefore(_openedAt);
+    return _Card(
+      color: got ? const Color(0xFFE6F6EC) : Colors.white,
+      child: Row(
+        children: [
+          Icon(
+            got ? Icons.check_circle : Icons.hourglass_empty,
+            color: got ? const Color(0xFF1E8E4E) : PvColors.muted,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              got
+                  ? 'Test message received. Your automation works.'
+                  : 'Test it: ask someone to text you "test debited", then come back here. '
+                        'This turns green when the message arrives.',
+              style: const TextStyle(fontSize: 15, height: 1.35),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Opens the setup guide on top of the current screen (from the banner or Settings).
+Future<void> openShortcutGuide(BuildContext context) =>
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (c) => ShortcutGuideScreen(
+          onDone: () => Navigator.of(c).pop(),
+          onSkip: () => Navigator.of(c).pop(),
+        ),
+      ),
+    );

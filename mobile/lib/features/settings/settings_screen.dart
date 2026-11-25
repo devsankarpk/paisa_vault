@@ -6,6 +6,8 @@ import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../lock/lock_controller.dart';
 import '../sms/raw_message_repository.dart';
+import '../sms/shortcut_guide_screen.dart';
+import '../sms/shortcut_health.dart';
 import 'erase_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -73,6 +75,21 @@ class SettingsScreen extends ConsumerWidget {
               're-checked, then deleted. Transactions stay.\n'
               'Never kept: card CVV.',
         ),
+        if (ref.watch(needsShortcutGuideProvider)) ...[
+          const SizedBox(height: 16),
+          _Card(
+            title: 'Shortcuts automation',
+            body: _lastText(
+              ref.watch(lastBankMessageProvider).asData?.value,
+              ref.watch(clockProvider).now(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: () => openShortcutGuide(context),
+            child: const Text('Setup steps and test'),
+          ),
+        ],
         const SizedBox(height: 16),
         const _Card(
           title: 'Erase everything',
@@ -87,6 +104,12 @@ class SettingsScreen extends ConsumerWidget {
       ],
     ),
   );
+}
+
+String _lastText(DateTime? last, DateTime now) {
+  if (last == null) return 'No bank message has reached the app yet.';
+  final d = daysSince(last, now);
+  return 'Last bank message received ${d == 0 ? 'today' : d == 1 ? 'yesterday' : '$d days ago'}.';
 }
 
 final _days = RawMessageRepository.retention.inDays;
