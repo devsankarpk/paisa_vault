@@ -43,6 +43,7 @@ class EraseService {
     'main.db-journal',
     'model_runs.log',
     'intent_runs.log',
+    'crash.log',
   ];
 
   Future<void> eraseAll() async {

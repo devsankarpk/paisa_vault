@@ -1,0 +1,233 @@
+[
+ {
+  "id": "hdfc-upi-debit",
+  "body": "Sent Rs.250.00 from HDFC Bank A/c *1234 to ZOMATO@okhdfc on 12-10-26. UPI Ref 123456789012",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 25000,
+   "direction": "debit",
+   "bank": "HDFC",
+   "last4": "1234",
+   "reference": "123456789012",
+   "channel": "UPI"
+  }
+ },
+ {
+  "id": "hdfc-card-spend",
+  "body": "Rs.1,250.00 spent on HDFC Bank Card x4321 at AMAZON on 12-10-26",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 125000,
+   "direction": "debit",
+   "bank": "HDFC",
+   "last4": "4321"
+  }
+ },
+ {
+  "id": "hdfc-neft-credit",
+  "body": "Rs. 5000.00 credited to HDFC Bank A/c XX1234 on 01-11-26 by NEFT from ACME PVT LTD. Ref 998877665544",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 500000,
+   "direction": "credit",
+   "bank": "HDFC",
+   "last4": "1234",
+   "channel": "NEFT"
+  }
+ },
+ {
+  "id": "hdfc-atm",
+  "body": "HDFC Bank: Rs 2,000.00 withdrawn at ATM from A/c XX1234 on 14-10-26",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 200000,
+   "direction": "debit",
+   "bank": "HDFC",
+   "last4": "1234",
+   "channel": "ATM"
+  }
+ },
+ {
+  "id": "hdfc-credit-card-brackets",
+  "body": "INR 1,00,000.50 debited from HDFC Bank Credit Card (XX9876) at SOME SHOP on 15-11-26",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 10000050,
+   "direction": "debit",
+   "bank": "HDFC",
+   "last4": "9876"
+  }
+ },
+ {
+  "id": "hdfc-card-brackets-plain",
+  "body": "Rs 340.00 spent on HDFC Bank Card (1234) at BOOKSTORE on 16-11-26",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 34000,
+   "direction": "debit",
+   "bank": "HDFC",
+   "last4": "1234"
+  }
+ },
+ {
+  "id": "sbi-ac-debit",
+  "body": "Dear Customer, A/C X1234 debited by Rs.499.00 on 20Nov26 transfer to RAJU STORES Ref No 123456789012. -SBI",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 49900,
+   "direction": "debit",
+   "bank": "SBI",
+   "last4": "1234",
+   "reference": "123456789012"
+  }
+ },
+ {
+  "id": "sbi-upi-credit",
+  "body": "Rs 700.00 credited to your SBI A/c XXXXXXXX1234 on 22/11/26 by UPI from FRIEND. UPI Ref 223344556677",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 70000,
+   "direction": "credit",
+   "bank": "SBI",
+   "last4": "1234",
+   "reference": "223344556677",
+   "channel": "UPI"
+  }
+ },
+ {
+  "id": "sbi-card-ending",
+  "body": "Your SBI Credit Card ending 4321 was used for Rs 899.00 at BIGBASKET on 12/10/26",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 89900,
+   "direction": "debit",
+   "bank": "SBI",
+   "last4": "4321"
+  }
+ },
+ {
+  "id": "sbi-card-spent",
+  "body": "Rs.2,150.00 spent on your SBI Card ending 5566 at DMART on 18-11-26",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 215000,
+   "direction": "debit",
+   "bank": "SBI",
+   "last4": "5566"
+  }
+ },
+ {
+  "id": "yes-upi-debit",
+  "body": "Rs 320.00 debited from YES BANK A/c XX5678 on 18-11-26 UPI Ref 334455667788",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 32000,
+   "direction": "debit",
+   "bank": "YES",
+   "last4": "5678",
+   "reference": "334455667788",
+   "channel": "UPI"
+  }
+ },
+ {
+  "id": "yes-imps-credit",
+  "body": "INR 1,500.00 credited to YES BANK A/c XX5678 on 19-11-26 via IMPS Ref 445566778899",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 150000,
+   "direction": "credit",
+   "bank": "YES",
+   "last4": "5678",
+   "reference": "445566778899",
+   "channel": "IMPS"
+  }
+ },
+ {
+  "id": "rbl-card-spend",
+  "body": "Rs 2,499.00 spent on RBL Bank Credit Card ending 3344 at FLIPKART on 20-11-26",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 249900,
+   "direction": "debit",
+   "bank": "RBL",
+   "last4": "3344"
+  }
+ },
+ {
+  "id": "rbl-card-payment",
+  "body": "Payment of Rs 5,000.00 received towards RBL Bank Credit Card (XX3344) on 21-11-26",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 500000,
+   "direction": "credit",
+   "bank": "RBL",
+   "last4": "3344"
+  }
+ },
+ {
+  "id": "indian-upi-debit",
+  "body": "Indian Bank: A/c *4455 debited Rs. 150.00 on 23-11-26 to SWIGGY. UPI Ref 556677889900",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 15000,
+   "direction": "debit",
+   "bank": "INDIAN",
+   "last4": "4455",
+   "reference": "556677889900",
+   "channel": "UPI"
+  }
+ },
+ {
+  "id": "indian-cash-credit",
+  "body": "Your Indian Bank a/c no. XXXXXX4455 is credited by Rs.3000.00 on 24-11-2026 by cash deposit",
+  "expect": {
+   "kind": "transaction",
+   "amountPaise": 300000,
+   "direction": "credit",
+   "bank": "INDIAN",
+   "last4": "4455"
+  }
+ },
+ {
+  "id": "otp-with-amount",
+  "body": "123456 is your OTP for transaction of Rs 250.00 at ZOMATO. Do not share it with anyone. -HDFC Bank",
+  "expect": {
+   "kind": "otp"
+  }
+ },
+ {
+  "id": "otp-plain",
+  "body": "Your OTP is 482913. Valid for 5 minutes. Never share your OTP. -SBI",
+  "expect": {
+   "kind": "otp"
+  }
+ },
+ {
+  "id": "promo-cashback",
+  "body": "Get Rs 5000 cashback on your HDFC credit card! Apply now at hdfcbank.com/offer. T&C apply",
+  "expect": {
+   "kind": "promo"
+  }
+ },
+ {
+  "id": "promo-loan",
+  "body": "Pre-approved personal loan of Rs 5,00,000 for you at low interest. Click to apply.",
+  "expect": {
+   "kind": "promo"
+  }
+ },
+ {
+  "id": "reminder-bill-due",
+  "body": "Your HDFC Bank Credit Card bill of Rs 12,345.00 is due on 05-12-26. Pay now to avoid late fee.",
+  "expect": {
+   "kind": "reminder"
+  }
+ },
+ {
+  "id": "declined",
+  "body": "Your transaction of Rs 500.00 on card ending 1234 was declined due to insufficient funds. -YES BANK",
+  "expect": {
+   "kind": "declined"
+  }
+ }
+]

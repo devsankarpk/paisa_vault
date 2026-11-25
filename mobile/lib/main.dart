@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/crash_log.dart';
 import 'core/providers.dart';
 import 'core/secret_store.dart';
 import 'core/theme/app_theme.dart';
@@ -13,6 +14,7 @@ import 'features/transactions/transactions_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  CrashLog().install();
   runApp(
     ProviderScope(
       overrides: [

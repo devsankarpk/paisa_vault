@@ -121,10 +121,10 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Processing queue (WorkManager, next-open on iPhone)
 - [x] Duplicate check (same bank, last 4, amount, day and reference; none without a reference)
 - [x] Bank, card and account mapping (bank + last 4; new ones saved as pending until confirmed in the accounts screen)
-- [ ] Pipeline log, local crash capture, redaction test
+- [x] Pipeline log, local crash capture, redaction test (done 25 Nov: crash.log keeps error type and first stack lines only, never the error message; diagnostics lines are redacted; tests process a message with distinctive text and check no log holds it)
 - [x] Consent screens and "Erase everything" (done 25 Nov: SMS disclosure on Android, Shortcut guide on iPhone, new Settings screen with privacy note and Erase everything; erase checked on the iPhone, not yet on the vivo)
 - [ ] Backup key design note
-- [ ] Golden-SMS suite in CI, real SMS from all five banks on both phones
+- [ ] Golden-SMS suite in CI, real SMS from all five banks on both phones (CI part done 25 Nov: 22 invented messages in each bank's format, per-field score printed; found and fixed one gap, "card ... was used for Rs"; real SMS from all five banks on both phones still to do)
 
 **Exit gate**
 
@@ -133,7 +133,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Golden suite green and meets Phase 0 thresholds
 - [ ] Release build has no INTERNET permission
 - [ ] "Erase everything" works (iPhone checked 25 Nov; vivo still to check)
-- [ ] Redaction test passes
+- [x] Redaction test passes
 
 ## Phase 1B: Categorise, search, budgets, backup
 
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 25 Nov 2026 | Local crash log (error type and stack lines only), redaction tests, and a golden SMS suite in CI (22 invented messages across HDFC, SBI, Yes, RBL, Indian Bank, OTP, promo, reminder, declined; all fields 100%). The suite found that "card ... was used for Rs" was not read as a transaction; fixed. |
 | 25 Nov 2026 | Settings screen with privacy note and "Erase everything" (checked on the iPhone: app returns to PIN setup with an empty list). Original message text is deleted after 60 days; transactions stay, so 3 and 6 month reports are unaffected. |
 | 24 Nov 2026 | Added "Add a bank SMS" (paste a missed message, + button on Transactions), an in-app banner that warns 3 days before the free Apple signing expires, and last 4 digits are now read when written in brackets. Stored transactions missing bank or last 4 are filled in again when the rules improve. Tested on iPhone; vivo not updated yet. |
 | 24 Nov 2026 | Transactions are linked to an account by bank and last 4 (new accounts saved as pending), and a repeat of the same transaction with the same reference number is stored once. Existing rows get linked. iPhone app stopped working because the free Apple signing expired after 7 days; reinstalled (next expiry 1 Dec) until the paid account is set up. |
