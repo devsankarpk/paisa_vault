@@ -59,10 +59,10 @@ const _bankWords = <String, String>{
 };
 
 final _debitWord = RegExp(
-  r'\b(debited|sent|spent|paid|withdrawn|purchase|purchased|deducted|payment of)\b',
+  r'\b(debited|sent|spent|paid|withdrawn|purchase|purchased|deducted|payment of|used (?:for|at))\b',
 );
 final _debitOnly = RegExp(
-  r'\b(debited|sent|spent|paid|withdrawn|purchase|purchased|deducted)\b',
+  r'\b(debited|sent|spent|paid|withdrawn|purchase|purchased|deducted|used (?:for|at))\b',
 );
 final _creditWord = RegExp(r'\b(credited|received|deposited|refund(?:ed)?)\b');
 

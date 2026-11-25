@@ -361,6 +361,37 @@ void main() {
     });
   });
 
+  group('processing logs', () {
+    test('events hold counts only, never message text', () async {
+      const canarySms =
+          'Rs 7,777.77 spent on HDFC Bank Card x4321 at CANARYMART. UPI Ref 987654321012';
+      await raw.save(sms(canarySms, DateTime(2026, 11, 21, 10)));
+      final events = <String>[];
+      final svc = ProcessingService(
+        db,
+        repo,
+        categories: defaultCategories,
+        engineFactory: () async => FakeLlmEngine([
+          '{"merchant": "CANARYMART", "category": "Shopping", "channel": "POS"}',
+        ]),
+        log: events.add,
+      );
+      await svc.processNew();
+      await svc.processNew();
+      expect(events, isNotEmpty);
+      final all = events.join('\n');
+      for (final secret in [
+        'CANARYMART',
+        '987654321012',
+        '7,777',
+        '7777',
+        'HDFC',
+      ]) {
+        expect(all, isNot(contains(secret)), reason: secret);
+      }
+    });
+  });
+
   group('purge of old message text', () {
     test(
       'old processed messages are deleted, transactions stay unlinked',

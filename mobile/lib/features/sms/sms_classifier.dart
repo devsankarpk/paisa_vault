@@ -42,7 +42,7 @@ class SmsClassifier {
 
   /// Words that say money has actually moved.
   static final _strong = RegExp(
-    r'\b(debited|credited|spent|withdrawn|deducted|debit alert|credit alert)\b',
+    r'\b(debited|credited|spent|withdrawn|deducted|debit alert|credit alert|card.{0,40}used (for|at))\b',
     caseSensitive: false,
   );
 
