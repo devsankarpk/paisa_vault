@@ -34,6 +34,7 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
       ? widget.tx.categoryName
       : null;
   late Direction _direction = widget.tx.direction;
+  bool _always = false;
   String? _error;
 
   @override
@@ -59,6 +60,10 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
       amountPaise: paise,
       note: _note.text.trim(),
     );
+    final merchant = _merchant.text.trim();
+    if (_always && _category != null && merchant.isNotEmpty) {
+      await repo.saveRule(merchant, _category!);
+    }
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -114,6 +119,14 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
               ],
               onChanged: (v) => setState(() => _category = v),
             ),
+            if (_merchant.text.trim().isNotEmpty)
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: const Text('Always use this category for this merchant'),
+                value: _always,
+                onChanged: (v) => setState(() => _always = v ?? false),
+              ),
             TextField(
               controller: _note,
               decoration: const InputDecoration(labelText: 'Note (optional)'),

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:drift/drift.dart' show Value, driftRuntimeOptions;
+import 'package:drift/drift.dart' show OrderingTerm, Value, driftRuntimeOptions;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,6 +9,8 @@ import 'package:paisa_vault/core/db/encrypted_executor.dart';
 import 'package:paisa_vault/core/db/key_store.dart';
 import 'package:paisa_vault/core/providers.dart';
 import 'package:paisa_vault/features/pipeline/extraction_pipeline.dart';
+import 'package:paisa_vault/features/categorise/merchant_key.dart';
+import 'package:paisa_vault/features/search/transaction_filter.dart';
 import 'package:paisa_vault/features/sms/raw_message_repository.dart';
 import 'package:paisa_vault/features/sms/shortcut_health.dart';
 import 'package:paisa_vault/features/transactions/add_message_screen.dart';
@@ -427,6 +429,237 @@ void main() {
       expect(daysUntil(DateTime(2026, 11, 24, 18), now), 0);
       expect(daysUntil(DateTime(2026, 11, 23, 12), now), -1);
     });
+  });
+
+  group('categorising', () {
+    const catReply =
+        '{"merchant": "RAJU STORES", "category": "Shopping", "channel": "UPI"}';
+    String msg(int rs, String day) =>
+        'Rs $rs.00 debited from A/c XX1234 on $day-11-26. UPI Ref 1234567890$rs';
+
+    Future<List<Transaction>> all() => (db.select(
+      db.transactions,
+    )..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
+
+    test('merchant names are made comparable', () {
+      expect(merchantKey(' Swiggy-Instamart 4521 '), 'SWIGGY INSTAMART');
+      expect(merchantKey(null), '');
+      expect(sameMerchant('SWIGGY INSTAMART', 'SWIGGY'), isTrue);
+      expect(sameMerchant('SWIGGY', 'SWIGGY'), isTrue);
+      expect(
+        sameMerchant('ABC', 'ABC STORES'),
+        isFalse,
+      ); // too short to swallow
+      expect(sameMerchant('SWIGGYX', 'SWIGGY'), isFalse); // not a whole word
+      expect(sameMerchant('', ''), isFalse);
+    });
+
+    test(
+      'the model suggestion is used when nothing else knows the merchant',
+      () async {
+        expect(
+          await repo.categorise('RAJU STORES', Direction.debit, 'Shopping'),
+          'Shopping',
+        );
+        expect(
+          await repo.categorise('RAJU STORES', Direction.debit, null),
+          isNull,
+        );
+      },
+    );
+
+    test('money in never gets an expense category', () async {
+      expect(
+        await repo.categorise('ACME', Direction.credit, 'Shopping'),
+        isNull,
+      );
+      expect(
+        await repo.categorise('ACME', Direction.credit, 'Income'),
+        'Income',
+      );
+    });
+
+    test('a rule beats the model, and similar names use it', () async {
+      await repo.saveRule('Swiggy', 'Food');
+      expect(
+        await repo.categorise('SWIGGY INSTAMART', Direction.debit, 'Shopping'),
+        'Food',
+      );
+      expect(
+        await repo.categorise('ZOMATO', Direction.debit, 'Shopping'),
+        'Shopping',
+      );
+    });
+
+    test(
+      'a first-time merchant is asked, then learned from the answer',
+      () async {
+        // Model gives no category, so the transaction waits for an answer.
+        await raw.save(sms(msg(480, '21'), DateTime(2026, 11, 21, 10)));
+        await service(
+          llm: FakeLlmEngine([
+            '{"merchant": "RAJU STORES", "category": null, "channel": "UPI"}',
+          ]),
+        ).processNew();
+        var rows = await all();
+        expect(rows.single.categoryName, isNull);
+        expect(await repo.watchUncategorised().first, hasLength(1));
+
+        await repo.answer(rows.single, 'Groceries', always: true);
+        rows = await all();
+        expect(rows.single.categoryName, 'Groceries');
+        expect(rows.single.userCorrected, isTrue);
+        expect(await repo.watchUncategorised().first, isEmpty);
+
+        // The same merchant next time is categorised automatically, even against the model.
+        clock.current = clock.current.add(const Duration(days: 1));
+        await raw.save(sms(msg(520, '22'), DateTime(2026, 11, 22, 10)));
+        await service(llm: FakeLlmEngine([catReply])).processNew();
+        rows = await all();
+        expect(rows.last.categoryName, 'Groceries');
+      },
+    );
+
+    test('answering without "always" does not make a rule', () async {
+      await raw.save(sms(msg(480, '21'), DateTime(2026, 11, 21, 10)));
+      await service(
+        llm: FakeLlmEngine([
+          '{"merchant": "RAJU STORES", "category": null, "channel": "UPI"}',
+        ]),
+      ).processNew();
+      await repo.answer((await all()).single, 'Groceries');
+      expect(await db.select(db.merchantRules).get(), isEmpty);
+    });
+
+    test('saving a rule also fills in transactions already waiting', () async {
+      await raw.save(sms(msg(480, '21'), DateTime(2026, 11, 21, 10)));
+      await raw.save(sms(msg(530, '22'), DateTime(2026, 11, 22, 10)));
+      await service(
+        llm: FakeLlmEngine([
+          '{"merchant": "RAJU STORES", "category": null, "channel": "UPI"}',
+          '{"merchant": "RAJU STORES", "category": null, "channel": "UPI"}',
+        ]),
+      ).processNew();
+      final first = (await all()).first;
+      await repo.answer(first, 'Groceries', always: true);
+      expect((await all()).map((t) => t.categoryName), [
+        'Groceries',
+        'Groceries',
+      ]);
+    });
+  });
+
+  group('search', () {
+    int n = 0;
+    Future<void> add(
+      int rs,
+      DateTime day, {
+      String? merchant,
+      String? category,
+      String? note,
+    }) async {
+      await db
+          .into(db.transactions)
+          .insert(
+            TransactionsCompanion.insert(
+              amountPaise: rs * 100,
+              direction: Direction.debit,
+              merchant: Value(merchant),
+              categoryName: Value(category),
+              note: Value(note),
+              fingerprint: 'f${n++}',
+              occurredAt: day,
+              createdAt: day,
+            ),
+          );
+    }
+
+    Future<List<int>> rupees(TransactionFilter f) async =>
+        (await repo.search(f)).map((t) => t.amountPaise ~/ 100).toList();
+
+    setUp(() async {
+      n = 0;
+      await add(
+        499,
+        DateTime(2026, 10, 3, 23, 59),
+        merchant: 'AMAZON',
+        category: 'Shopping',
+      );
+      await add(
+        499,
+        DateTime(2026, 10, 20),
+        merchant: 'NETFLIX',
+        category: 'Entertainment',
+      );
+      await add(
+        250,
+        DateTime(2026, 10, 15, 8),
+        merchant: 'Zomato',
+        category: 'Food',
+        note: 'team lunch',
+      );
+      await add(
+        499,
+        DateTime(2026, 11, 2),
+        merchant: 'AMAZON PRIME',
+        category: 'Shopping',
+      );
+    });
+
+    test('no filter returns everything, newest first', () async {
+      expect(await rupees(const TransactionFilter()), [499, 499, 250, 499]);
+    });
+
+    test('exact amount within a date range, both end days included', () async {
+      final f = TransactionFilter(
+        amountPaise: 49900,
+        from: DateTime(2026, 10, 1),
+        to: DateTime(2026, 10, 3),
+      );
+      final r = await repo.search(f);
+      expect(r, hasLength(1)); // the 3 Oct 23:59 one counts as 3 Oct
+      expect(r.single.merchant, 'AMAZON');
+      expect(await rupees(f.copyWith(to: DateTime(2026, 10, 31))), [499, 499]);
+    });
+
+    test('category, text on merchant and on note, and combinations', () async {
+      expect(
+        (await repo.search(const TransactionFilter(category: 'Shopping'))),
+        hasLength(2),
+      );
+      expect(await rupees(const TransactionFilter(text: 'amazon')), [499, 499]);
+      expect(await rupees(const TransactionFilter(text: 'LUNCH')), [250]);
+      expect(
+        await rupees(const TransactionFilter(text: 'amazon', category: 'Food')),
+        isEmpty,
+      );
+      // a typed % is a plain character, not "match everything"
+      expect(await rupees(const TransactionFilter(text: '%')), [
+        499,
+        499,
+        250,
+        499,
+      ]);
+    });
+
+    test(
+      'matches exactly what a plain filter of the same rows gives',
+      () async {
+        final every = await repo.search(const TransactionFilter());
+        for (final paise in [49900, 25000, 100]) {
+          for (final from in [DateTime(2026, 10, 1), DateTime(2026, 10, 16)]) {
+            final f = TransactionFilter(amountPaise: paise, from: from);
+            final want = every
+                .where(
+                  (t) => t.amountPaise == paise && !t.occurredAt.isBefore(from),
+                )
+                .map((t) => t.id)
+                .toList();
+            expect((await repo.search(f)).map((t) => t.id).toList(), want);
+          }
+        }
+      },
+    );
   });
 
   group('shortcut health', () {

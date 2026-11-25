@@ -121,6 +121,15 @@ class Transactions extends Table {
   DateTimeColumn get createdAt => dateTime()();
 }
 
+/// A learned or user-made rule: this merchant always gets this category. The key is the
+/// merchant name made comparable (see merchantKey), so "Swiggy " and "SWIGGY" are one rule.
+class MerchantRules extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get merchantKey => text().unique()();
+  TextColumn get categoryName => text()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
 /// Local diagnostics. Messages must never contain SMS text or card numbers.
 class PipelineLog extends Table {
   IntColumn get id => integer().autoIncrement()();

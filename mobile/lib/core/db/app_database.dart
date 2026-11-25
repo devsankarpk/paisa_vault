@@ -19,6 +19,7 @@ part 'app_database.g.dart';
     Accounts,
     RawMessages,
     Transactions,
+    MerchantRules,
     PipelineLog,
     HiddenHash,
   ],
@@ -34,7 +35,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -47,6 +48,9 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(transactions, transactions.categoryName);
         await m.addColumn(transactions, transactions.confirmReason);
         await m.addColumn(transactions, transactions.userCorrected);
+      }
+      if (from < 3) {
+        await m.createTable(merchantRules);
       }
     },
     beforeOpen: (details) async {

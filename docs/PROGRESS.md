@@ -139,13 +139,13 @@ Status values: Not started, In progress, Blocked, Done.
 
 [Details](phases/phase-1b-categorise-search-budgets.md)
 
-- [ ] Categories, merchants, merchant_rules, seed data
-- [ ] Categoriser (rule, similar, LLM, ask)
-- [ ] Income handling
+- [ ] Categories, merchants, merchant_rules, seed data (merchant_rules table done 25 Nov, schema v3; the fixed default category list is still in code, not a table, so editing categories is still to do)
+- [x] Categoriser (rule, similar, LLM, ask) (done 25 Nov: user rule, then similar merchant already categorised by you, then the model suggestion, else it waits for your answer; tested)
+- [x] Income handling (done 25 Nov: money in only gets Income or Transfer, otherwise it is asked)
 - [ ] Manual entry and transaction detail/edit
-- [ ] "What was this?" flow and notification
+- [ ] "What was this?" flow and notification (in-app part done 25 Nov: banner on the list, answer screen with category buttons and "always use for this merchant", same checkbox in the edit sheet; notification still to do)
 - [ ] Category and merchant-rule management screens
-- [ ] Search (date, category, exact amount in range, text) with indexes
+- [ ] Search (date, category, exact amount in range, text) with indexes (done 25 Nov: search screen with dates, category, exact amount and merchant or note text, filters combine, tested; text search uses a plain match, not full-text, which is enough for personal volumes; left open to check on the phone)
 - [ ] Budgets and threshold alerts, once per period
 - [ ] Uncategorised alert and evening grouping
 - [ ] Dashboard numbers from transactions
@@ -267,6 +267,8 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 25 Nov 2026 | Search screen (magnifier on the Transactions screen): dates, category, exact amount, merchant or note text; filters combine. Tested; not yet seen on a phone. |
+| 25 Nov 2026 | Phase 1B started: schema v3 (merchant_rules), categoriser (rule, similar merchant, model, else ask), "What was this?" screen and banner, "always use this category" learning. Tested; not yet seen on a phone. |
 | 25 Nov 2026 | iPhone Shortcut health check: banner on the Transactions screen when no bank SMS has ever reached the app or none for 7 days, a last-received line and "Setup steps and test" button in Settings, and a test step in the guide that turns green when a message arrives. Built after two real transactions were missed once the reinstall broke the automations. Apple does not allow apps to create automations, so the user must re-check them after every reinstall. Tested; not yet seen on the phone. |
 | 25 Nov 2026 | Local crash log (error type and stack lines only), redaction tests, and a golden SMS suite in CI (22 invented messages across HDFC, SBI, Yes, RBL, Indian Bank, OTP, promo, reminder, declined; all fields 100%). The suite found that "card ... was used for Rs" was not read as a transaction; fixed. |
 | 25 Nov 2026 | Settings screen with privacy note and "Erase everything" (checked on the iPhone: app returns to PIN setup with an empty list). Original message text is deleted after 60 days; transactions stay, so 3 and 6 month reports are unaffected. |

@@ -145,10 +145,16 @@ class ProcessingService {
     final fresh = (await pipeline.process(raw.body)).transaction;
     // Only accept the result if the model actually answered; otherwise try again next time.
     if (fresh == null || fresh.confirmReason == 'model_error') return;
+    final merchant = fresh.merchant ?? t.merchant;
+    final category = await _repo.categorise(
+      merchant,
+      t.direction,
+      fresh.category,
+    );
     await (_db.update(_db.transactions)..where((x) => x.id.equals(t.id))).write(
       TransactionsCompanion(
-        merchant: Value(fresh.merchant ?? t.merchant),
-        categoryName: Value(fresh.category ?? t.categoryName),
+        merchant: Value(merchant),
+        categoryName: Value(category ?? t.categoryName),
         channel: Value(fresh.channel ?? t.channel),
         status: Value(fresh.status),
         confirmReason: Value(fresh.confirmReason),

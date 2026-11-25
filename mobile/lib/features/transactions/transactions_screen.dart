@@ -6,6 +6,8 @@ import '../../core/theme/app_theme.dart';
 import '../../core/providers.dart';
 import '../sms/shortcut_guide_screen.dart';
 import '../sms/shortcut_health.dart';
+import '../categorise/ask_screen.dart';
+import '../search/search_screen.dart';
 import 'add_message_screen.dart';
 import '../settings/settings_screen.dart';
 import 'format.dart';
@@ -29,6 +31,13 @@ class TransactionsScreen extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         actions: [
           IconButton(
+            tooltip: 'Search',
+            icon: const Icon(Icons.search),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SearchScreen()),
+            ),
+          ),
+          IconButton(
             tooltip: 'Settings',
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => Navigator.of(context).push(
@@ -48,6 +57,7 @@ class TransactionsScreen extends ConsumerWidget {
         children: [
           const _SigningBanner(),
           const _ShortcutBanner(),
+          const _AskBanner(),
           Expanded(child: _body(list)),
         ],
       ),
@@ -64,7 +74,7 @@ class TransactionsScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (_, i) => _Tile(items[i]),
+              itemBuilder: (_, i) => TransactionTile(items[i]),
             ),
     );
   }
@@ -98,6 +108,34 @@ class _SigningBanner extends ConsumerWidget {
   }
 }
 
+/// Tells the user how many transactions are waiting for a category.
+class _AskBanner extends ConsumerWidget {
+  const _AskBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final n = ref.watch(uncategorisedProvider).asData?.value.length ?? 0;
+    if (n == 0) return const SizedBox.shrink();
+    return InkWell(
+      onTap: () =>
+          Navigator.of(context)
+              .push(MaterialPageRoute<void>(builder: (_) => const AskScreen())),
+      child: Container(
+        width: double.infinity,
+        color: const Color(0xFFE8EEFF),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Text(
+          '$n transaction${n == 1 ? '' : 's'} need${n == 1 ? 's' : ''} a category. Tap to answer.',
+          style: const TextStyle(
+            color: PvColors.primary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// iPhone only: warns when no bank SMS has reached the app, or none for a week, since a
 /// Shortcuts automation that stops running gives no error.
 class _ShortcutBanner extends ConsumerWidget {
@@ -112,8 +150,7 @@ class _ShortcutBanner extends ConsumerWidget {
     final now = ref.watch(clockProvider).now();
     final text = switch (shortcutHealth(last, now)) {
       ShortcutHealth.ok => null,
-      ShortcutHealth.neverReceived =>
-        'No bank SMS has reached the app yet. Tap to check your Shortcuts setup.',
+      ShortcutHealth.neverReceived => 'No bank SMS has reached the app yet. Tap to check your Shortcuts setup.',
       ShortcutHealth.stale =>
         'No bank SMS for ${daysSince(last!, now)} days. If you had bank transactions, tap to check your Shortcuts setup.',
     };
@@ -152,8 +189,8 @@ class _Empty extends StatelessWidget {
   );
 }
 
-class _Tile extends StatelessWidget {
-  const _Tile(this.t);
+class TransactionTile extends StatelessWidget {
+  const TransactionTile(this.t, {super.key});
   final Transaction t;
 
   @override

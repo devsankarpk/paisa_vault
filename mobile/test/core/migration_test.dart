@@ -5,7 +5,7 @@ import 'package:paisa_vault/core/db/app_database.dart';
 
 import '../generated_migrations/schema.dart';
 import '../generated_migrations/schema_v1.dart' as v1;
-import '../generated_migrations/schema_v2.dart' as v2;
+import '../generated_migrations/schema_v3.dart' as v3;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -17,6 +17,13 @@ void main() {
     final connection = await verifier.startAt(1);
     final db = AppDatabase(connection);
     await verifier.migrateAndValidate(db, 2);
+    await db.close();
+  });
+
+  test('v2 to v3 adds the merchant rules table', () async {
+    final connection = await verifier.startAt(2);
+    final db = AppDatabase(connection);
+    await verifier.migrateAndValidate(db, 3);
     await db.close();
   });
 
@@ -36,7 +43,7 @@ void main() {
     await old.close();
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 2);
+    await verifier.migrateAndValidate(db, 3);
     final t = await db.select(db.transactions).getSingle();
     expect(t.amountPaise, 500);
     expect(t.bankCode, isNull);
@@ -46,9 +53,9 @@ void main() {
     await db.close();
   });
 
-  test('a fresh install is at v2 too', () async {
-    final db = v2.DatabaseAtV2((await verifier.schemaAt(2)).newConnection());
-    expect(db.schemaVersion, 2);
+  test('a fresh install is at v3 too', () async {
+    final db = v3.DatabaseAtV3((await verifier.schemaAt(3)).newConnection());
+    expect(db.schemaVersion, 3);
     await db.close();
   });
 }

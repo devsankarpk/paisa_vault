@@ -5,6 +5,8 @@ import 'package:drift/drift.dart';
 
 import '../../core/clock.dart';
 import '../../core/db/app_database.dart';
+import '../categorise/merchant_key.dart';
+import '../search/transaction_filter.dart';
 import '../pipeline/extraction_pipeline.dart';
 import '../pipeline/rule_extractor.dart';
 
@@ -70,6 +72,7 @@ class TransactionRepository {
       if (same != null) return null;
     }
     final accountId = await accountFor(t.bank, t.last4, t.accountKind);
+    final category = await categorise(t.merchant, t.direction, t.category);
     return _db
         .into(_db.transactions)
         .insert(
@@ -85,7 +88,7 @@ class TransactionRepository {
             bankCode: Value(t.bank),
             last4: Value(t.last4),
             accountKind: Value(t.accountKind.name),
-            categoryName: Value(t.category),
+            categoryName: Value(category),
             confirmReason: Value(t.confirmReason),
             modelId: Value(t.modelId),
             promptVersion: Value(t.promptVersion),
@@ -94,6 +97,109 @@ class TransactionRepository {
             createdAt: _clock.now(),
           ),
         );
+  }
+
+  /// Picks a category in this order: a rule the user made, a similar merchant the user already
+  /// categorised, then the model's suggestion. Null means "ask the user". Money coming in is
+  /// never put in an expense category: only Income or Transfer are accepted for it.
+  Future<String?> categorise(
+    String? merchant,
+    Direction direction,
+    String? modelCategory,
+  ) async {
+    bool fits(String? c) =>
+        c != null &&
+        (direction == Direction.debit || c == 'Income' || c == 'Transfer');
+    final key = merchantKey(merchant);
+    if (key.isNotEmpty) {
+      final rules = await _db.select(_db.merchantRules).get();
+      // An exact rule wins over a looser one ("SWIGGY INSTAMART" over "SWIGGY").
+      rules.sort(
+        (a, b) => b.merchantKey.length.compareTo(a.merchantKey.length),
+      );
+      for (final r in rules) {
+        if (sameMerchant(key, r.merchantKey) && fits(r.categoryName)) {
+          return r.categoryName;
+        }
+      }
+      final past =
+          await (_db.select(_db.transactions)
+                ..where(
+                  (t) =>
+                      t.userCorrected.equals(true) &
+                      t.categoryName.isNotNull() &
+                      t.merchant.isNotNull(),
+                )
+                ..orderBy([(t) => OrderingTerm.desc(t.id)]))
+              .get();
+      for (final p in past) {
+        if (p.direction == direction &&
+            sameMerchant(key, merchantKey(p.merchant))) {
+          return p.categoryName;
+        }
+      }
+    }
+    return fits(modelCategory) ? modelCategory : null;
+  }
+
+  /// Remembers that [merchant] always gets [category], and applies it to transactions that are
+  /// still waiting for a category. Returns how many of those were updated.
+  Future<int> saveRule(String merchant, String category) async {
+    final key = merchantKey(merchant);
+    if (key.isEmpty) return 0;
+    await _db
+        .into(_db.merchantRules)
+        .insertOnConflictUpdate(
+          MerchantRulesCompanion.insert(
+            merchantKey: key,
+            categoryName: category,
+            createdAt: _clock.now(),
+          ),
+        );
+    final waiting =
+        await (_db.select(_db.transactions)..where(
+              (t) =>
+                  t.categoryName.isNull() &
+                  t.userCorrected.equals(false) &
+                  t.merchant.isNotNull(),
+            ))
+            .get();
+    var n = 0;
+    for (final t in waiting) {
+      if (!sameMerchant(key, merchantKey(t.merchant))) continue;
+      if (t.direction == Direction.credit &&
+          category != 'Income' &&
+          category != 'Transfer') {
+        continue;
+      }
+      await (_db.update(_db.transactions)..where((x) => x.id.equals(t.id)))
+          .write(TransactionsCompanion(categoryName: Value(category)));
+      n++;
+    }
+    return n;
+  }
+
+  /// Transactions with no category, newest first: the "What was this?" questions.
+  Stream<List<Transaction>> watchUncategorised() =>
+      (_db.select(_db.transactions)
+            ..where((t) => t.categoryName.isNull())
+            ..orderBy([
+              (t) => OrderingTerm.desc(t.occurredAt),
+              (t) => OrderingTerm.desc(t.id),
+            ]))
+          .watch();
+
+  /// The user's answer to "What was this?". With [always], the merchant is remembered.
+  Future<void> answer(
+    Transaction t,
+    String category, {
+    String? note,
+    bool always = false,
+  }) async {
+    await correct(t.id, categoryName: category, note: note);
+    if (always && t.merchant != null && t.merchant!.trim().isNotEmpty) {
+      await saveRule(t.merchant!, category);
+    }
   }
 
   /// Finds the account for a bank code and last 4, creating it (as pending, for the user to
@@ -187,6 +293,41 @@ class TransactionRepository {
       n++;
     }
     return n;
+  }
+
+  /// Transactions matching every filter that is set, newest first. Dates include both end days.
+  Future<List<Transaction>> search(TransactionFilter f) {
+    final q = _db.select(_db.transactions);
+    final from = f.from;
+    final to = f.to;
+    final category = f.category;
+    final amount = f.amountPaise;
+    // "%" and "_" typed by the user are plain characters, not wildcards.
+    final text = f.text.trim().replaceAll(RegExp(r'[%_]'), '');
+    q.where((t) {
+      Expression<bool> ok = const Constant(true);
+      if (from != null) {
+        ok &= t.occurredAt.isBiggerOrEqualValue(
+          DateTime(from.year, from.month, from.day),
+        );
+      }
+      if (to != null) {
+        ok &= t.occurredAt.isSmallerThanValue(
+          DateTime(to.year, to.month, to.day + 1),
+        );
+      }
+      if (category != null) ok &= t.categoryName.equals(category);
+      if (amount != null) ok &= t.amountPaise.equals(amount);
+      if (text.isNotEmpty) {
+        ok &= t.merchant.like('%$text%') | t.note.like('%$text%');
+      }
+      return ok;
+    });
+    q.orderBy([
+      (t) => OrderingTerm.desc(t.occurredAt),
+      (t) => OrderingTerm.desc(t.id),
+    ]);
+    return q.get();
   }
 
   /// Newest first.
