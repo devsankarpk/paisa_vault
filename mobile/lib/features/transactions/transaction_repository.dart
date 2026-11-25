@@ -6,6 +6,7 @@ import 'package:drift/drift.dart';
 import '../../core/clock.dart';
 import '../../core/db/app_database.dart';
 import '../categorise/merchant_key.dart';
+import '../search/transaction_filter.dart';
 import '../pipeline/extraction_pipeline.dart';
 import '../pipeline/rule_extractor.dart';
 
@@ -292,6 +293,41 @@ class TransactionRepository {
       n++;
     }
     return n;
+  }
+
+  /// Transactions matching every filter that is set, newest first. Dates include both end days.
+  Future<List<Transaction>> search(TransactionFilter f) {
+    final q = _db.select(_db.transactions);
+    final from = f.from;
+    final to = f.to;
+    final category = f.category;
+    final amount = f.amountPaise;
+    // "%" and "_" typed by the user are plain characters, not wildcards.
+    final text = f.text.trim().replaceAll(RegExp(r'[%_]'), '');
+    q.where((t) {
+      Expression<bool> ok = const Constant(true);
+      if (from != null) {
+        ok &= t.occurredAt.isBiggerOrEqualValue(
+          DateTime(from.year, from.month, from.day),
+        );
+      }
+      if (to != null) {
+        ok &= t.occurredAt.isSmallerThanValue(
+          DateTime(to.year, to.month, to.day + 1),
+        );
+      }
+      if (category != null) ok &= t.categoryName.equals(category);
+      if (amount != null) ok &= t.amountPaise.equals(amount);
+      if (text.isNotEmpty) {
+        ok &= t.merchant.like('%$text%') | t.note.like('%$text%');
+      }
+      return ok;
+    });
+    q.orderBy([
+      (t) => OrderingTerm.desc(t.occurredAt),
+      (t) => OrderingTerm.desc(t.id),
+    ]);
+    return q.get();
   }
 
   /// Newest first.

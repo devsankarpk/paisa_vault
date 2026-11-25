@@ -7,6 +7,7 @@ import '../../core/providers.dart';
 import '../sms/shortcut_guide_screen.dart';
 import '../sms/shortcut_health.dart';
 import '../categorise/ask_screen.dart';
+import '../search/search_screen.dart';
 import 'add_message_screen.dart';
 import '../settings/settings_screen.dart';
 import 'format.dart';
@@ -29,6 +30,13 @@ class TransactionsScreen extends ConsumerWidget {
         backgroundColor: PvColors.background,
         surfaceTintColor: Colors.transparent,
         actions: [
+          IconButton(
+            tooltip: 'Search',
+            icon: const Icon(Icons.search),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SearchScreen()),
+            ),
+          ),
           IconButton(
             tooltip: 'Settings',
             icon: const Icon(Icons.settings_outlined),
@@ -66,7 +74,7 @@ class TransactionsScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               itemCount: items.length,
               separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (_, i) => _Tile(items[i]),
+              itemBuilder: (_, i) => TransactionTile(items[i]),
             ),
     );
   }
@@ -181,8 +189,8 @@ class _Empty extends StatelessWidget {
   );
 }
 
-class _Tile extends StatelessWidget {
-  const _Tile(this.t);
+class TransactionTile extends StatelessWidget {
+  const TransactionTile(this.t, {super.key});
   final Transaction t;
 
   @override
