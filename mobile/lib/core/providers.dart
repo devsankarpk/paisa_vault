@@ -6,6 +6,7 @@ import 'db/app_database.dart';
 import 'db/key_store.dart';
 import '../services/card_reader.dart';
 import '../services/llm_engine.dart';
+import '../services/notifier.dart';
 import '../services/sms_source.dart';
 import '../services/text_scanner.dart';
 import 'clock.dart';
@@ -24,6 +25,10 @@ final cardReaderProvider = Provider<CardReader>(
 );
 final textScannerProvider = Provider<TextScanner>(
   (_) => throw UnimplementedError(),
+);
+
+final notifierProvider = Provider<AlertNotifier>(
+  (_) => const SilentAlertNotifier(),
 );
 
 final secretStoreProvider = Provider<SecretStore>(

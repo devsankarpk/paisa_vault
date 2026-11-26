@@ -3256,6 +3256,674 @@ class MerchantRulesCompanion extends UpdateCompanion<MerchantRule> {
   }
 }
 
+class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BudgetsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _categoryNameMeta = const VerificationMeta(
+    'categoryName',
+  );
+  @override
+  late final GeneratedColumn<String> categoryName = GeneratedColumn<String>(
+    'category_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _limitPaiseMeta = const VerificationMeta(
+    'limitPaise',
+  );
+  @override
+  late final GeneratedColumn<int> limitPaise = GeneratedColumn<int>(
+    'limit_paise',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    categoryName,
+    limitPaise,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'budgets';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Budget> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('category_name')) {
+      context.handle(
+        _categoryNameMeta,
+        categoryName.isAcceptableOrUnknown(
+          data['category_name']!,
+          _categoryNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryNameMeta);
+    }
+    if (data.containsKey('limit_paise')) {
+      context.handle(
+        _limitPaiseMeta,
+        limitPaise.isAcceptableOrUnknown(data['limit_paise']!, _limitPaiseMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_limitPaiseMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Budget map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Budget(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      categoryName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category_name'],
+      )!,
+      limitPaise: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}limit_paise'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BudgetsTable createAlias(String alias) {
+    return $BudgetsTable(attachedDatabase, alias);
+  }
+}
+
+class Budget extends DataClass implements Insertable<Budget> {
+  final int id;
+  final String categoryName;
+  final int limitPaise;
+  final DateTime createdAt;
+  const Budget({
+    required this.id,
+    required this.categoryName,
+    required this.limitPaise,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['category_name'] = Variable<String>(categoryName);
+    map['limit_paise'] = Variable<int>(limitPaise);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  BudgetsCompanion toCompanion(bool nullToAbsent) {
+    return BudgetsCompanion(
+      id: Value(id),
+      categoryName: Value(categoryName),
+      limitPaise: Value(limitPaise),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Budget.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Budget(
+      id: serializer.fromJson<int>(json['id']),
+      categoryName: serializer.fromJson<String>(json['categoryName']),
+      limitPaise: serializer.fromJson<int>(json['limitPaise']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'categoryName': serializer.toJson<String>(categoryName),
+      'limitPaise': serializer.toJson<int>(limitPaise),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Budget copyWith({
+    int? id,
+    String? categoryName,
+    int? limitPaise,
+    DateTime? createdAt,
+  }) => Budget(
+    id: id ?? this.id,
+    categoryName: categoryName ?? this.categoryName,
+    limitPaise: limitPaise ?? this.limitPaise,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Budget copyWithCompanion(BudgetsCompanion data) {
+    return Budget(
+      id: data.id.present ? data.id.value : this.id,
+      categoryName: data.categoryName.present
+          ? data.categoryName.value
+          : this.categoryName,
+      limitPaise: data.limitPaise.present
+          ? data.limitPaise.value
+          : this.limitPaise,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Budget(')
+          ..write('id: $id, ')
+          ..write('categoryName: $categoryName, ')
+          ..write('limitPaise: $limitPaise, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, categoryName, limitPaise, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Budget &&
+          other.id == this.id &&
+          other.categoryName == this.categoryName &&
+          other.limitPaise == this.limitPaise &&
+          other.createdAt == this.createdAt);
+}
+
+class BudgetsCompanion extends UpdateCompanion<Budget> {
+  final Value<int> id;
+  final Value<String> categoryName;
+  final Value<int> limitPaise;
+  final Value<DateTime> createdAt;
+  const BudgetsCompanion({
+    this.id = const Value.absent(),
+    this.categoryName = const Value.absent(),
+    this.limitPaise = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  BudgetsCompanion.insert({
+    this.id = const Value.absent(),
+    required String categoryName,
+    required int limitPaise,
+    required DateTime createdAt,
+  }) : categoryName = Value(categoryName),
+       limitPaise = Value(limitPaise),
+       createdAt = Value(createdAt);
+  static Insertable<Budget> custom({
+    Expression<int>? id,
+    Expression<String>? categoryName,
+    Expression<int>? limitPaise,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (categoryName != null) 'category_name': categoryName,
+      if (limitPaise != null) 'limit_paise': limitPaise,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  BudgetsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? categoryName,
+    Value<int>? limitPaise,
+    Value<DateTime>? createdAt,
+  }) {
+    return BudgetsCompanion(
+      id: id ?? this.id,
+      categoryName: categoryName ?? this.categoryName,
+      limitPaise: limitPaise ?? this.limitPaise,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (categoryName.present) {
+      map['category_name'] = Variable<String>(categoryName.value);
+    }
+    if (limitPaise.present) {
+      map['limit_paise'] = Variable<int>(limitPaise.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BudgetsCompanion(')
+          ..write('id: $id, ')
+          ..write('categoryName: $categoryName, ')
+          ..write('limitPaise: $limitPaise, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $BudgetAlertLogTable extends BudgetAlertLog
+    with TableInfo<$BudgetAlertLogTable, BudgetAlertLogData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BudgetAlertLogTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _categoryNameMeta = const VerificationMeta(
+    'categoryName',
+  );
+  @override
+  late final GeneratedColumn<String> categoryName = GeneratedColumn<String>(
+    'category_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _periodMeta = const VerificationMeta('period');
+  @override
+  late final GeneratedColumn<String> period = GeneratedColumn<String>(
+    'period',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _thresholdMeta = const VerificationMeta(
+    'threshold',
+  );
+  @override
+  late final GeneratedColumn<int> threshold = GeneratedColumn<int>(
+    'threshold',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _firedAtMeta = const VerificationMeta(
+    'firedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> firedAt = GeneratedColumn<DateTime>(
+    'fired_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    categoryName,
+    period,
+    threshold,
+    firedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'budget_alert_log';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BudgetAlertLogData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('category_name')) {
+      context.handle(
+        _categoryNameMeta,
+        categoryName.isAcceptableOrUnknown(
+          data['category_name']!,
+          _categoryNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryNameMeta);
+    }
+    if (data.containsKey('period')) {
+      context.handle(
+        _periodMeta,
+        period.isAcceptableOrUnknown(data['period']!, _periodMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_periodMeta);
+    }
+    if (data.containsKey('threshold')) {
+      context.handle(
+        _thresholdMeta,
+        threshold.isAcceptableOrUnknown(data['threshold']!, _thresholdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_thresholdMeta);
+    }
+    if (data.containsKey('fired_at')) {
+      context.handle(
+        _firedAtMeta,
+        firedAt.isAcceptableOrUnknown(data['fired_at']!, _firedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_firedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BudgetAlertLogData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BudgetAlertLogData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      categoryName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category_name'],
+      )!,
+      period: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}period'],
+      )!,
+      threshold: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}threshold'],
+      )!,
+      firedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}fired_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BudgetAlertLogTable createAlias(String alias) {
+    return $BudgetAlertLogTable(attachedDatabase, alias);
+  }
+}
+
+class BudgetAlertLogData extends DataClass
+    implements Insertable<BudgetAlertLogData> {
+  final int id;
+  final String categoryName;
+  final String period;
+  final int threshold;
+  final DateTime firedAt;
+  const BudgetAlertLogData({
+    required this.id,
+    required this.categoryName,
+    required this.period,
+    required this.threshold,
+    required this.firedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['category_name'] = Variable<String>(categoryName);
+    map['period'] = Variable<String>(period);
+    map['threshold'] = Variable<int>(threshold);
+    map['fired_at'] = Variable<DateTime>(firedAt);
+    return map;
+  }
+
+  BudgetAlertLogCompanion toCompanion(bool nullToAbsent) {
+    return BudgetAlertLogCompanion(
+      id: Value(id),
+      categoryName: Value(categoryName),
+      period: Value(period),
+      threshold: Value(threshold),
+      firedAt: Value(firedAt),
+    );
+  }
+
+  factory BudgetAlertLogData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BudgetAlertLogData(
+      id: serializer.fromJson<int>(json['id']),
+      categoryName: serializer.fromJson<String>(json['categoryName']),
+      period: serializer.fromJson<String>(json['period']),
+      threshold: serializer.fromJson<int>(json['threshold']),
+      firedAt: serializer.fromJson<DateTime>(json['firedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'categoryName': serializer.toJson<String>(categoryName),
+      'period': serializer.toJson<String>(period),
+      'threshold': serializer.toJson<int>(threshold),
+      'firedAt': serializer.toJson<DateTime>(firedAt),
+    };
+  }
+
+  BudgetAlertLogData copyWith({
+    int? id,
+    String? categoryName,
+    String? period,
+    int? threshold,
+    DateTime? firedAt,
+  }) => BudgetAlertLogData(
+    id: id ?? this.id,
+    categoryName: categoryName ?? this.categoryName,
+    period: period ?? this.period,
+    threshold: threshold ?? this.threshold,
+    firedAt: firedAt ?? this.firedAt,
+  );
+  BudgetAlertLogData copyWithCompanion(BudgetAlertLogCompanion data) {
+    return BudgetAlertLogData(
+      id: data.id.present ? data.id.value : this.id,
+      categoryName: data.categoryName.present
+          ? data.categoryName.value
+          : this.categoryName,
+      period: data.period.present ? data.period.value : this.period,
+      threshold: data.threshold.present ? data.threshold.value : this.threshold,
+      firedAt: data.firedAt.present ? data.firedAt.value : this.firedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BudgetAlertLogData(')
+          ..write('id: $id, ')
+          ..write('categoryName: $categoryName, ')
+          ..write('period: $period, ')
+          ..write('threshold: $threshold, ')
+          ..write('firedAt: $firedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, categoryName, period, threshold, firedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BudgetAlertLogData &&
+          other.id == this.id &&
+          other.categoryName == this.categoryName &&
+          other.period == this.period &&
+          other.threshold == this.threshold &&
+          other.firedAt == this.firedAt);
+}
+
+class BudgetAlertLogCompanion extends UpdateCompanion<BudgetAlertLogData> {
+  final Value<int> id;
+  final Value<String> categoryName;
+  final Value<String> period;
+  final Value<int> threshold;
+  final Value<DateTime> firedAt;
+  const BudgetAlertLogCompanion({
+    this.id = const Value.absent(),
+    this.categoryName = const Value.absent(),
+    this.period = const Value.absent(),
+    this.threshold = const Value.absent(),
+    this.firedAt = const Value.absent(),
+  });
+  BudgetAlertLogCompanion.insert({
+    this.id = const Value.absent(),
+    required String categoryName,
+    required String period,
+    required int threshold,
+    required DateTime firedAt,
+  }) : categoryName = Value(categoryName),
+       period = Value(period),
+       threshold = Value(threshold),
+       firedAt = Value(firedAt);
+  static Insertable<BudgetAlertLogData> custom({
+    Expression<int>? id,
+    Expression<String>? categoryName,
+    Expression<String>? period,
+    Expression<int>? threshold,
+    Expression<DateTime>? firedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (categoryName != null) 'category_name': categoryName,
+      if (period != null) 'period': period,
+      if (threshold != null) 'threshold': threshold,
+      if (firedAt != null) 'fired_at': firedAt,
+    });
+  }
+
+  BudgetAlertLogCompanion copyWith({
+    Value<int>? id,
+    Value<String>? categoryName,
+    Value<String>? period,
+    Value<int>? threshold,
+    Value<DateTime>? firedAt,
+  }) {
+    return BudgetAlertLogCompanion(
+      id: id ?? this.id,
+      categoryName: categoryName ?? this.categoryName,
+      period: period ?? this.period,
+      threshold: threshold ?? this.threshold,
+      firedAt: firedAt ?? this.firedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (categoryName.present) {
+      map['category_name'] = Variable<String>(categoryName.value);
+    }
+    if (period.present) {
+      map['period'] = Variable<String>(period.value);
+    }
+    if (threshold.present) {
+      map['threshold'] = Variable<int>(threshold.value);
+    }
+    if (firedAt.present) {
+      map['fired_at'] = Variable<DateTime>(firedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BudgetAlertLogCompanion(')
+          ..write('id: $id, ')
+          ..write('categoryName: $categoryName, ')
+          ..write('period: $period, ')
+          ..write('threshold: $threshold, ')
+          ..write('firedAt: $firedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $PipelineLogTable extends PipelineLog
     with TableInfo<$PipelineLogTable, PipelineLogData> {
   @override
@@ -3874,6 +4542,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $RawMessagesTable rawMessages = $RawMessagesTable(this);
   late final $TransactionsTable transactions = $TransactionsTable(this);
   late final $MerchantRulesTable merchantRules = $MerchantRulesTable(this);
+  late final $BudgetsTable budgets = $BudgetsTable(this);
+  late final $BudgetAlertLogTable budgetAlertLog = $BudgetAlertLogTable(this);
   late final $PipelineLogTable pipelineLog = $PipelineLogTable(this);
   late final $HiddenHashTable hiddenHash = $HiddenHashTable(this);
   late final Index rawMessagesHash = Index(
@@ -3900,6 +4570,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'txn_fingerprint',
     'CREATE INDEX txn_fingerprint ON transactions (fingerprint)',
   );
+  late final Index budgetAlertOnce = Index(
+    'budget_alert_once',
+    'CREATE UNIQUE INDEX budget_alert_once ON budget_alert_log (category_name, period, threshold)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3911,6 +4585,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     rawMessages,
     transactions,
     merchantRules,
+    budgets,
+    budgetAlertLog,
     pipelineLog,
     hiddenHash,
     rawMessagesHash,
@@ -3919,6 +4595,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     txnAmountDate,
     txnCategoryDate,
     txnFingerprint,
+    budgetAlertOnce,
   ];
 }
 
@@ -6126,6 +6803,397 @@ typedef $$MerchantRulesTableProcessedTableManager =
       MerchantRule,
       PrefetchHooks Function()
     >;
+typedef $$BudgetsTableCreateCompanionBuilder = BudgetsCompanion Function({
+  Value<int> id,
+  required String categoryName,
+  required int limitPaise,
+  required DateTime createdAt,
+});
+typedef $$BudgetsTableUpdateCompanionBuilder = BudgetsCompanion Function({
+  Value<int> id,
+  Value<String> categoryName,
+  Value<int> limitPaise,
+  Value<DateTime> createdAt,
+});
+
+class $$BudgetsTableFilterComposer
+    extends Composer<_$AppDatabase, $BudgetsTable> {
+  $$BudgetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get limitPaise => $composableBuilder(
+    column: $table.limitPaise,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BudgetsTableOrderingComposer
+    extends Composer<_$AppDatabase, $BudgetsTable> {
+  $$BudgetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get limitPaise => $composableBuilder(
+    column: $table.limitPaise,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BudgetsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BudgetsTable> {
+  $$BudgetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get limitPaise => $composableBuilder(
+    column: $table.limitPaise,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$BudgetsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BudgetsTable,
+          Budget,
+          $$BudgetsTableFilterComposer,
+          $$BudgetsTableOrderingComposer,
+          $$BudgetsTableAnnotationComposer,
+          $$BudgetsTableCreateCompanionBuilder,
+          $$BudgetsTableUpdateCompanionBuilder,
+          (Budget, BaseReferences<_$AppDatabase, $BudgetsTable, Budget>),
+          Budget,
+          PrefetchHooks Function()
+        > {
+  $$BudgetsTableTableManager(_$AppDatabase db, $BudgetsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BudgetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BudgetsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BudgetsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> categoryName = const Value.absent(),
+                Value<int> limitPaise = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => BudgetsCompanion(
+                id: id,
+                categoryName: categoryName,
+                limitPaise: limitPaise,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String categoryName,
+                required int limitPaise,
+                required DateTime createdAt,
+              }) => BudgetsCompanion.insert(
+                id: id,
+                categoryName: categoryName,
+                limitPaise: limitPaise,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$BudgetsTable, Budget>(table),
+                  BaseReferences<_$AppDatabase, $BudgetsTable, Budget>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BudgetsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BudgetsTable,
+      Budget,
+      $$BudgetsTableFilterComposer,
+      $$BudgetsTableOrderingComposer,
+      $$BudgetsTableAnnotationComposer,
+      $$BudgetsTableCreateCompanionBuilder,
+      $$BudgetsTableUpdateCompanionBuilder,
+      (Budget, BaseReferences<_$AppDatabase, $BudgetsTable, Budget>),
+      Budget,
+      PrefetchHooks Function()
+    >;
+typedef $$BudgetAlertLogTableCreateCompanionBuilder =
+    BudgetAlertLogCompanion Function({
+      Value<int> id,
+      required String categoryName,
+      required String period,
+      required int threshold,
+      required DateTime firedAt,
+    });
+typedef $$BudgetAlertLogTableUpdateCompanionBuilder =
+    BudgetAlertLogCompanion Function({
+      Value<int> id,
+      Value<String> categoryName,
+      Value<String> period,
+      Value<int> threshold,
+      Value<DateTime> firedAt,
+    });
+
+class $$BudgetAlertLogTableFilterComposer
+    extends Composer<_$AppDatabase, $BudgetAlertLogTable> {
+  $$BudgetAlertLogTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get period => $composableBuilder(
+    column: $table.period,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get threshold => $composableBuilder(
+    column: $table.threshold,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get firedAt => $composableBuilder(
+    column: $table.firedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BudgetAlertLogTableOrderingComposer
+    extends Composer<_$AppDatabase, $BudgetAlertLogTable> {
+  $$BudgetAlertLogTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get period => $composableBuilder(
+    column: $table.period,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get threshold => $composableBuilder(
+    column: $table.threshold,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get firedAt => $composableBuilder(
+    column: $table.firedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BudgetAlertLogTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BudgetAlertLogTable> {
+  $$BudgetAlertLogTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get categoryName => $composableBuilder(
+    column: $table.categoryName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get period =>
+      $composableBuilder(column: $table.period, builder: (column) => column);
+
+  GeneratedColumn<int> get threshold =>
+      $composableBuilder(column: $table.threshold, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get firedAt =>
+      $composableBuilder(column: $table.firedAt, builder: (column) => column);
+}
+
+class $$BudgetAlertLogTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BudgetAlertLogTable,
+          BudgetAlertLogData,
+          $$BudgetAlertLogTableFilterComposer,
+          $$BudgetAlertLogTableOrderingComposer,
+          $$BudgetAlertLogTableAnnotationComposer,
+          $$BudgetAlertLogTableCreateCompanionBuilder,
+          $$BudgetAlertLogTableUpdateCompanionBuilder,
+          (
+            BudgetAlertLogData,
+            BaseReferences<
+              _$AppDatabase,
+              $BudgetAlertLogTable,
+              BudgetAlertLogData
+            >,
+          ),
+          BudgetAlertLogData,
+          PrefetchHooks Function()
+        > {
+  $$BudgetAlertLogTableTableManager(
+    _$AppDatabase db,
+    $BudgetAlertLogTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BudgetAlertLogTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BudgetAlertLogTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BudgetAlertLogTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> categoryName = const Value.absent(),
+                Value<String> period = const Value.absent(),
+                Value<int> threshold = const Value.absent(),
+                Value<DateTime> firedAt = const Value.absent(),
+              }) => BudgetAlertLogCompanion(
+                id: id,
+                categoryName: categoryName,
+                period: period,
+                threshold: threshold,
+                firedAt: firedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String categoryName,
+                required String period,
+                required int threshold,
+                required DateTime firedAt,
+              }) => BudgetAlertLogCompanion.insert(
+                id: id,
+                categoryName: categoryName,
+                period: period,
+                threshold: threshold,
+                firedAt: firedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$BudgetAlertLogTable, BudgetAlertLogData>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $BudgetAlertLogTable,
+                    BudgetAlertLogData
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BudgetAlertLogTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BudgetAlertLogTable,
+      BudgetAlertLogData,
+      $$BudgetAlertLogTableFilterComposer,
+      $$BudgetAlertLogTableOrderingComposer,
+      $$BudgetAlertLogTableAnnotationComposer,
+      $$BudgetAlertLogTableCreateCompanionBuilder,
+      $$BudgetAlertLogTableUpdateCompanionBuilder,
+      (
+        BudgetAlertLogData,
+        BaseReferences<_$AppDatabase, $BudgetAlertLogTable, BudgetAlertLogData>,
+      ),
+      BudgetAlertLogData,
+      PrefetchHooks Function()
+    >;
 typedef $$PipelineLogTableCreateCompanionBuilder =
     PipelineLogCompanion Function({
       Value<int> id,
@@ -6516,6 +7584,10 @@ class $AppDatabaseManager {
       $$TransactionsTableTableManager(_db, _db.transactions);
   $$MerchantRulesTableTableManager get merchantRules =>
       $$MerchantRulesTableTableManager(_db, _db.merchantRules);
+  $$BudgetsTableTableManager get budgets =>
+      $$BudgetsTableTableManager(_db, _db.budgets);
+  $$BudgetAlertLogTableTableManager get budgetAlertLog =>
+      $$BudgetAlertLogTableTableManager(_db, _db.budgetAlertLog);
   $$PipelineLogTableTableManager get pipelineLog =>
       $$PipelineLogTableTableManager(_db, _db.pipelineLog);
   $$HiddenHashTableTableManager get hiddenHash =>

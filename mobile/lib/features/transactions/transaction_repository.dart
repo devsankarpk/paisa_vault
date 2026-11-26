@@ -149,11 +149,15 @@ class TransactionRepository {
     if (key.isEmpty) return 0;
     await _db
         .into(_db.merchantRules)
-        .insertOnConflictUpdate(
+        .insert(
           MerchantRulesCompanion.insert(
             merchantKey: key,
             categoryName: category,
             createdAt: _clock.now(),
+          ),
+          onConflict: DoUpdate(
+            (_) => MerchantRulesCompanion(categoryName: Value(category)),
+            target: [_db.merchantRules.merchantKey],
           ),
         );
     final waiting =

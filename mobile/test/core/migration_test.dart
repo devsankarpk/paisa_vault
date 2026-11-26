@@ -5,7 +5,7 @@ import 'package:paisa_vault/core/db/app_database.dart';
 
 import '../generated_migrations/schema.dart';
 import '../generated_migrations/schema_v1.dart' as v1;
-import '../generated_migrations/schema_v3.dart' as v3;
+import '../generated_migrations/schema_v4.dart' as v4;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -43,7 +43,7 @@ void main() {
     await old.close();
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 3);
+    await verifier.migrateAndValidate(db, 4);
     final t = await db.select(db.transactions).getSingle();
     expect(t.amountPaise, 500);
     expect(t.bankCode, isNull);
@@ -53,9 +53,16 @@ void main() {
     await db.close();
   });
 
-  test('a fresh install is at v3 too', () async {
-    final db = v3.DatabaseAtV3((await verifier.schemaAt(3)).newConnection());
-    expect(db.schemaVersion, 3);
+  test('v3 to v4 adds budgets and the alert log', () async {
+    final connection = await verifier.startAt(3);
+    final db = AppDatabase(connection);
+    await verifier.migrateAndValidate(db, 4);
+    await db.close();
+  });
+
+  test('a fresh install is at v4 too', () async {
+    final db = v4.DatabaseAtV4((await verifier.schemaAt(4)).newConnection());
+    expect(db.schemaVersion, 4);
     await db.close();
   });
 }

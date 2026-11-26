@@ -6,12 +6,15 @@ plugins {
 
 android {
     namespace = "com.paisavault.paisa_vault"
-    compileSdk = flutter.compileSdkVersion
+    // flutter_local_notifications and androidx.core need API 37 to compile; targetSdk is unchanged.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // Needed by flutter_local_notifications.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -53,5 +56,6 @@ flutter {
 }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     testImplementation("junit:junit:4.13.2")
 }

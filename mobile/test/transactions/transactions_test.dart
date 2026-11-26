@@ -520,6 +520,14 @@ void main() {
       },
     );
 
+    test('answering again for the same merchant changes its rule', () async {
+      await repo.saveRule('RAJU STORES', 'Shopping');
+      await repo.saveRule('Raju Stores', 'Groceries');
+      final rules = await db.select(db.merchantRules).get();
+      expect(rules, hasLength(1));
+      expect(rules.single.categoryName, 'Groceries');
+    });
+
     test('answering without "always" does not make a rule', () async {
       await raw.save(sms(msg(480, '21'), DateTime(2026, 11, 21, 10)));
       await service(

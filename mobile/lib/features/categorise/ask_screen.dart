@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/app_database.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/providers.dart';
+import '../budgets/providers.dart';
 import '../transactions/format.dart';
 import '../transactions/providers.dart';
 import '../transactions/transaction_repository.dart';
@@ -65,6 +67,10 @@ class _AskCardState extends ConsumerState<AskCard> {
   Future<void> _pick(String category) async {
     final repo = await ref.read(transactionRepositoryProvider.future);
     await repo.answer(widget.tx, category, always: _always);
+    await runBudgetAlerts(
+      ref.read(budgetRepositoryProvider.future),
+      ref.read(notifierProvider),
+    );
   }
 
   @override
