@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../categories/categories_screen.dart';
 import '../lock/lock_controller.dart';
 import '../sms/raw_message_repository.dart';
 import '../sms/shortcut_guide_screen.dart';
@@ -90,6 +91,18 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('Setup steps and test'),
           ),
         ],
+        const SizedBox(height: 16),
+        const _Card(
+          title: 'Categories',
+          body: 'Add your own categories, rename them or hide the ones you do not use.',
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const CategoriesScreen()),
+          ),
+          child: const Text('Manage categories'),
+        ),
         const SizedBox(height: 16),
         const _Card(
           title: 'Erase everything',

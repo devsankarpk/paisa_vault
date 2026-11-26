@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
+import '../categories/providers.dart';
 import '../transactions/format.dart';
 import '../transactions/rule_amount.dart';
-import '../transactions/transaction_repository.dart';
 import 'budget_repository.dart';
 import 'providers.dart';
 
@@ -124,15 +124,15 @@ class BudgetsScreen extends ConsumerWidget {
   }
 }
 
-class _BudgetDialog extends StatefulWidget {
+class _BudgetDialog extends ConsumerStatefulWidget {
   const _BudgetDialog({this.existing});
   final BudgetStatus? existing;
 
   @override
-  State<_BudgetDialog> createState() => _BudgetDialogState();
+  ConsumerState<_BudgetDialog> createState() => _BudgetDialogState();
 }
 
-class _BudgetDialogState extends State<_BudgetDialog> {
+class _BudgetDialogState extends ConsumerState<_BudgetDialog> {
   late String? _category = widget.existing?.budget.categoryName;
   late final _amount = TextEditingController(
     text: widget.existing == null
@@ -172,9 +172,9 @@ class _BudgetDialogState extends State<_BudgetDialog> {
             initialValue: _category,
             decoration: const InputDecoration(labelText: 'Category'),
             items: [
-              for (final c in defaultCategories.where(
-                (c) => c != 'Income' && c != 'Transfer',
-              ))
+              for (final c in namesOrDefault(
+                ref.watch(categoryNamesProvider),
+              ).where((c) => c != 'Income' && c != 'Transfer'))
                 DropdownMenuItem(value: c, child: Text(c)),
             ],
             onChanged: editing ? null : (v) => setState(() => _category = v),

@@ -12,6 +12,39 @@ export 'tables.dart';
 
 part 'app_database.g.dart';
 
+/// The starting category list (decision D4). Added once, when the table is empty.
+const seedExpenseCategories = [
+  'Food',
+  'Groceries',
+  'Shopping',
+  'Bills',
+  'Travel',
+  'Health',
+  'Entertainment',
+  'Other',
+];
+
+Future<void> seedCategories(AppDatabase db) async {
+  if ((await db.select(db.categories).get()).isNotEmpty) return;
+  final now = DateTime.now();
+  var order = 0;
+  Future<void> add(String name, CategoryKind kind) => db
+      .into(db.categories)
+      .insert(
+        CategoriesCompanion.insert(
+          name: name,
+          kind: kind,
+          sortOrder: Value(order++),
+          createdAt: now,
+        ),
+      );
+  for (final c in seedExpenseCategories) {
+    await add(c, CategoryKind.expense);
+  }
+  await add('Income', CategoryKind.income);
+  await add('Transfer', CategoryKind.transfer);
+}
+
 @DriftDatabase(
   tables: [
     Settings,
@@ -20,6 +53,7 @@ part 'app_database.g.dart';
     RawMessages,
     Transactions,
     MerchantRules,
+    Categories,
     Budgets,
     BudgetAlertLog,
     PipelineLog,
@@ -37,7 +71,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -59,9 +93,13 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(budgetAlertLog);
         await m.createIndex(budgetAlertOnce);
       }
+      if (from < 5) {
+        await m.createTable(categories);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
+      await seedCategories(this);
     },
   );
 }
