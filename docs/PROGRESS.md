@@ -139,12 +139,12 @@ Status values: Not started, In progress, Blocked, Done.
 
 [Details](phases/phase-1b-categorise-search-budgets.md)
 
-- [ ] Categories, merchants, merchant_rules, seed data (merchant_rules table done 25 Nov, schema v3; the fixed default category list is still in code, not a table, so editing categories is still to do)
+- [x] Categories, merchants, merchant_rules, seed data (done 26 Nov, schema v5: categories table seeded with the default list; Income and Transfer fixed; seed data tested)
 - [x] Categoriser (rule, similar, LLM, ask) (done 25 Nov: user rule, then similar merchant already categorised by you, then the model suggestion, else it waits for your answer; tested)
 - [x] Income handling (done 25 Nov: money in only gets Income or Transfer, otherwise it is asked)
 - [ ] Manual entry and transaction detail/edit
 - [ ] "What was this?" flow and notification (in-app part done 25 Nov: banner on the list, answer screen with category buttons and "always use for this merchant", same checkbox in the edit sheet; notification still to do)
-- [ ] Category and merchant-rule management screens
+- [ ] Category and merchant-rule management screens (categories done 26 Nov: Settings, Manage categories, add, rename everywhere, hide; merchant-rule screen still to do)
 - [ ] Search (date, category, exact amount in range, text) with indexes (done 25 Nov: search screen with dates, category, exact amount and merchant or note text, filters combine, tested; text search uses a plain match, not full-text, which is enough for personal volumes; left open to check on the phone)
 - [ ] Budgets and threshold alerts, once per period (done 25 Nov, schema v4: budgets per category per calendar month, alert log, 70/80/90/100% each once a month, only the highest level when spending jumps, local notification with category and percentage only, no amounts; Budgets screen with progress bars; left open until seen firing on a phone)
 - [ ] Uncategorised alert and evening grouping
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 26 Nov 2026 | Editable categories (schema v5): add, rename (updates transactions, rules and budgets) and hide, from Settings. Every picker and the model prompt use the stored list. Tested; not yet seen on a phone. |
 | 26 Nov 2026 | Budgets (schema v4), once-per-month threshold alerts, local notifications (flutter_local_notifications), Budgets screen. Also fixed a bug found by a new test: changing the category for a merchant that already had a rule would have crashed. Tested; not yet seen on a phone. |
 | 25 Nov 2026 | Search screen (magnifier on the Transactions screen): dates, category, exact amount, merchant or note text; filters combine. Tested; not yet seen on a phone. |
 | 25 Nov 2026 | Phase 1B started: schema v3 (merchant_rules), categoriser (rule, similar merchant, model, else ask), "What was this?" screen and banner, "always use this category" learning. Tested; not yet seen on a phone. |

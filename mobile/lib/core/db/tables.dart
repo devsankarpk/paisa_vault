@@ -130,6 +130,20 @@ class MerchantRules extends Table {
   DateTimeColumn get createdAt => dateTime()();
 }
 
+enum CategoryKind { expense, income, transfer }
+
+/// The names a transaction can be filed under. Income and Transfer are fixed (the income and
+/// self-transfer logic relies on them); expense categories can be added, renamed and hidden.
+/// A hidden category stays on old transactions but is not offered for new ones.
+class Categories extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().unique()();
+  TextColumn get kind => textEnum<CategoryKind>()();
+  BoolColumn get hidden => boolean().withDefault(const Constant(false))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
 /// A spending limit for one category for each calendar month.
 class Budgets extends Table {
   IntColumn get id => integer().autoIncrement()();

@@ -6,6 +6,7 @@ import '../../services/llm_engine.dart';
 import '../pipeline/model_reply.dart';
 import '../model/llama_engine.dart';
 import '../sms/raw_message_repository.dart';
+import '../categories/providers.dart';
 import '../model/model_diagnostics.dart';
 import '../model/model_locator.dart';
 import '../model/model_manifest.dart';
@@ -78,7 +79,7 @@ class _TimedEngine implements LlmEngine {
     final ch = val('channel');
     return 'think=${r.contains('<think>')} fence=${r.contains('```')} '
         'start=${r.trimLeft().startsWith('{')} keys=$keys '
-        'catOk=${cat == null ? 'none' : defaultCategories.contains(cat)} '
+        'cat=${cat == null ? 'none' : 'set'} '
         'chOk=${ch == null ? 'none' : allowedChannels.contains(ch)}';
   }
 
@@ -111,7 +112,8 @@ final processingServiceProvider = FutureProvider<ProcessingService>((
   return ProcessingService(
     db,
     repo,
-    categories: defaultCategories,
+    categories: await (await ref.watch(categoryRepositoryProvider.future))
+        .visibleNames(),
     engineFactory: ref.watch(engineFactoryProvider),
     log: (e) => ModelDiagnostics().note(e),
   );

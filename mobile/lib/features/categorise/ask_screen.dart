@@ -5,9 +5,9 @@ import '../../core/db/app_database.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/providers.dart';
 import '../budgets/providers.dart';
+import '../categories/providers.dart';
 import '../transactions/format.dart';
 import '../transactions/providers.dart';
-import '../transactions/transaction_repository.dart';
 
 /// Transactions that still have no category. Always on top of the list screen as a banner.
 final uncategorisedProvider = StreamProvider<List<Transaction>>((ref) async* {
@@ -83,7 +83,9 @@ class _AskCardState extends ConsumerState<AskCard> {
         : (credit ? 'received from $merchant' : 'paid to $merchant');
     final choices = credit
         ? const ['Income', 'Transfer', 'Other']
-        : defaultCategories.where((c) => c != 'Income').toList();
+        : namesOrDefault(ref.watch(categoryNamesProvider))
+              .where((c) => c != 'Income' && c != 'Transfer')
+              .toList();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

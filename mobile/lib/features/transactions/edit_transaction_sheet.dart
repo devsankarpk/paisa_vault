@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/db/app_database.dart';
 import '../../core/providers.dart';
 import '../budgets/providers.dart';
+import '../categories/providers.dart';
 import 'format.dart';
 import 'providers.dart';
 import 'rule_amount.dart';
-import 'transaction_repository.dart';
 
 Future<void> showEditTransactionSheet(BuildContext context, Transaction tx) {
   return showModalBottomSheet<void>(
@@ -32,9 +32,7 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
     text: formatRupees(widget.tx.amountPaise).replaceAll(',', ''),
   );
   late final _note = TextEditingController(text: widget.tx.note ?? '');
-  late String? _category = defaultCategories.contains(widget.tx.categoryName)
-      ? widget.tx.categoryName
-      : null;
+  late String? _category = widget.tx.categoryName;
   late Direction _direction = widget.tx.direction;
   bool _always = false;
   String? _error;
@@ -45,6 +43,13 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
     _amount.dispose();
     _note.dispose();
     super.dispose();
+  }
+
+  /// The visible categories, plus this transaction's own one if it has since been hidden.
+  List<String> _choices() {
+    final names = namesOrDefault(ref.watch(categoryNamesProvider));
+    final own = _category;
+    return own != null && !names.contains(own) ? [...names, own] : names;
   }
 
   Future<void> _save() async {
@@ -120,7 +125,7 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
               initialValue: _category,
               decoration: const InputDecoration(labelText: 'Category'),
               items: [
-                for (final c in defaultCategories)
+                for (final c in _choices())
                   DropdownMenuItem(value: c, child: Text(c)),
               ],
               onChanged: (v) => setState(() => _category = v),

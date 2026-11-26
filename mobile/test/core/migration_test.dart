@@ -5,7 +5,7 @@ import 'package:paisa_vault/core/db/app_database.dart';
 
 import '../generated_migrations/schema.dart';
 import '../generated_migrations/schema_v1.dart' as v1;
-import '../generated_migrations/schema_v4.dart' as v4;
+import '../generated_migrations/schema_v5.dart' as v5;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -43,7 +43,7 @@ void main() {
     await old.close();
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 4);
+    await verifier.migrateAndValidate(db, 5);
     final t = await db.select(db.transactions).getSingle();
     expect(t.amountPaise, 500);
     expect(t.bankCode, isNull);
@@ -60,9 +60,18 @@ void main() {
     await db.close();
   });
 
-  test('a fresh install is at v4 too', () async {
-    final db = v4.DatabaseAtV4((await verifier.schemaAt(4)).newConnection());
-    expect(db.schemaVersion, 4);
+  test('v4 to v5 adds categories and fills in the starting list', () async {
+    final connection = await verifier.startAt(4);
+    final db = AppDatabase(connection);
+    await verifier.migrateAndValidate(db, 5);
+    final names = (await db.select(db.categories).get()).map((c) => c.name);
+    expect(names, containsAll(['Food', 'Other', 'Income', 'Transfer']));
+    await db.close();
+  });
+
+  test('a fresh install is at v5 too', () async {
+    final db = v5.DatabaseAtV5((await verifier.schemaAt(5)).newConnection());
+    expect(db.schemaVersion, 5);
     await db.close();
   });
 }

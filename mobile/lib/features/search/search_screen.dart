@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/app_database.dart';
 import '../../core/theme/app_theme.dart';
+import '../categories/providers.dart';
 import '../transactions/format.dart';
 import '../transactions/providers.dart';
 import '../transactions/rule_amount.dart';
-import '../transactions/transaction_repository.dart';
 import '../transactions/transactions_screen.dart';
 import 'transaction_filter.dart';
 
@@ -130,7 +130,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             value: null,
                             child: Text('Any'),
                           ),
-                          for (final c in defaultCategories)
+                          for (final c in namesOrDefault(
+                            ref.watch(allNamesProvider),
+                          ))
                             DropdownMenuItem(value: c, child: Text(c)),
                         ],
                         onChanged: (v) => _set(
