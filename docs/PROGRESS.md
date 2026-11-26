@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 26 Nov 2026 | Paste-an-SMS now checks first: the same text is refused however old, and a transaction with the same amount, day and card asks "Add anyway?". Found when the + button let an already-saved message be added again. Tested. |
 | 26 Nov 2026 | Encrypted backup and restore (Settings, Backup and restore): passphrase-locked file shared through the iOS and Android share sheet, restore from a picked file with a confirm step. Round trip, wrong passphrase and damaged file tested; not yet tried on a phone. |
 | 26 Nov 2026 | Editable categories (schema v5): add, rename (updates transactions, rules and budgets) and hide, from Settings. Every picker and the model prompt use the stored list. Tested; not yet seen on a phone. |
 | 26 Nov 2026 | Budgets (schema v4), once-per-month threshold alerts, local notifications (flutter_local_notifications), Budgets screen. Also fixed a bug found by a new test: changing the category for a merchant that already had a rule would have crashed. Tested; not yet seen on a phone. |

@@ -724,8 +724,10 @@ void main() {
           ),
         ),
       );
-      Future<AddMessageResult> add(String text) async =>
-          (await t.runAsync(() => addPastedMessage(captured, text)))!;
+      Future<AddMessageResult> add(String text, {bool force = false}) async =>
+          (await t.runAsync(
+            () => addPastedMessage(captured, text, force: force),
+          ))!;
 
       expect(await add('   '), AddMessageResult.empty);
       expect(await add('Your OTP is 123456'), AddMessageResult.notATransaction);
@@ -738,6 +740,32 @@ void main() {
       expect(
         await t.runAsync(() => db.select(db.transactions).get()),
         hasLength(1),
+      );
+
+      // Different wording of the same payment (same amount, day and card) asks first
+      const reworded =
+          'HDFC Bank: Rs 250.00 spent on Card x1234 at ZOMATO on 12-10-26. Not you? Call us.';
+      expect(await add(reworded), AddMessageResult.possibleDuplicate);
+      expect(
+        await t.runAsync(() => db.select(db.transactions).get()),
+        hasLength(1), // nothing was added or saved yet
+      );
+      expect(
+        await t.runAsync(() => db.select(db.rawMessages).get()),
+        hasLength(2),
+      );
+      // a different amount on the same day is not a duplicate
+      expect(
+        await add(
+          'Rs 260.00 spent on HDFC Bank Card x1234 at ZOMATO on 12-10-26.',
+        ),
+        AddMessageResult.added,
+      );
+      // "add anyway" goes through
+      expect(await add(reworded, force: true), AddMessageResult.added);
+      expect(
+        await t.runAsync(() => db.select(db.transactions).get()),
+        hasLength(3),
       );
 
       await t.pumpWidget(const SizedBox());

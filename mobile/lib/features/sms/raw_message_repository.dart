@@ -50,6 +50,17 @@ class RawMessageRepository {
     return row.read(latest);
   }
 
+  /// True when exactly this text is already saved, however long ago it arrived.
+  Future<bool> hasSameText(String sender, String body) async {
+    final hash = hashOf(sender, body);
+    final found =
+        await (_db.select(_db.rawMessages)
+              ..where((m) => m.contentHash.equals(hash))
+              ..limit(1))
+            .get();
+    return found.isNotEmpty;
+  }
+
   static String hashOf(String sender, String body) =>
       sha256.convert(utf8.encode('${sender.toUpperCase()}\n$body')).toString();
 
