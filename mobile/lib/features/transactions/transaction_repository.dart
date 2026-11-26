@@ -99,6 +99,33 @@ class TransactionRepository {
         );
   }
 
+  /// A transaction you already have that looks like the one in [body]: same amount, same
+  /// direction, same day, and the same last 4 when both messages give one. Null when none, or
+  /// when the text has no clear amount and direction. Used before adding a pasted message.
+  Future<Transaction?> findLikelyDuplicate(String body, DateTime today) async {
+    final f = const RuleExtractor().extract(body);
+    final amount = f.amountPaise;
+    final direction = f.direction;
+    if (amount == null || direction == null) return null;
+    final day = f.date ?? today;
+    final start = DateTime(day.year, day.month, day.day);
+    final same =
+        await (_db.select(_db.transactions)..where(
+              (t) =>
+                  t.amountPaise.equals(amount) &
+                  t.direction.equals(direction.name) &
+                  t.occurredAt.isBiggerOrEqualValue(start) &
+                  t.occurredAt.isSmallerThanValue(
+                    DateTime(day.year, day.month, day.day + 1),
+                  ),
+            ))
+            .get();
+    for (final t in same) {
+      if (f.last4 == null || t.last4 == null || f.last4 == t.last4) return t;
+    }
+    return null;
+  }
+
   /// Picks a category in this order: a rule the user made, a similar merchant the user already
   /// categorised, then the model's suggestion. Null means "ask the user". Money coming in is
   /// never put in an expense category: only Income or Transfer are accepted for it.
