@@ -130,6 +130,29 @@ class MerchantRules extends Table {
   DateTimeColumn get createdAt => dateTime()();
 }
 
+/// A spending limit for one category for each calendar month.
+class Budgets extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get categoryName => text().unique()();
+  IntColumn get limitPaise => integer()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+/// Which alert levels (70, 80, 90, 100 percent) already fired for a category in a month, so
+/// each fires once. [period] is "2026-11".
+@TableIndex(
+  name: 'budget_alert_once',
+  columns: {#categoryName, #period, #threshold},
+  unique: true,
+)
+class BudgetAlertLog extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get categoryName => text()();
+  TextColumn get period => text()();
+  IntColumn get threshold => integer()();
+  DateTimeColumn get firedAt => dateTime()();
+}
+
 /// Local diagnostics. Messages must never contain SMS text or card numbers.
 class PipelineLog extends Table {
   IntColumn get id => integer().autoIncrement()();

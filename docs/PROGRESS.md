@@ -146,7 +146,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] "What was this?" flow and notification (in-app part done 25 Nov: banner on the list, answer screen with category buttons and "always use for this merchant", same checkbox in the edit sheet; notification still to do)
 - [ ] Category and merchant-rule management screens
 - [ ] Search (date, category, exact amount in range, text) with indexes (done 25 Nov: search screen with dates, category, exact amount and merchant or note text, filters combine, tested; text search uses a plain match, not full-text, which is enough for personal volumes; left open to check on the phone)
-- [ ] Budgets and threshold alerts, once per period
+- [ ] Budgets and threshold alerts, once per period (done 25 Nov, schema v4: budgets per category per calendar month, alert log, 70/80/90/100% each once a month, only the highest level when spending jumps, local notification with category and percentage only, no amounts; Budgets screen with progress bars; left open until seen firing on a phone)
 - [ ] Uncategorised alert and evening grouping
 - [ ] Dashboard numbers from transactions
 - [ ] Encrypted backup and restore
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 26 Nov 2026 | Budgets (schema v4), once-per-month threshold alerts, local notifications (flutter_local_notifications), Budgets screen. Also fixed a bug found by a new test: changing the category for a merchant that already had a rule would have crashed. Tested; not yet seen on a phone. |
 | 25 Nov 2026 | Search screen (magnifier on the Transactions screen): dates, category, exact amount, merchant or note text; filters combine. Tested; not yet seen on a phone. |
 | 25 Nov 2026 | Phase 1B started: schema v3 (merchant_rules), categoriser (rule, similar merchant, model, else ask), "What was this?" screen and banner, "always use this category" learning. Tested; not yet seen on a phone. |
 | 25 Nov 2026 | iPhone Shortcut health check: banner on the Transactions screen when no bank SMS has ever reached the app or none for 7 days, a last-received line and "Setup steps and test" button in Settings, and a test step in the guide that turns green when a message arrives. Built after two real transactions were missed once the reinstall broke the automations. Apple does not allow apps to create automations, so the user must re-check them after every reinstall. Tested; not yet seen on the phone. |

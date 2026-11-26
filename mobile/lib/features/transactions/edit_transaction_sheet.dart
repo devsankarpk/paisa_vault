@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/app_database.dart';
+import '../../core/providers.dart';
+import '../budgets/providers.dart';
 import 'format.dart';
 import 'providers.dart';
 import 'rule_amount.dart';
@@ -64,6 +66,10 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
     if (_always && _category != null && merchant.isNotEmpty) {
       await repo.saveRule(merchant, _category!);
     }
+    await runBudgetAlerts(
+      ref.read(budgetRepositoryProvider.future),
+      ref.read(notifierProvider),
+    );
     if (mounted) Navigator.of(context).pop();
   }
 

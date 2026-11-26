@@ -11,6 +11,7 @@ import 'features/lock/lock_gate.dart';
 import 'features/sms/native_sms_source.dart';
 import 'features/sms/sms_runner.dart';
 import 'features/transactions/transactions_screen.dart';
+import 'services/local_notifier.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +22,7 @@ void main() {
         secretStoreProvider.overrideWithValue(SecureSecretStore()),
         biometricsProvider.overrideWithValue(LocalAuthBiometrics()),
         smsSourceProvider.overrideWithValue(NativeSmsSource()),
+        notifierProvider.overrideWithValue(LocalNotifier()),
       ],
       child: const PaisaVaultApp(),
     ),

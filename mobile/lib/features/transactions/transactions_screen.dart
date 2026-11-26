@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/providers.dart';
 import '../sms/shortcut_guide_screen.dart';
 import '../sms/shortcut_health.dart';
+import '../budgets/budgets_screen.dart';
 import '../categorise/ask_screen.dart';
 import '../search/search_screen.dart';
 import 'add_message_screen.dart';
@@ -30,6 +31,13 @@ class TransactionsScreen extends ConsumerWidget {
         backgroundColor: PvColors.background,
         surfaceTintColor: Colors.transparent,
         actions: [
+          IconButton(
+            tooltip: 'Budgets',
+            icon: const Icon(Icons.savings_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const BudgetsScreen()),
+            ),
+          ),
           IconButton(
             tooltip: 'Search',
             icon: const Icon(Icons.search),
