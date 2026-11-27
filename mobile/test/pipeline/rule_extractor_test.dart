@@ -222,4 +222,26 @@ void main() {
       test(text, () => expect(const RuleExtractor().extract(text).last4, want));
     }
   });
+
+  group('AutoPay and "CC" card wording', () {
+    const text =
+        'AutoPay (E-mandate) Success!\nFor Acme Tools\nTxn Amt:INR2399.00\nDt:27/11/2026\nVia:HDFC Bank CC 1111\nCall 18002586161/SMS BLOCK CC 1111 to 7308080808';
+    final f = const RuleExtractor().extract(text);
+    test('amount, direction, bank and card', () {
+      expect(f.amountPaise, 239900);
+      expect(f.direction, Direction.debit);
+      expect(f.bank, 'HDFC');
+      expect(f.last4, '1111');
+      expect(f.accountKind, AccountKind.creditCard);
+      expect(f.date, DateTime(2026, 11, 27));
+    });
+    test('a phone number is not taken for the card', () {
+      expect(
+        const RuleExtractor()
+            .extract('Call 18002586161 for help. Rs 5 debited')
+            .last4,
+        isNull,
+      );
+    });
+  });
 }

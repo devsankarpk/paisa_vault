@@ -99,6 +99,126 @@ class TransactionRepository {
         );
   }
 
+  /// Text made comparable: lower case, letters and digits only. The same SMS saved by the
+  /// Shortcut and by a paste can differ in line breaks, spaces or a trailing newline.
+  static String comparable(String body) =>
+      body.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '');
+
+  /// True when a different saved message with the same text (ignoring spacing and punctuation)
+  /// already made a transaction. The same SMS can be saved twice (two Shortcut automations, or a
+  /// paste of one already received); it is one payment.
+  Future<bool> sameTextAlreadyCounted(RawMessage m) async {
+    final mine = comparable(m.body);
+    final near =
+        await (_db.select(_db.rawMessages)..where(
+              (r) =>
+                  r.id.equals(m.id).not() &
+                  r.receivedAt.isBiggerOrEqualValue(
+                    m.receivedAt.subtract(const Duration(days: 3)),
+                  ) &
+                  r.receivedAt.isSmallerOrEqualValue(
+                    m.receivedAt.add(const Duration(days: 3)),
+                  ),
+            ))
+            .get();
+    final same = near.where((r) => comparable(r.body) == mine).toList();
+    if (same.isEmpty) return false;
+    final made =
+        await (_db.select(_db.transactions)
+              ..where((t) => t.rawMessageId.isIn(same.map((o) => o.id)))
+              ..limit(1))
+            .get();
+    return made.isNotEmpty;
+  }
+
+  /// Removes extra transactions made from messages with the same text, keeping the one you
+  /// edited, or else the oldest. Returns how many were removed.
+  Future<int> removeSameTextDuplicates() async {
+    final rows = await _db
+        .customSelect(
+          'SELECT t.id AS id, r.body AS body, t.user_corrected AS corrected '
+          'FROM transactions t JOIN raw_messages r ON r.id = t.raw_message_id',
+        )
+        .get();
+    final groups = <String, List<({int id, bool corrected})>>{};
+    for (final r in rows) {
+      groups.putIfAbsent(comparable(r.read<String>('body')), () => []).add((
+        id: r.read<int>('id'),
+        corrected: r.read<bool>('corrected'),
+      ));
+    }
+    var removed = 0;
+    for (final g in groups.values) {
+      if (g.length < 2) continue;
+      g.sort((a, b) {
+        if (a.corrected != b.corrected) return a.corrected ? -1 : 1;
+        return a.id.compareTo(b.id);
+      });
+      for (final extra in g.skip(1)) {
+        if (extra.corrected) continue; // never delete something the user edited
+        await (_db.delete(
+          _db.transactions,
+        )..where((t) => t.id.equals(extra.id))).go();
+        removed++;
+      }
+    }
+    return removed;
+  }
+
+  /// Removes extra transactions that are the same payment saved from two differently worded
+  /// copies of one SMS (for example a pasted copy and the shortcut copy). Only rows with no
+  /// reference number, the same amount, direction, day, card digits and merchant, and never
+  /// one you edited. Keeps the edited one, or else the oldest. Returns how many were removed.
+  Future<int> removeLookalikeDuplicates() async {
+    final all = await (_db.select(
+      _db.transactions,
+    )..where((t) => t.reference.isNull())).get();
+    // Same payment: amount, direction, day and card digits. The merchant may be missing on one.
+    final groups = <String, List<Transaction>>{};
+    for (final t in all) {
+      final d = t.occurredAt.toLocal();
+      final key =
+          '${t.amountPaise}|${t.direction.name}|${d.year}-${d.month}-${d.day}|${t.last4 ?? ''}';
+      groups.putIfAbsent(key, () => []).add(t);
+    }
+    var removed = 0;
+    Future<void> drop(Transaction t) async {
+      await (_db.delete(
+        _db.transactions,
+      )..where((x) => x.id.equals(t.id))).go();
+      removed++;
+    }
+
+    int order(Transaction a, Transaction b) {
+      if (a.userCorrected != b.userCorrected) return a.userCorrected ? -1 : 1;
+      return a.id.compareTo(b.id);
+    }
+
+    for (final g in groups.values) {
+      if (g.length < 2) continue;
+      final named = g.where((t) => merchantKey(t.merchant ?? '').isNotEmpty);
+      final blank = g.where((t) => merchantKey(t.merchant ?? '').isEmpty);
+      // A row with no merchant next to one that has a merchant is the same payment.
+      if (named.isNotEmpty) {
+        for (final t in blank) {
+          if (!t.userCorrected) await drop(t);
+        }
+      }
+      final byMerchant = <String, List<Transaction>>{};
+      for (final t in named) {
+        byMerchant.putIfAbsent(merchantKey(t.merchant!), () => []).add(t);
+      }
+      for (final m in byMerchant.values) {
+        if (m.length < 2) continue;
+        m.sort(order);
+        for (final extra in m.skip(1)) {
+          if (!extra.userCorrected) await drop(extra);
+        }
+      }
+    }
+    return removed;
+  }
+
   /// A transaction you already have that looks like the one in [body]: same amount, same
   /// direction, same day, and the same last 4 when both messages give one. Null when none, or
   /// when the text has no clear amount and direction. Used before adding a pasted message.

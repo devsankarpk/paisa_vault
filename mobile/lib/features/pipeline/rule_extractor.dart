@@ -64,6 +64,11 @@ final _debitWord = RegExp(
 final _debitOnly = RegExp(
   r'\b(debited|sent|spent|paid|withdrawn|purchase|purchased|deducted|used (?:for|at))\b',
 );
+
+/// A standing-instruction charge that went through: "AutoPay (E-mandate) Success!".
+final _autopayDone = RegExp(
+  r'\b(autopay|auto[- ]?debit|e-?mandate|mandate)\b[^\n]{0,40}\bsuccess(?:ful(?:ly)?)?\b',
+);
 final _creditWord = RegExp(r'\b(credited|received|deposited|refund(?:ed)?)\b');
 
 final _amountRs = RegExp(
@@ -72,7 +77,7 @@ final _amountRs = RegExp(
 );
 final _amountBy = RegExp(r'\b(?:by|of)\s+([\d,]+\.\d+)', caseSensitive: false);
 final _last4 = RegExp(
-  r'(?:a/c|acct|card|ending)(?:\s+(?:no\.?|with|is))?\s*[(\[]?\s*[*x]*(\d{4,})',
+  r'(?:a/c|acct|card|ending|\bcc)(?:\s+(?:no\.?|with|is))?\s*[(\[]?\s*[*x]*(\d{4,})',
   caseSensitive: false,
 );
 
@@ -129,6 +134,7 @@ class RuleExtractor {
     final debit = _debitWord.hasMatch(low);
     final credit = _creditWord.hasMatch(low);
     if (debit && !credit) return Direction.debit;
+    if (!debit && !credit && _autopayDone.hasMatch(low)) return Direction.debit;
     if (credit && !debit) return Direction.credit;
     if (debit && credit) {
       // Both words: the first one describes this account ("debited ... credited to X").
@@ -157,7 +163,9 @@ class RuleExtractor {
   }
 
   AccountKind _kind(String low) {
-    if (low.contains('credit card')) return AccountKind.creditCard;
+    if (low.contains('credit card') || RegExp(r'\bcc\b').hasMatch(low)) {
+      return AccountKind.creditCard;
+    }
     if (low.contains('card')) return AccountKind.debitCard;
     return AccountKind.savings;
   }
