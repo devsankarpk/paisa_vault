@@ -150,7 +150,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Uncategorised alert and evening grouping
 - [x] Dashboard numbers from transactions (done 27 Nov: earning, spend, savings and spend by category for a month, month picker; own-account transfers left out; Budgets reached from the dashboard)
 - [ ] Encrypted backup and restore (built 26 Nov: AES-256-GCM file, key from your own passphrase with PBKDF2 600,000 rounds, not from phone keys; holds transactions, accounts, categories, rules and budgets, no message text; replace-all restore; tested round trip, wrong passphrase, damaged file; left open until a backup is restored on a clean install on a phone)
-- [ ] PIN recovery path
+- [x] PIN recovery path (done 27 Nov: "Forgot PIN?" on the lock screen explains that nobody can reset it, points to Face ID or fingerprint if on, else erase and restore the backup, with two confirmations; setup note says to create a PIN then restore; the full erase and restore round trip on a phone is still to be checked)
 - [x] Diagnostics screen and export (done 26 Nov: Settings, Diagnostics shows transaction counts, needs-a-check rate and reasons, hand-edit rate, saved messages by state, model speed and errors, crashes; shared report is numbers only; tested with canary merchant, note, sender, message text and amounts)
 - [ ] Re-check after model change
 - [ ] One-week dogfood on both phones
@@ -312,3 +312,4 @@ Status values: Not started, In progress, Blocked, Done.
 | 27 Nov 2026 | "Needs a category" notification: one new uncategorised transaction is announced at once; several waiting are grouped into one reminder a day, shown after 6 pm the next time the app processes messages. Text never names a merchant or amount. Exact-time reminders while the app is closed need the background job (WorkManager), still open. |
 | 27 Nov 2026 | Merchant rules screen (Settings > Merchant rules): lists the merchants the app files automatically, change a rule's category or forget it. Changes affect new transactions only. |
 | 27 Nov 2026 | Dashboard: earning, spend and savings for a calendar month with a category donut and list, previous and next month. Own-account transfers and the Transfer category do not count; money out with no category shows as Uncategorised. The Transactions top bar now opens the dashboard; Budgets is a button on it. |
+| 27 Nov 2026 | PIN recovery: "Forgot PIN?" on the lock screen. Explains there is no reset, suggests Face ID or fingerprint when turned on, otherwise offers erase everything (two confirmations) and then restore from the encrypted backup after creating a new PIN. Erase logic shared with Settings. |

@@ -99,6 +99,32 @@ void main() {
     expect(find.text('Wrong PIN. Try again.'), findsNothing);
   });
 
+  scenario('forgot PIN explains the way back and can be cancelled', (t) async {
+    await PinService(store, clock, iterations: 1000).setPin('2468');
+    await start(t);
+    await t.tap(find.text('Forgot PIN?'));
+    await t.pumpAndSettle();
+    expect(find.textContaining('Nobody can reset your PIN'), findsOneWidget);
+    expect(
+      find.textContaining('restore your encrypted backup'),
+      findsOneWidget,
+    );
+    await t.tap(find.text('Cancel'));
+    await t.pumpAndSettle();
+    expect(
+      find.text('Enter your PIN to unlock'),
+      findsOneWidget,
+    ); // still locked
+    await t.tap(find.text('Forgot PIN?'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('Erase and start again'));
+    await t.pumpAndSettle();
+    expect(find.text('Erase everything?'), findsOneWidget); // asks again
+    await t.tap(find.text('Cancel'));
+    await t.pumpAndSettle();
+    expect(find.text('Enter your PIN to unlock'), findsOneWidget);
+  });
+
   scenario('five wrong PINs show a lockout message', (t) async {
     await PinService(store, clock, iterations: 1000).setPin('2468');
     await start(t);

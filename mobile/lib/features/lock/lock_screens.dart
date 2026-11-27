@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../settings/erase_action.dart';
 import 'biometrics.dart';
 import 'lock_controller.dart';
 import 'pin_pad.dart';
@@ -130,6 +131,65 @@ class _LockScreenState extends ConsumerState<LockScreen>
     });
   }
 
+  /// There is no server, so nobody can reset the PIN. Face ID or fingerprint still works if it
+  /// was turned on; otherwise the way back in is to erase the app and restore the backup file.
+  Future<void> _forgot() async {
+    final bio = ref.read(lockControllerProvider).biometricEnabled;
+    final erase = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Forgot your PIN?'),
+        content: Text(
+          '${bio ? 'Try ${_kind == BiometricKind.face ? 'Face ID' : 'your fingerprint'} first; it unlocks the app without the PIN.\n\n' : ''}'
+          'Nobody can reset your PIN, because your data never leaves this phone.\n\n'
+          'If you cannot get in, you can erase the app and restore your encrypted backup file '
+          '(you will need its passphrase). Anything not in a backup is lost.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Erase and start again',
+              style: TextStyle(color: PvColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (erase != true || !mounted) return;
+    final sure = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Erase everything?'),
+        content: const Text(
+          'All transactions, accounts and your PIN are deleted from this phone. '
+          'This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Erase everything',
+              style: TextStyle(color: PvColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (sure != true || !mounted) return;
+    final lock = ref.read(lockControllerProvider.notifier);
+    await eraseEverything(ref);
+    await lock.load();
+  }
+
   @override
   Widget build(BuildContext context) {
     final bio = ref.watch(
@@ -166,6 +226,10 @@ class _LockScreenState extends ConsumerState<LockScreen>
                           ),
                         )
                       : null,
+                ),
+                TextButton(
+                  onPressed: _forgot,
+                  child: const Text('Forgot PIN?'),
                 ),
                 if (_blocked)
                   TextButton(
@@ -255,7 +319,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                     'Everything stays on this phone. There is no account and no server, so '
                     'nobody can reset your PIN for you.\n\n'
                     'If you forget your PIN and have not turned on Face ID or fingerprint, the only '
-                    'way back in is to erase the app and restore from your encrypted backup file.',
+                    'way back in is to erase the app and restore from your encrypted backup file.\n\n'
+                    'Restoring after an erase? Create a PIN first, then open Settings, Backup and restore.',
                     style: TextStyle(fontSize: 16, height: 1.4),
                   ),
                   const SizedBox(height: 28),
