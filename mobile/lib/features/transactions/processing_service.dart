@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../core/db/app_database.dart';
 import '../../services/llm_engine.dart';
 import '../pipeline/extraction_pipeline.dart';
+import '../pipeline/prompt.dart';
 import '../sms/sms_classifier.dart';
 import 'transaction_repository.dart';
 
@@ -223,4 +224,135 @@ class ProcessingService {
       (_db.update(_db.rawMessages)..where((m) => m.id.equals(id))).write(
         RawMessagesCompanion(status: Value(status)),
       );
+
+  /// Re-reads recent transactions with the current model and returns what would change, so the
+  /// user can confirm instead of the app overwriting silently. Looks only at transactions the
+  /// user has not edited, whose message is still saved and which an older model or prompt made.
+  /// Those with no difference are marked as checked straight away. Returns null when no model is
+  /// available or messages are being processed right now.
+  Future<List<RecheckChange>?> previewRecheck({
+    int limit = 20,
+    void Function(int done, int total)? progress,
+  }) async {
+    if (_running) return null;
+    _running = true;
+    LlmEngine? engine;
+    try {
+      try {
+        engine = await engineFactory?.call();
+      } catch (_) {
+        engine = null;
+      }
+      if (engine == null) return null;
+      final pipeline = ExtractionPipeline(engine, categories: categories);
+      final all =
+          await (_db.select(_db.transactions)
+                ..where(
+                  (t) =>
+                      t.userCorrected.equals(false) &
+                      t.rawMessageId.isNotNull(),
+                )
+                ..orderBy([(t) => OrderingTerm.desc(t.occurredAt)]))
+              .get();
+      final due = all
+          .where(
+            (t) =>
+                t.modelId != engine!.modelId ||
+                t.promptVersion != promptVersion,
+          )
+          .take(limit)
+          .toList();
+      final changes = <RecheckChange>[];
+      for (var i = 0; i < due.length; i++) {
+        progress?.call(i, due.length);
+        final t = due[i];
+        final raw = await (_db.select(
+          _db.rawMessages,
+        )..where((m) => m.id.equals(t.rawMessageId!))).getSingleOrNull();
+        if (raw == null) continue; // the message was purged
+        final fresh = (await pipeline.process(raw.body)).transaction;
+        if (fresh == null || fresh.confirmReason == 'model_error') continue;
+        final merchant = fresh.merchant ?? t.merchant;
+        final category =
+            await _repo.categorise(merchant, t.direction, fresh.category) ??
+            t.categoryName;
+        final channel = fresh.channel ?? t.channel;
+        final change = RecheckChange(
+          transactionId: t.id,
+          oldMerchant: t.merchant,
+          newMerchant: merchant,
+          oldCategory: t.categoryName,
+          newCategory: category,
+          oldChannel: t.channel,
+          newChannel: channel,
+          status: fresh.status,
+          confirmReason: fresh.confirmReason,
+          modelId: fresh.modelId,
+          promptVersion: fresh.promptVersion,
+        );
+        if (change.differs) {
+          changes.add(change);
+        } else {
+          await _writeRecheck(change, fields: false);
+        }
+      }
+      progress?.call(due.length, due.length);
+      return changes;
+    } finally {
+      await engine?.dispose();
+      _running = false;
+    }
+  }
+
+  /// Applies the changes the user accepted.
+  Future<void> applyRecheck(Iterable<RecheckChange> changes) async {
+    for (final c in changes) {
+      await _writeRecheck(c, fields: true);
+    }
+  }
+
+  Future<void> _writeRecheck(RecheckChange c, {required bool fields}) =>
+      (_db.update(
+        _db.transactions,
+      )..where((x) => x.id.equals(c.transactionId))).write(
+        TransactionsCompanion(
+          merchant: fields ? Value(c.newMerchant) : const Value.absent(),
+          categoryName: fields ? Value(c.newCategory) : const Value.absent(),
+          channel: fields ? Value(c.newChannel) : const Value.absent(),
+          status: fields ? Value(c.status) : const Value.absent(),
+          confirmReason: fields ? Value(c.confirmReason) : const Value.absent(),
+          modelId: Value(c.modelId),
+          promptVersion: Value(c.promptVersion),
+        ),
+      );
+}
+
+/// What a newer model would change on one transaction.
+class RecheckChange {
+  const RecheckChange({
+    required this.transactionId,
+    required this.oldMerchant,
+    required this.newMerchant,
+    required this.oldCategory,
+    required this.newCategory,
+    required this.oldChannel,
+    required this.newChannel,
+    required this.status,
+    required this.confirmReason,
+    required this.modelId,
+    required this.promptVersion,
+  });
+  final int transactionId;
+  final String? oldMerchant, newMerchant;
+  final String? oldCategory, newCategory;
+  final String? oldChannel, newChannel;
+  final TransactionStatus status;
+  final String? confirmReason;
+  final String? modelId;
+  final String? promptVersion;
+
+  bool get differs =>
+      oldMerchant != newMerchant ||
+      oldCategory != newCategory ||
+      oldChannel != newChannel;
 }

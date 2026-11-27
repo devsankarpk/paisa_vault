@@ -118,7 +118,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] LlmEngine for the chosen model, manifest, bundled model
 - [x] Extraction prompt and strict JSON schema (done 23 Nov: rules read amount, direction, bank, last 4, date, reference, channel and known merchant phrasings; model asked only for merchant, category, channel; strict reply check, one retry, then please confirm; 26 tests; on 25 real transaction messages rules found amount, direction, last 4 and date in all 25)
 - [x] Amount safety check (done 23 Nov: amount must literally appear in the SMS, tested with Indian number grouping)
-- [ ] Processing queue (WorkManager, next-open on iPhone)
+- [x] Processing queue (light version chosen 27 Nov: a message is saved in the encrypted stage at once and survives the app being killed; with the app closed, Android now shows a plain "bank message saved, open Paisa Vault" notification with no sender, amount or text; the model still runs when the app is opened, same as iPhone. Android build compiles; not yet seen on the vivo. Running the model in the background was left out on purpose: it needs a hidden Flutter engine and a plugin refactor, and stays on the later list)
 - [x] Duplicate check (same bank, last 4, amount, day and reference; none without a reference)
 - [x] Bank, card and account mapping (bank + last 4; new ones saved as pending until confirmed in the accounts screen)
 - [x] Pipeline log, local crash capture, redaction test (done 25 Nov: crash.log keeps error type and first stack lines only, never the error message; diagnostics lines are redacted; tests process a message with distinctive text and check no log holds it)
@@ -152,7 +152,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Encrypted backup and restore (built 26 Nov: AES-256-GCM file, key from your own passphrase with PBKDF2 600,000 rounds, not from phone keys; holds transactions, accounts, categories, rules and budgets, no message text; replace-all restore; tested round trip, wrong passphrase, damaged file; left open until a backup is restored on a clean install on a phone)
 - [x] PIN recovery path (done 27 Nov: "Forgot PIN?" on the lock screen explains that nobody can reset it, points to Face ID or fingerprint if on, else erase and restore the backup, with two confirmations; setup note says to create a PIN then restore; the full erase and restore round trip on a phone is still to be checked)
 - [x] Diagnostics screen and export (done 26 Nov: Settings, Diagnostics shows transaction counts, needs-a-check rate and reasons, hand-edit rate, saved messages by state, model speed and errors, crashes; shared report is numbers only; tested with canary merchant, note, sender, message text and amounts)
-- [ ] Re-check after model change
+- [x] Re-check after model change (done 27 Nov: Settings, Re-check with the model reads up to 20 recent unedited transactions made by an older model or prompt, shows merchant, category and channel differences, applies only the ones you tick)
 - [ ] One-week dogfood on both phones
 
 **Exit gate**
@@ -313,3 +313,5 @@ Status values: Not started, In progress, Blocked, Done.
 | 27 Nov 2026 | Merchant rules screen (Settings > Merchant rules): lists the merchants the app files automatically, change a rule's category or forget it. Changes affect new transactions only. |
 | 27 Nov 2026 | Dashboard: earning, spend and savings for a calendar month with a category donut and list, previous and next month. Own-account transfers and the Transfer category do not count; money out with no category shows as Uncategorised. The Transactions top bar now opens the dashboard; Budgets is a button on it. |
 | 27 Nov 2026 | PIN recovery: "Forgot PIN?" on the lock screen. Explains there is no reset, suggests Face ID or fingerprint when turned on, otherwise offers erase everything (two confirmations) and then restore from the encrypted backup after creating a new PIN. Erase logic shared with Settings. |
+| 27 Nov 2026 | Re-check after a model change (T6): Settings > Re-check with the model. Looks at up to 20 recent transactions made by an older model or prompt version, never ones you edited, and needs the original message still saved. Shows old and new merchant, category and channel; nothing changes until you tick and apply. Unchanged ones are marked as checked so they are not run again. |
+| 27 Nov 2026 | Android: when a bank SMS is saved while the app is closed, a notification says so (generic text only). Notification permission is now asked right after the SMS permission, not only when a budget is added. Chosen instead of a background model run, which is riskier and needs the vivo to prove. |
