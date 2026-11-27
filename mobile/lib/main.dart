@@ -5,6 +5,7 @@ import 'core/crash_log.dart';
 import 'core/providers.dart';
 import 'core/secret_store.dart';
 import 'core/theme/app_theme.dart';
+import 'core/ui/system_bar_padding.dart';
 import 'features/lock/biometrics.dart';
 import 'features/lock/lock_controller.dart';
 import 'features/lock/lock_gate.dart';
@@ -40,6 +41,7 @@ class PaisaVaultApp extends StatelessWidget {
       title: 'Paisa Vault',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(),
+      builder: (context, child) => SystemBarPadding(child: child!),
       home: LockGate(child: SmsRunner(child: home)),
     );
   }
