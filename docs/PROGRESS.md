@@ -167,9 +167,9 @@ Status values: Not started, In progress, Blocked, Done.
 
 [Details](phases/phase-2-cards-privacy.md)
 
-- [ ] cards and card_bill_settings, card mapping
-- [ ] Card list and detail screens
-- [ ] Add card: manual, camera, NFC per Phase 0 result
+- [x] cards and card_bill_settings, card mapping (done 27 Nov, schema v6: cards table with bank, type, network, last 4, expiry and a vault link, no CVV or full-number column; bill settings per credit card; adding a card reuses and confirms the account its SMS transactions already use, so earlier transactions are linked to it; 8 tests)
+- [x] Card list and detail screens (done 27 Nov: Transactions top bar, card icon; list shows bank, last 4, type and network only; detail shows expiry and the bill reminder; full number and reveal come with the vault)
+- [ ] Add card: manual, camera, NFC per Phase 0 result (manual entry and credit card bill setup done 27 Nov, no CVV field; camera scan and NFC still to do)
 - [ ] vault.db with its own key
 - [ ] Field-level encryption and timed reveal
 - [ ] Optional card PIN with warning
@@ -318,3 +318,5 @@ Status values: Not started, In progress, Blocked, Done.
 | 27 Nov 2026 | Android: the last row of every list was hidden behind the navigation bar on the vivo (newer Android draws the app edge to edge). The whole app now stops above the bar on Android; iPhone unchanged. |
 | 27 Nov 2026 | Wrote the backup key design note (ADR 0002). Checked the Android release APK permissions: no INTERNET, no READ_SMS. |
 | 27 Nov 2026 | vivo: backup, Erase everything, new PIN and restore from the file all worked. The iPhone round trip is still to do. |
+| 27 Nov 2026 | Phase 2 started: schema v6 adds cards and card bill settings (statement day, due day, optional limit, reminder days) and a card repository. Adding a card takes over the account that SMS transactions for that bank and last 4 already use. No screens yet; the card list and add flow are next. |
+| 27 Nov 2026 | Card vault screens: list, detail, add card by typing (bank, credit or debit, network, last 4, optional expiry) and the credit card bill reminder setup (statement day, due day, optional limit, remind 7, 5, 3, 2, 1 or 0 days before). A test caught a blank bill screen for a new card, fixed. List tiles now sit in a Material so taps show properly. Reminder notifications themselves are still to do (Week 4). |

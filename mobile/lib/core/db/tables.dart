@@ -4,6 +4,10 @@ enum AccountKind { savings, current, creditCard, debitCard, wallet, upi }
 
 enum AccountStatus { confirmed, pending }
 
+enum CardType { debit, credit }
+
+enum CardNetwork { visa, mastercard, rupay, amex, diners, other }
+
 enum Direction { debit, credit }
 
 enum TransactionStatus { confirmed, pleaseConfirm }
@@ -185,4 +189,42 @@ class HiddenHash extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {hash};
+}
+
+/// A card the user added: only what the list may show (bank, type, network, last 4, expiry).
+/// The full number and PIN will live encrypted in vault.db and are linked through [secretRef].
+/// There is no CVV column and there never will be.
+@DataClassName('PvCard')
+class Cards extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get bankId => integer().references(Banks, #id)();
+
+  /// The account its SMS transactions are filed under (same bank and last 4).
+  IntColumn get accountId => integer().nullable().references(Accounts, #id)();
+  TextColumn get type => textEnum<CardType>()();
+  TextColumn get network => textEnum<CardNetwork>()();
+  TextColumn get last4 => text().withLength(min: 4, max: 4)();
+  IntColumn get expiryMonth => integer().nullable()();
+  IntColumn get expiryYear => integer().nullable()();
+
+  /// Id of the encrypted secret in vault.db, when one is stored.
+  TextColumn get secretRef => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {bankId, type, last4},
+  ];
+}
+
+/// Credit card bill reminders. Days are days of the month (1 to 31).
+class CardBillSettings extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get cardId => integer().unique().references(Cards, #id)();
+  IntColumn get statementDay => integer()();
+  IntColumn get dueDay => integer()();
+  IntColumn get creditLimitPaise => integer().nullable()();
+
+  /// Days before the due date to remind, comma separated, for example "5,1".
+  TextColumn get reminderDays => text().withDefault(const Constant('5,1'))();
 }

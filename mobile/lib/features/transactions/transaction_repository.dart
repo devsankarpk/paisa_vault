@@ -36,7 +36,7 @@ String fingerprintOf(ExtractedTransaction t, DateTime when) {
       .toString();
 }
 
-const _bankNames = {
+const bankNames = {
   'HDFC': 'HDFC Bank',
   'SBI': 'State Bank of India',
   'YES': 'Yes Bank',
@@ -385,7 +385,7 @@ class TransactionRepository {
         .insertReturning(
           BanksCompanion.insert(
             code: bankCode,
-            name: _bankNames[bankCode] ?? bankCode,
+            name: bankNames[bankCode] ?? bankCode,
           ),
         );
     final existing =

@@ -109,23 +109,24 @@ class RulesScreen extends ConsumerWidget {
                   ),
                 ),
                 for (final r in rules)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Material(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: ListTile(
-                      title: Text(
-                        r.merchantKey,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      subtitle: Text(r.categoryName),
-                      onTap: () => _change(context, ref, r),
-                      trailing: IconButton(
-                        tooltip: 'Forget rule',
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () => _forget(context, ref, r),
+                      clipBehavior: Clip.antiAlias,
+                      child: ListTile(
+                        title: Text(
+                          r.merchantKey,
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(r.categoryName),
+                        onTap: () => _change(context, ref, r),
+                        trailing: IconButton(
+                          tooltip: 'Forget rule',
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => _forget(context, ref, r),
+                        ),
                       ),
                     ),
                   ),
