@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
@@ -12,7 +11,7 @@ import '../lock/lock_controller.dart';
 import '../sms/raw_message_repository.dart';
 import '../sms/shortcut_guide_screen.dart';
 import '../sms/shortcut_health.dart';
-import 'erase_service.dart';
+import 'erase_action.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -42,15 +41,7 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
     if (sure != true) return;
-    final db = await ref.read(appDatabaseProvider.future);
-    await EraseService(
-      appSupport: await getApplicationSupportDirectory(),
-      keyStore: ref.read(keyStoreProvider),
-      secrets: ref.read(secretStoreProvider),
-      sms: ref.read(smsSourceProvider),
-      closeDatabase: db.close,
-    ).eraseAll();
-    ref.invalidate(appDatabaseProvider);
+    await eraseEverything(ref);
     // Back to the first-time screen: choose a new PIN.
     if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
     await ref.read(lockControllerProvider.notifier).load();
