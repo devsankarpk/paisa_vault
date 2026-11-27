@@ -544,6 +544,19 @@ void main() {
       db.transactions,
     )..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
 
+    test('rules can be listed, changed and forgotten', () async {
+      await repo.saveRule('Raju Stores', 'Shopping');
+      await repo.saveRule('Swiggy', 'Food');
+      final rules = await repo.watchRules().first;
+      expect(rules.map((r) => r.merchantKey), ['RAJU STORES', 'SWIGGY']);
+
+      await repo.changeRule(rules.first.id, 'Groceries');
+      expect((await repo.watchRules().first).first.categoryName, 'Groceries');
+
+      await repo.deleteRule(rules.last.id);
+      expect(await repo.watchRules().first, hasLength(1));
+    });
+
     test('merchant names are made comparable', () {
       expect(merchantKey(' Swiggy-Instamart 4521 '), 'SWIGGY INSTAMART');
       expect(merchantKey(null), '');

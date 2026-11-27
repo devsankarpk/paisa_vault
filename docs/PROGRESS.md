@@ -144,7 +144,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Income handling (done 25 Nov: money in only gets Income or Transfer, otherwise it is asked)
 - [ ] Manual entry and transaction detail/edit
 - [ ] "What was this?" flow and notification (in-app part done 25 Nov: banner on the list, answer screen with category buttons and "always use for this merchant", same checkbox in the edit sheet; notification still to do)
-- [ ] Category and merchant-rule management screens (categories done 26 Nov: Settings, Manage categories, add, rename everywhere, hide; merchant-rule screen still to do)
+- [x] Category and merchant-rule management screens (categories done 26 Nov: Settings, Manage categories, add, rename everywhere, hide; merchant rules done 27 Nov: Settings, Merchant rules, change category, forget)
 - [ ] Search (date, category, exact amount in range, text) with indexes (done 25 Nov: search screen with dates, category, exact amount and merchant or note text, filters combine, tested; text search uses a plain match, not full-text, which is enough for personal volumes; left open to check on the phone)
 - [ ] Budgets and threshold alerts, once per period (done 25 Nov, schema v4: budgets per category per calendar month, alert log, 70/80/90/100% each once a month, only the highest level when spending jumps, local notification with category and percentage only, no amounts; Budgets screen with progress bars; left open until seen firing on a phone)
 - [x] Uncategorised alert and evening grouping
@@ -310,3 +310,4 @@ Status values: Not started, In progress, Blocked, Done.
 | 2 Nov 2026  | Created this tracker. Phase 0 in progress.                                                                                                                                                 |
 | 29 Oct 2026 | Flutter upgraded to 3.47.8, JDK 17 configured, Intel Mac risk recorded. Planning docs committed.                                                                                           |
 | 27 Nov 2026 | "Needs a category" notification: one new uncategorised transaction is announced at once; several waiting are grouped into one reminder a day, shown after 6 pm the next time the app processes messages. Text never names a merchant or amount. Exact-time reminders while the app is closed need the background job (WorkManager), still open. |
+| 27 Nov 2026 | Merchant rules screen (Settings > Merchant rules): lists the merchants the app files automatically, change a rule's category or forget it. Changes affect new transactions only. |
