@@ -123,7 +123,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] Bank, card and account mapping (bank + last 4; new ones saved as pending until confirmed in the accounts screen)
 - [x] Pipeline log, local crash capture, redaction test (done 25 Nov: crash.log keeps error type and first stack lines only, never the error message; diagnostics lines are redacted; tests process a message with distinctive text and check no log holds it)
 - [x] Consent screens and "Erase everything" (done 25 Nov: SMS disclosure on Android, Shortcut guide on iPhone, new Settings screen with privacy note and Erase everything; erase checked on the iPhone, not yet on the vivo)
-- [ ] Backup key design note
+- [x] Backup key design note (docs/adr/0002-backup-key.md, 27 Nov)
 - [ ] Golden-SMS suite in CI, real SMS from all five banks on both phones (CI part done 25 Nov: 22 invented messages in each bank's format, per-field score printed; found and fixed one gap, "card ... was used for Rs"; real SMS from all five banks on both phones still to do)
 
 **Exit gate**
@@ -131,8 +131,8 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Real SMS from each bank becomes a mapped transaction on Android and iPhone
 - [x] Amount safety check (done 23 Nov: amount must literally appear in the SMS, tested with Indian number grouping) proven
 - [ ] Golden suite green and meets Phase 0 thresholds
-- [ ] Release build has no INTERNET permission
-- [ ] "Erase everything" works (iPhone checked 25 Nov; vivo still to check)
+- [x] Release build has no INTERNET permission (Android checked 27 Nov: the release APK asks only for RECEIVE_SMS, notifications, biometrics and vibrate; the INTERNET permission is only in the debug and profile manifests. The Wi-Fi household sync in Phase 4 will need it and must be justified then)
+- [x] "Erase everything" works (iPhone checked 25 Nov; vivo checked 27 Nov)
 - [x] Redaction test passes
 
 ## Phase 1B: Categorise, search, budgets, backup
@@ -149,7 +149,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Budgets and threshold alerts, once per period (done 25 Nov, schema v4: budgets per category per calendar month, alert log, 70/80/90/100% each once a month, only the highest level when spending jumps, local notification with category and percentage only, no amounts; Budgets screen with progress bars; left open until seen firing on a phone)
 - [x] Uncategorised alert and evening grouping
 - [x] Dashboard numbers from transactions (done 27 Nov: earning, spend, savings and spend by category for a month, month picker; own-account transfers left out; Budgets reached from the dashboard)
-- [ ] Encrypted backup and restore (built 26 Nov: AES-256-GCM file, key from your own passphrase with PBKDF2 600,000 rounds, not from phone keys; holds transactions, accounts, categories, rules and budgets, no message text; replace-all restore; tested round trip, wrong passphrase, damaged file; left open until a backup is restored on a clean install on a phone)
+- [x] Encrypted backup and restore (checked on the vivo 27 Nov: backup, erase everything, new PIN, restore all worked; built 26 Nov: AES-256-GCM file, key from your own passphrase with PBKDF2 600,000 rounds, not from phone keys; holds transactions, accounts, categories, rules and budgets, no message text; replace-all restore; tested round trip, wrong passphrase, damaged file)
 - [x] PIN recovery path (done 27 Nov: "Forgot PIN?" on the lock screen explains that nobody can reset it, points to Face ID or fingerprint if on, else erase and restore the backup, with two confirmations; setup note says to create a PIN then restore; the full erase and restore round trip on a phone is still to be checked)
 - [x] Diagnostics screen and export (done 26 Nov: Settings, Diagnostics shows transaction counts, needs-a-check rate and reasons, hand-edit rate, saved messages by state, model speed and errors, crashes; shared report is numbers only; tested with canary merchant, note, sender, message text and amounts)
 - [x] Re-check after model change (done 27 Nov: Settings, Re-check with the model reads up to 20 recent unedited transactions made by an older model or prompt, shows merchant, category and channel differences, applies only the ones you tick)
@@ -316,3 +316,5 @@ Status values: Not started, In progress, Blocked, Done.
 | 27 Nov 2026 | Re-check after a model change (T6): Settings > Re-check with the model. Looks at up to 20 recent transactions made by an older model or prompt version, never ones you edited, and needs the original message still saved. Shows old and new merchant, category and channel; nothing changes until you tick and apply. Unchanged ones are marked as checked so they are not run again. |
 | 27 Nov 2026 | Android: when a bank SMS is saved while the app is closed, a notification says so (generic text only). Notification permission is now asked right after the SMS permission, not only when a budget is added. Chosen instead of a background model run, which is riskier and needs the vivo to prove. |
 | 27 Nov 2026 | Android: the last row of every list was hidden behind the navigation bar on the vivo (newer Android draws the app edge to edge). The whole app now stops above the bar on Android; iPhone unchanged. |
+| 27 Nov 2026 | Wrote the backup key design note (ADR 0002). Checked the Android release APK permissions: no INTERNET, no READ_SMS. |
+| 27 Nov 2026 | vivo: backup, Erase everything, new PIN and restore from the file all worked. The iPhone round trip is still to do. |
