@@ -1,3 +1,5 @@
+import '../categorise/uncategorised_alerter.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -85,6 +87,11 @@ class _SmsRunnerState extends ConsumerState<SmsRunner>
       ref.invalidate(lastBankMessageProvider);
       await runBudgetAlerts(
         ref.read(budgetRepositoryProvider.future),
+        ref.read(notifierProvider),
+      );
+      await runUncategorisedAlert(
+        ref.read(appDatabaseProvider.future),
+        ref.read(clockProvider),
         ref.read(notifierProvider),
       );
       if (purged > 0) debugPrint('PV_PURGE deleted=$purged');

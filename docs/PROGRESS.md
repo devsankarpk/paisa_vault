@@ -147,7 +147,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Category and merchant-rule management screens (categories done 26 Nov: Settings, Manage categories, add, rename everywhere, hide; merchant-rule screen still to do)
 - [ ] Search (date, category, exact amount in range, text) with indexes (done 25 Nov: search screen with dates, category, exact amount and merchant or note text, filters combine, tested; text search uses a plain match, not full-text, which is enough for personal volumes; left open to check on the phone)
 - [ ] Budgets and threshold alerts, once per period (done 25 Nov, schema v4: budgets per category per calendar month, alert log, 70/80/90/100% each once a month, only the highest level when spending jumps, local notification with category and percentage only, no amounts; Budgets screen with progress bars; left open until seen firing on a phone)
-- [ ] Uncategorised alert and evening grouping
+- [x] Uncategorised alert and evening grouping
 - [ ] Dashboard numbers from transactions
 - [ ] Encrypted backup and restore (built 26 Nov: AES-256-GCM file, key from your own passphrase with PBKDF2 600,000 rounds, not from phone keys; holds transactions, accounts, categories, rules and budgets, no message text; replace-all restore; tested round trip, wrong passphrase, damaged file; left open until a backup is restored on a clean install on a phone)
 - [ ] PIN recovery path
@@ -309,3 +309,4 @@ Status values: Not started, In progress, Blocked, Done.
 | 2 Nov 2026  | Verified the "Blocked on you" items: none done yet.                                                                                                                                        |
 | 2 Nov 2026  | Created this tracker. Phase 0 in progress.                                                                                                                                                 |
 | 29 Oct 2026 | Flutter upgraded to 3.47.8, JDK 17 configured, Intel Mac risk recorded. Planning docs committed.                                                                                           |
+| 27 Nov 2026 | "Needs a category" notification: one new uncategorised transaction is announced at once; several waiting are grouped into one reminder a day, shown after 6 pm the next time the app processes messages. Text never names a merchant or amount. Exact-time reminders while the app is closed need the background job (WorkManager), still open. |
