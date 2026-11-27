@@ -151,7 +151,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Dashboard numbers from transactions
 - [ ] Encrypted backup and restore (built 26 Nov: AES-256-GCM file, key from your own passphrase with PBKDF2 600,000 rounds, not from phone keys; holds transactions, accounts, categories, rules and budgets, no message text; replace-all restore; tested round trip, wrong passphrase, damaged file; left open until a backup is restored on a clean install on a phone)
 - [ ] PIN recovery path
-- [ ] Diagnostics screen and export
+- [x] Diagnostics screen and export (done 26 Nov: Settings, Diagnostics shows transaction counts, needs-a-check rate and reasons, hand-edit rate, saved messages by state, model speed and errors, crashes; shared report is numbers only; tested with canary merchant, note, sender, message text and amounts)
 - [ ] Re-check after model change
 - [ ] One-week dogfood on both phones
 
@@ -161,7 +161,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [ ] Same merchant categorised automatically after first answer
 - [ ] Each threshold alerts once per period
 - [ ] Restore reproduces the ledger exactly
-- [ ] Diagnostics export has no amounts, merchants or SMS text
+- [x] Diagnostics export has no amounts, merchants or SMS text (tested 26 Nov)
 
 ## Phase 2: Cards and privacy
 
@@ -267,6 +267,7 @@ Status values: Not started, In progress, Blocked, Done.
 
 | Date        | What changed                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 26 Nov 2026 | Diagnostics screen and shareable report (Settings, Diagnostics): rates, reasons, model speed, errors, crashes. A test with canary text proves the report holds no amounts, merchants, notes or message text. |
 | 26 Nov 2026 | Paste-an-SMS now checks first: the same text is refused however old, and a transaction with the same amount, day and card asks "Add anyway?". Found when the + button let an already-saved message be added again. Tested. |
 | 26 Nov 2026 | Encrypted backup and restore (Settings, Backup and restore): passphrase-locked file shared through the iOS and Android share sheet, restore from a picked file with a confirm step. Round trip, wrong passphrase and damaged file tested; not yet tried on a phone. |
 | 26 Nov 2026 | Editable categories (schema v5): add, rename (updates transactions, rules and budgets) and hide, from Settings. Every picker and the model prompt use the stored list. Tested; not yet seen on a phone. |

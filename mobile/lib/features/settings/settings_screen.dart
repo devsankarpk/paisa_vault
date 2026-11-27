@@ -6,6 +6,7 @@ import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../backup/backup_screen.dart';
 import '../categories/categories_screen.dart';
+import '../diagnostics/diagnostics_screen.dart';
 import '../lock/lock_controller.dart';
 import '../sms/raw_message_repository.dart';
 import '../sms/shortcut_guide_screen.dart';
@@ -115,6 +116,18 @@ class SettingsScreen extends ConsumerWidget {
             context,
           ).push(MaterialPageRoute<void>(builder: (_) => const BackupScreen())),
           child: const Text('Backup and restore'),
+        ),
+        const SizedBox(height: 16),
+        const _Card(
+          title: 'Diagnostics',
+          body: 'How well messages are being read: counts and timings only, never amounts or message text.',
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const DiagnosticsScreen()),
+          ),
+          child: const Text('Open diagnostics'),
         ),
         const SizedBox(height: 16),
         const _Card(
