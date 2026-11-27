@@ -22,8 +22,11 @@ class SmsReceiver : BroadcastReceiver() {
         Log.i(TAG, "sender=$sender sub=$subscription bodyLength=${body.length} kept=$keep")
         if (!keep) return
         try {
-            SmsStage(context).add(sender, body, System.currentTimeMillis(), subscription)
-            SmsEvents.arrived()
+            val stage = SmsStage(context)
+            stage.add(sender, body, System.currentTimeMillis(), subscription)
+            // App open: it picks the message up itself. App closed: say it was saved.
+            if (SmsEvents.listener == null) SmsAlert.show(context, stage.pending().size)
+            else SmsEvents.arrived()
         } catch (e: Exception) {
             Log.e(TAG, "stage failed: ${e.javaClass.simpleName}")
         }

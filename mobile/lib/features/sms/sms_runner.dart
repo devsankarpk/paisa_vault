@@ -112,7 +112,11 @@ class _SmsRunnerState extends ConsumerState<SmsRunner>
     final granted = await ref.read(smsSourceProvider).requestPermission();
     if (!mounted) return;
     setState(() => _needsDisclosure = false);
-    if (granted) await _drain();
+    if (granted) {
+      // So the app can say a message was saved while it is closed (Android 13 and later).
+      await ref.read(notifierProvider).requestPermission();
+      await _drain();
+    }
   }
 
   Future<void> _skip() async {

@@ -220,6 +220,70 @@ void main() {
     });
   });
 
+  group('re-check after a model change', () {
+    const newer =
+        '{"merchant": "RAJU STORES", "category": "Groceries", "channel": "UPI"}';
+    Future<int> first() async {
+      await raw.save(sms(noMerchant, DateTime(2026, 11, 21, 10)));
+      await service(llm: FakeLlmEngine([goodReply])).processNew();
+      final id = (await db.select(db.transactions).getSingle()).id;
+      await (db.update(db.transactions)..where((t) => t.id.equals(id))).write(
+        const TransactionsCompanion(modelId: Value('old-model')),
+      );
+      return id;
+    }
+
+    test('shows differences and changes nothing until applied', () async {
+      final id = await first();
+      final svc = service(llm: FakeLlmEngine([newer]));
+      final changes = await svc.previewRecheck();
+      expect(changes, hasLength(1));
+      expect(changes!.single.newMerchant, 'RAJU STORES');
+      expect(changes.single.newCategory, 'Groceries');
+      var t = await (db.select(
+        db.transactions,
+      )..where((x) => x.id.equals(id))).getSingle();
+      expect(t.merchant, 'SOME SHOP'); // untouched so far
+      expect(t.modelId, 'old-model');
+
+      await svc.applyRecheck(changes);
+      t = await (db.select(
+        db.transactions,
+      )..where((x) => x.id.equals(id))).getSingle();
+      expect(t.merchant, 'RAJU STORES');
+      expect(t.categoryName, 'Groceries');
+      expect(t.modelId, 'fake-model');
+    });
+
+    test(
+      'no difference means nothing to confirm, and it is not checked again',
+      () async {
+        await first();
+        final svc = service(llm: FakeLlmEngine([goodReply]));
+        expect(await svc.previewRecheck(), isEmpty);
+        expect(
+          (await db.select(db.transactions).getSingle()).modelId,
+          'fake-model',
+        );
+        final again = FakeLlmEngine([newer]);
+        expect(await service(llm: again).previewRecheck(), isEmpty);
+        expect(
+          again.prompts,
+          isEmpty,
+        ); // already checked by this model: not run
+      },
+    );
+
+    test('edited transactions are skipped, and no model gives null', () async {
+      final id = await first();
+      await repo.correct(id, merchant: 'MINE');
+      final llm = FakeLlmEngine([newer]);
+      expect(await service(llm: llm).previewRecheck(), isEmpty);
+      expect(llm.prompts, isEmpty);
+      expect(await service().previewRecheck(), isNull);
+    });
+  });
+
   group('re-check when a model arrives', () {
     test(
       'transactions made without a model are filled in once one is installed',

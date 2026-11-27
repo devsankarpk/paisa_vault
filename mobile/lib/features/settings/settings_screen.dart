@@ -7,6 +7,7 @@ import '../backup/backup_screen.dart';
 import '../categories/categories_screen.dart';
 import '../categorise/rules_screen.dart';
 import '../diagnostics/diagnostics_screen.dart';
+import '../model/recheck_screen.dart';
 import '../lock/lock_controller.dart';
 import '../sms/raw_message_repository.dart';
 import '../sms/shortcut_guide_screen.dart';
@@ -103,6 +104,13 @@ class SettingsScreen extends ConsumerWidget {
             context,
           ).push(MaterialPageRoute<void>(builder: (_) => const RulesScreen())),
           child: const Text('Merchant rules'),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const RecheckScreen()),
+          ),
+          child: const Text('Re-check with the model'),
         ),
         const SizedBox(height: 16),
         const _Card(
