@@ -4933,6 +4933,1058 @@ class HiddenHashCompanion extends UpdateCompanion<HiddenHashData> {
   }
 }
 
+class $CardsTable extends Cards with TableInfo<$CardsTable, PvCard> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CardsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _bankIdMeta = const VerificationMeta('bankId');
+  @override
+  late final GeneratedColumn<int> bankId = GeneratedColumn<int>(
+    'bank_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES banks (id)',
+    ),
+  );
+  static const VerificationMeta _accountIdMeta = const VerificationMeta(
+    'accountId',
+  );
+  @override
+  late final GeneratedColumn<int> accountId = GeneratedColumn<int>(
+    'account_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES accounts (id)',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<CardType, String> type =
+      GeneratedColumn<String>(
+        'type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<CardType>($CardsTable.$convertertype);
+  @override
+  late final GeneratedColumnWithTypeConverter<CardNetwork, String> network =
+      GeneratedColumn<String>(
+        'network',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<CardNetwork>($CardsTable.$converternetwork);
+  static const VerificationMeta _last4Meta = const VerificationMeta('last4');
+  @override
+  late final GeneratedColumn<String> last4 = GeneratedColumn<String>(
+    'last4',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 4,
+      maxTextLength: 4,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _expiryMonthMeta = const VerificationMeta(
+    'expiryMonth',
+  );
+  @override
+  late final GeneratedColumn<int> expiryMonth = GeneratedColumn<int>(
+    'expiry_month',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _expiryYearMeta = const VerificationMeta(
+    'expiryYear',
+  );
+  @override
+  late final GeneratedColumn<int> expiryYear = GeneratedColumn<int>(
+    'expiry_year',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _secretRefMeta = const VerificationMeta(
+    'secretRef',
+  );
+  @override
+  late final GeneratedColumn<String> secretRef = GeneratedColumn<String>(
+    'secret_ref',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    bankId,
+    accountId,
+    type,
+    network,
+    last4,
+    expiryMonth,
+    expiryYear,
+    secretRef,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cards';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PvCard> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('bank_id')) {
+      context.handle(
+        _bankIdMeta,
+        bankId.isAcceptableOrUnknown(data['bank_id']!, _bankIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bankIdMeta);
+    }
+    if (data.containsKey('account_id')) {
+      context.handle(
+        _accountIdMeta,
+        accountId.isAcceptableOrUnknown(data['account_id']!, _accountIdMeta),
+      );
+    }
+    if (data.containsKey('last4')) {
+      context.handle(
+        _last4Meta,
+        last4.isAcceptableOrUnknown(data['last4']!, _last4Meta),
+      );
+    } else if (isInserting) {
+      context.missing(_last4Meta);
+    }
+    if (data.containsKey('expiry_month')) {
+      context.handle(
+        _expiryMonthMeta,
+        expiryMonth.isAcceptableOrUnknown(
+          data['expiry_month']!,
+          _expiryMonthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('expiry_year')) {
+      context.handle(
+        _expiryYearMeta,
+        expiryYear.isAcceptableOrUnknown(data['expiry_year']!, _expiryYearMeta),
+      );
+    }
+    if (data.containsKey('secret_ref')) {
+      context.handle(
+        _secretRefMeta,
+        secretRef.isAcceptableOrUnknown(data['secret_ref']!, _secretRefMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {bankId, type, last4},
+  ];
+  @override
+  PvCard map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PvCard(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      bankId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}bank_id'],
+      )!,
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}account_id'],
+      ),
+      type: $CardsTable.$convertertype.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}type'],
+        )!,
+      ),
+      network: $CardsTable.$converternetwork.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}network'],
+        )!,
+      ),
+      last4: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last4'],
+      )!,
+      expiryMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}expiry_month'],
+      ),
+      expiryYear: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}expiry_year'],
+      ),
+      secretRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}secret_ref'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CardsTable createAlias(String alias) {
+    return $CardsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<CardType, String, String> $convertertype =
+      const EnumNameConverter<CardType>(CardType.values);
+  static JsonTypeConverter2<CardNetwork, String, String> $converternetwork =
+      const EnumNameConverter<CardNetwork>(CardNetwork.values);
+}
+
+class PvCard extends DataClass implements Insertable<PvCard> {
+  final int id;
+  final int bankId;
+
+  /// The account its SMS transactions are filed under (same bank and last 4).
+  final int? accountId;
+  final CardType type;
+  final CardNetwork network;
+  final String last4;
+  final int? expiryMonth;
+  final int? expiryYear;
+
+  /// Id of the encrypted secret in vault.db, when one is stored.
+  final String? secretRef;
+  final DateTime createdAt;
+  const PvCard({
+    required this.id,
+    required this.bankId,
+    this.accountId,
+    required this.type,
+    required this.network,
+    required this.last4,
+    this.expiryMonth,
+    this.expiryYear,
+    this.secretRef,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['bank_id'] = Variable<int>(bankId);
+    if (!nullToAbsent || accountId != null) {
+      map['account_id'] = Variable<int>(accountId);
+    }
+    {
+      map['type'] = Variable<String>($CardsTable.$convertertype.toSql(type));
+    }
+    {
+      map['network'] = Variable<String>(
+        $CardsTable.$converternetwork.toSql(network),
+      );
+    }
+    map['last4'] = Variable<String>(last4);
+    if (!nullToAbsent || expiryMonth != null) {
+      map['expiry_month'] = Variable<int>(expiryMonth);
+    }
+    if (!nullToAbsent || expiryYear != null) {
+      map['expiry_year'] = Variable<int>(expiryYear);
+    }
+    if (!nullToAbsent || secretRef != null) {
+      map['secret_ref'] = Variable<String>(secretRef);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  CardsCompanion toCompanion(bool nullToAbsent) {
+    return CardsCompanion(
+      id: Value(id),
+      bankId: Value(bankId),
+      accountId: accountId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountId),
+      type: Value(type),
+      network: Value(network),
+      last4: Value(last4),
+      expiryMonth: expiryMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiryMonth),
+      expiryYear: expiryYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiryYear),
+      secretRef: secretRef == null && nullToAbsent
+          ? const Value.absent()
+          : Value(secretRef),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory PvCard.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PvCard(
+      id: serializer.fromJson<int>(json['id']),
+      bankId: serializer.fromJson<int>(json['bankId']),
+      accountId: serializer.fromJson<int?>(json['accountId']),
+      type: $CardsTable.$convertertype.fromJson(
+        serializer.fromJson<String>(json['type']),
+      ),
+      network: $CardsTable.$converternetwork.fromJson(
+        serializer.fromJson<String>(json['network']),
+      ),
+      last4: serializer.fromJson<String>(json['last4']),
+      expiryMonth: serializer.fromJson<int?>(json['expiryMonth']),
+      expiryYear: serializer.fromJson<int?>(json['expiryYear']),
+      secretRef: serializer.fromJson<String?>(json['secretRef']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'bankId': serializer.toJson<int>(bankId),
+      'accountId': serializer.toJson<int?>(accountId),
+      'type': serializer.toJson<String>(
+        $CardsTable.$convertertype.toJson(type),
+      ),
+      'network': serializer.toJson<String>(
+        $CardsTable.$converternetwork.toJson(network),
+      ),
+      'last4': serializer.toJson<String>(last4),
+      'expiryMonth': serializer.toJson<int?>(expiryMonth),
+      'expiryYear': serializer.toJson<int?>(expiryYear),
+      'secretRef': serializer.toJson<String?>(secretRef),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  PvCard copyWith({
+    int? id,
+    int? bankId,
+    Value<int?> accountId = const Value.absent(),
+    CardType? type,
+    CardNetwork? network,
+    String? last4,
+    Value<int?> expiryMonth = const Value.absent(),
+    Value<int?> expiryYear = const Value.absent(),
+    Value<String?> secretRef = const Value.absent(),
+    DateTime? createdAt,
+  }) => PvCard(
+    id: id ?? this.id,
+    bankId: bankId ?? this.bankId,
+    accountId: accountId.present ? accountId.value : this.accountId,
+    type: type ?? this.type,
+    network: network ?? this.network,
+    last4: last4 ?? this.last4,
+    expiryMonth: expiryMonth.present ? expiryMonth.value : this.expiryMonth,
+    expiryYear: expiryYear.present ? expiryYear.value : this.expiryYear,
+    secretRef: secretRef.present ? secretRef.value : this.secretRef,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  PvCard copyWithCompanion(CardsCompanion data) {
+    return PvCard(
+      id: data.id.present ? data.id.value : this.id,
+      bankId: data.bankId.present ? data.bankId.value : this.bankId,
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      type: data.type.present ? data.type.value : this.type,
+      network: data.network.present ? data.network.value : this.network,
+      last4: data.last4.present ? data.last4.value : this.last4,
+      expiryMonth: data.expiryMonth.present
+          ? data.expiryMonth.value
+          : this.expiryMonth,
+      expiryYear: data.expiryYear.present
+          ? data.expiryYear.value
+          : this.expiryYear,
+      secretRef: data.secretRef.present ? data.secretRef.value : this.secretRef,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PvCard(')
+          ..write('id: $id, ')
+          ..write('bankId: $bankId, ')
+          ..write('accountId: $accountId, ')
+          ..write('type: $type, ')
+          ..write('network: $network, ')
+          ..write('last4: $last4, ')
+          ..write('expiryMonth: $expiryMonth, ')
+          ..write('expiryYear: $expiryYear, ')
+          ..write('secretRef: $secretRef, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    bankId,
+    accountId,
+    type,
+    network,
+    last4,
+    expiryMonth,
+    expiryYear,
+    secretRef,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PvCard &&
+          other.id == this.id &&
+          other.bankId == this.bankId &&
+          other.accountId == this.accountId &&
+          other.type == this.type &&
+          other.network == this.network &&
+          other.last4 == this.last4 &&
+          other.expiryMonth == this.expiryMonth &&
+          other.expiryYear == this.expiryYear &&
+          other.secretRef == this.secretRef &&
+          other.createdAt == this.createdAt);
+}
+
+class CardsCompanion extends UpdateCompanion<PvCard> {
+  final Value<int> id;
+  final Value<int> bankId;
+  final Value<int?> accountId;
+  final Value<CardType> type;
+  final Value<CardNetwork> network;
+  final Value<String> last4;
+  final Value<int?> expiryMonth;
+  final Value<int?> expiryYear;
+  final Value<String?> secretRef;
+  final Value<DateTime> createdAt;
+  const CardsCompanion({
+    this.id = const Value.absent(),
+    this.bankId = const Value.absent(),
+    this.accountId = const Value.absent(),
+    this.type = const Value.absent(),
+    this.network = const Value.absent(),
+    this.last4 = const Value.absent(),
+    this.expiryMonth = const Value.absent(),
+    this.expiryYear = const Value.absent(),
+    this.secretRef = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  CardsCompanion.insert({
+    this.id = const Value.absent(),
+    required int bankId,
+    this.accountId = const Value.absent(),
+    required CardType type,
+    required CardNetwork network,
+    required String last4,
+    this.expiryMonth = const Value.absent(),
+    this.expiryYear = const Value.absent(),
+    this.secretRef = const Value.absent(),
+    required DateTime createdAt,
+  }) : bankId = Value(bankId),
+       type = Value(type),
+       network = Value(network),
+       last4 = Value(last4),
+       createdAt = Value(createdAt);
+  static Insertable<PvCard> custom({
+    Expression<int>? id,
+    Expression<int>? bankId,
+    Expression<int>? accountId,
+    Expression<String>? type,
+    Expression<String>? network,
+    Expression<String>? last4,
+    Expression<int>? expiryMonth,
+    Expression<int>? expiryYear,
+    Expression<String>? secretRef,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (bankId != null) 'bank_id': bankId,
+      if (accountId != null) 'account_id': accountId,
+      if (type != null) 'type': type,
+      if (network != null) 'network': network,
+      if (last4 != null) 'last4': last4,
+      if (expiryMonth != null) 'expiry_month': expiryMonth,
+      if (expiryYear != null) 'expiry_year': expiryYear,
+      if (secretRef != null) 'secret_ref': secretRef,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  CardsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? bankId,
+    Value<int?>? accountId,
+    Value<CardType>? type,
+    Value<CardNetwork>? network,
+    Value<String>? last4,
+    Value<int?>? expiryMonth,
+    Value<int?>? expiryYear,
+    Value<String?>? secretRef,
+    Value<DateTime>? createdAt,
+  }) {
+    return CardsCompanion(
+      id: id ?? this.id,
+      bankId: bankId ?? this.bankId,
+      accountId: accountId ?? this.accountId,
+      type: type ?? this.type,
+      network: network ?? this.network,
+      last4: last4 ?? this.last4,
+      expiryMonth: expiryMonth ?? this.expiryMonth,
+      expiryYear: expiryYear ?? this.expiryYear,
+      secretRef: secretRef ?? this.secretRef,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (bankId.present) {
+      map['bank_id'] = Variable<int>(bankId.value);
+    }
+    if (accountId.present) {
+      map['account_id'] = Variable<int>(accountId.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(
+        $CardsTable.$convertertype.toSql(type.value),
+      );
+    }
+    if (network.present) {
+      map['network'] = Variable<String>(
+        $CardsTable.$converternetwork.toSql(network.value),
+      );
+    }
+    if (last4.present) {
+      map['last4'] = Variable<String>(last4.value);
+    }
+    if (expiryMonth.present) {
+      map['expiry_month'] = Variable<int>(expiryMonth.value);
+    }
+    if (expiryYear.present) {
+      map['expiry_year'] = Variable<int>(expiryYear.value);
+    }
+    if (secretRef.present) {
+      map['secret_ref'] = Variable<String>(secretRef.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardsCompanion(')
+          ..write('id: $id, ')
+          ..write('bankId: $bankId, ')
+          ..write('accountId: $accountId, ')
+          ..write('type: $type, ')
+          ..write('network: $network, ')
+          ..write('last4: $last4, ')
+          ..write('expiryMonth: $expiryMonth, ')
+          ..write('expiryYear: $expiryYear, ')
+          ..write('secretRef: $secretRef, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CardBillSettingsTable extends CardBillSettings
+    with TableInfo<$CardBillSettingsTable, CardBillSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CardBillSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _cardIdMeta = const VerificationMeta('cardId');
+  @override
+  late final GeneratedColumn<int> cardId = GeneratedColumn<int>(
+    'card_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES cards (id)',
+    ),
+  );
+  static const VerificationMeta _statementDayMeta = const VerificationMeta(
+    'statementDay',
+  );
+  @override
+  late final GeneratedColumn<int> statementDay = GeneratedColumn<int>(
+    'statement_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dueDayMeta = const VerificationMeta('dueDay');
+  @override
+  late final GeneratedColumn<int> dueDay = GeneratedColumn<int>(
+    'due_day',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _creditLimitPaiseMeta = const VerificationMeta(
+    'creditLimitPaise',
+  );
+  @override
+  late final GeneratedColumn<int> creditLimitPaise = GeneratedColumn<int>(
+    'credit_limit_paise',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _reminderDaysMeta = const VerificationMeta(
+    'reminderDays',
+  );
+  @override
+  late final GeneratedColumn<String> reminderDays = GeneratedColumn<String>(
+    'reminder_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('5,1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    cardId,
+    statementDay,
+    dueDay,
+    creditLimitPaise,
+    reminderDays,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'card_bill_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CardBillSetting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('card_id')) {
+      context.handle(
+        _cardIdMeta,
+        cardId.isAcceptableOrUnknown(data['card_id']!, _cardIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cardIdMeta);
+    }
+    if (data.containsKey('statement_day')) {
+      context.handle(
+        _statementDayMeta,
+        statementDay.isAcceptableOrUnknown(
+          data['statement_day']!,
+          _statementDayMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_statementDayMeta);
+    }
+    if (data.containsKey('due_day')) {
+      context.handle(
+        _dueDayMeta,
+        dueDay.isAcceptableOrUnknown(data['due_day']!, _dueDayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dueDayMeta);
+    }
+    if (data.containsKey('credit_limit_paise')) {
+      context.handle(
+        _creditLimitPaiseMeta,
+        creditLimitPaise.isAcceptableOrUnknown(
+          data['credit_limit_paise']!,
+          _creditLimitPaiseMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reminder_days')) {
+      context.handle(
+        _reminderDaysMeta,
+        reminderDays.isAcceptableOrUnknown(
+          data['reminder_days']!,
+          _reminderDaysMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CardBillSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CardBillSetting(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      cardId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}card_id'],
+      )!,
+      statementDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}statement_day'],
+      )!,
+      dueDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}due_day'],
+      )!,
+      creditLimitPaise: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}credit_limit_paise'],
+      ),
+      reminderDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reminder_days'],
+      )!,
+    );
+  }
+
+  @override
+  $CardBillSettingsTable createAlias(String alias) {
+    return $CardBillSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class CardBillSetting extends DataClass implements Insertable<CardBillSetting> {
+  final int id;
+  final int cardId;
+  final int statementDay;
+  final int dueDay;
+  final int? creditLimitPaise;
+
+  /// Days before the due date to remind, comma separated, for example "5,1".
+  final String reminderDays;
+  const CardBillSetting({
+    required this.id,
+    required this.cardId,
+    required this.statementDay,
+    required this.dueDay,
+    this.creditLimitPaise,
+    required this.reminderDays,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['card_id'] = Variable<int>(cardId);
+    map['statement_day'] = Variable<int>(statementDay);
+    map['due_day'] = Variable<int>(dueDay);
+    if (!nullToAbsent || creditLimitPaise != null) {
+      map['credit_limit_paise'] = Variable<int>(creditLimitPaise);
+    }
+    map['reminder_days'] = Variable<String>(reminderDays);
+    return map;
+  }
+
+  CardBillSettingsCompanion toCompanion(bool nullToAbsent) {
+    return CardBillSettingsCompanion(
+      id: Value(id),
+      cardId: Value(cardId),
+      statementDay: Value(statementDay),
+      dueDay: Value(dueDay),
+      creditLimitPaise: creditLimitPaise == null && nullToAbsent
+          ? const Value.absent()
+          : Value(creditLimitPaise),
+      reminderDays: Value(reminderDays),
+    );
+  }
+
+  factory CardBillSetting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CardBillSetting(
+      id: serializer.fromJson<int>(json['id']),
+      cardId: serializer.fromJson<int>(json['cardId']),
+      statementDay: serializer.fromJson<int>(json['statementDay']),
+      dueDay: serializer.fromJson<int>(json['dueDay']),
+      creditLimitPaise: serializer.fromJson<int?>(json['creditLimitPaise']),
+      reminderDays: serializer.fromJson<String>(json['reminderDays']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'cardId': serializer.toJson<int>(cardId),
+      'statementDay': serializer.toJson<int>(statementDay),
+      'dueDay': serializer.toJson<int>(dueDay),
+      'creditLimitPaise': serializer.toJson<int?>(creditLimitPaise),
+      'reminderDays': serializer.toJson<String>(reminderDays),
+    };
+  }
+
+  CardBillSetting copyWith({
+    int? id,
+    int? cardId,
+    int? statementDay,
+    int? dueDay,
+    Value<int?> creditLimitPaise = const Value.absent(),
+    String? reminderDays,
+  }) => CardBillSetting(
+    id: id ?? this.id,
+    cardId: cardId ?? this.cardId,
+    statementDay: statementDay ?? this.statementDay,
+    dueDay: dueDay ?? this.dueDay,
+    creditLimitPaise: creditLimitPaise.present
+        ? creditLimitPaise.value
+        : this.creditLimitPaise,
+    reminderDays: reminderDays ?? this.reminderDays,
+  );
+  CardBillSetting copyWithCompanion(CardBillSettingsCompanion data) {
+    return CardBillSetting(
+      id: data.id.present ? data.id.value : this.id,
+      cardId: data.cardId.present ? data.cardId.value : this.cardId,
+      statementDay: data.statementDay.present
+          ? data.statementDay.value
+          : this.statementDay,
+      dueDay: data.dueDay.present ? data.dueDay.value : this.dueDay,
+      creditLimitPaise: data.creditLimitPaise.present
+          ? data.creditLimitPaise.value
+          : this.creditLimitPaise,
+      reminderDays: data.reminderDays.present
+          ? data.reminderDays.value
+          : this.reminderDays,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardBillSetting(')
+          ..write('id: $id, ')
+          ..write('cardId: $cardId, ')
+          ..write('statementDay: $statementDay, ')
+          ..write('dueDay: $dueDay, ')
+          ..write('creditLimitPaise: $creditLimitPaise, ')
+          ..write('reminderDays: $reminderDays')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    cardId,
+    statementDay,
+    dueDay,
+    creditLimitPaise,
+    reminderDays,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CardBillSetting &&
+          other.id == this.id &&
+          other.cardId == this.cardId &&
+          other.statementDay == this.statementDay &&
+          other.dueDay == this.dueDay &&
+          other.creditLimitPaise == this.creditLimitPaise &&
+          other.reminderDays == this.reminderDays);
+}
+
+class CardBillSettingsCompanion extends UpdateCompanion<CardBillSetting> {
+  final Value<int> id;
+  final Value<int> cardId;
+  final Value<int> statementDay;
+  final Value<int> dueDay;
+  final Value<int?> creditLimitPaise;
+  final Value<String> reminderDays;
+  const CardBillSettingsCompanion({
+    this.id = const Value.absent(),
+    this.cardId = const Value.absent(),
+    this.statementDay = const Value.absent(),
+    this.dueDay = const Value.absent(),
+    this.creditLimitPaise = const Value.absent(),
+    this.reminderDays = const Value.absent(),
+  });
+  CardBillSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    required int cardId,
+    required int statementDay,
+    required int dueDay,
+    this.creditLimitPaise = const Value.absent(),
+    this.reminderDays = const Value.absent(),
+  }) : cardId = Value(cardId),
+       statementDay = Value(statementDay),
+       dueDay = Value(dueDay);
+  static Insertable<CardBillSetting> custom({
+    Expression<int>? id,
+    Expression<int>? cardId,
+    Expression<int>? statementDay,
+    Expression<int>? dueDay,
+    Expression<int>? creditLimitPaise,
+    Expression<String>? reminderDays,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (cardId != null) 'card_id': cardId,
+      if (statementDay != null) 'statement_day': statementDay,
+      if (dueDay != null) 'due_day': dueDay,
+      if (creditLimitPaise != null) 'credit_limit_paise': creditLimitPaise,
+      if (reminderDays != null) 'reminder_days': reminderDays,
+    });
+  }
+
+  CardBillSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? cardId,
+    Value<int>? statementDay,
+    Value<int>? dueDay,
+    Value<int?>? creditLimitPaise,
+    Value<String>? reminderDays,
+  }) {
+    return CardBillSettingsCompanion(
+      id: id ?? this.id,
+      cardId: cardId ?? this.cardId,
+      statementDay: statementDay ?? this.statementDay,
+      dueDay: dueDay ?? this.dueDay,
+      creditLimitPaise: creditLimitPaise ?? this.creditLimitPaise,
+      reminderDays: reminderDays ?? this.reminderDays,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (cardId.present) {
+      map['card_id'] = Variable<int>(cardId.value);
+    }
+    if (statementDay.present) {
+      map['statement_day'] = Variable<int>(statementDay.value);
+    }
+    if (dueDay.present) {
+      map['due_day'] = Variable<int>(dueDay.value);
+    }
+    if (creditLimitPaise.present) {
+      map['credit_limit_paise'] = Variable<int>(creditLimitPaise.value);
+    }
+    if (reminderDays.present) {
+      map['reminder_days'] = Variable<String>(reminderDays.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CardBillSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('cardId: $cardId, ')
+          ..write('statementDay: $statementDay, ')
+          ..write('dueDay: $dueDay, ')
+          ..write('creditLimitPaise: $creditLimitPaise, ')
+          ..write('reminderDays: $reminderDays')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4947,6 +5999,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $BudgetAlertLogTable budgetAlertLog = $BudgetAlertLogTable(this);
   late final $PipelineLogTable pipelineLog = $PipelineLogTable(this);
   late final $HiddenHashTable hiddenHash = $HiddenHashTable(this);
+  late final $CardsTable cards = $CardsTable(this);
+  late final $CardBillSettingsTable cardBillSettings = $CardBillSettingsTable(
+    this,
+  );
   late final Index rawMessagesHash = Index(
     'raw_messages_hash',
     'CREATE INDEX raw_messages_hash ON raw_messages (content_hash)',
@@ -4991,6 +6047,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     budgetAlertLog,
     pipelineLog,
     hiddenHash,
+    cards,
+    cardBillSettings,
     rawMessagesHash,
     rawMessagesReceived,
     txnDate,
@@ -5170,6 +6228,25 @@ final class $$BanksTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$CardsTable, List<PvCard>> _cardsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.cards,
+    aliasName: 'banks__id__cards__bank_id',
+  );
+
+  $$CardsTableProcessedTableManager get cardsRefs {
+    final manager = $$CardsTableTableManager(
+      $_db,
+      $_db.cards,
+    ).filter((f) => f.bankId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_cardsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$BanksTableFilterComposer extends Composer<_$AppDatabase, $BanksTable> {
@@ -5216,6 +6293,31 @@ class $$BanksTableFilterComposer extends Composer<_$AppDatabase, $BanksTable> {
           }) => $$AccountsTableFilterComposer(
             $db: $db,
             $table: $db.accounts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> cardsRefs(
+    Expression<bool> Function($$CardsTableFilterComposer f) f,
+  ) {
+    final $$CardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.bankId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableFilterComposer(
+            $db: $db,
+            $table: $db.cards,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5301,6 +6403,31 @@ class $$BanksTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> cardsRefs<T extends Object>(
+    Expression<T> Function($$CardsTableAnnotationComposer a) f,
+  ) {
+    final $$CardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.bankId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$BanksTableTableManager
@@ -5316,7 +6443,7 @@ class $$BanksTableTableManager
           $$BanksTableUpdateCompanionBuilder,
           (Bank, $$BanksTableReferences),
           Bank,
-          PrefetchHooks Function({bool accountsRefs})
+          PrefetchHooks Function({bool accountsRefs, bool cardsRefs})
         > {
   $$BanksTableTableManager(_$AppDatabase db, $BanksTable table)
     : super(
@@ -5361,10 +6488,13 @@ class $$BanksTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({accountsRefs = false}) {
+          prefetchHooksCallback: ({accountsRefs = false, cardsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (accountsRefs) db.accounts],
+              explicitlyWatchedTables: [
+                if (accountsRefs) db.accounts,
+                if (cardsRefs) db.cards,
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -5380,6 +6510,23 @@ class $$BanksTableTableManager
                           ._accountsRefsTable(db),
                       managerFromTypedResult: (p0) =>
                           $$BanksTableReferences(db, table, p0).accountsRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'bank_id',
+                      typedResults: items,
+                    ),
+                  if (cardsRefs)
+                    await $_getPrefetchedDataByColumns<
+                      Bank,
+                      $BanksTable,
+                      PvCard,
+                      $CardsTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$BanksTableReferences._cardsRefsTable(
+                        db,
+                      ),
+                      managerFromTypedResult: (p0) =>
+                          $$BanksTableReferences(db, table, p0).cardsRefs,
                       currentColumn: 'id',
                       referencedColumn: 'bank_id',
                       typedResults: items,
@@ -5404,7 +6551,7 @@ typedef $$BanksTableProcessedTableManager =
       $$BanksTableUpdateCompanionBuilder,
       (Bank, $$BanksTableReferences),
       Bank,
-      PrefetchHooks Function({bool accountsRefs})
+      PrefetchHooks Function({bool accountsRefs, bool cardsRefs})
     >;
 typedef $$AccountsTableCreateCompanionBuilder = AccountsCompanion Function({
   Value<int> id,
@@ -5461,6 +6608,25 @@ final class $$AccountsTableReferences
     ).filter((f) => f.accountId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_transactionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CardsTable, List<PvCard>> _cardsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.cards,
+    aliasName: 'accounts__id__cards__account_id',
+  );
+
+  $$CardsTableProcessedTableManager get cardsRefs {
+    final manager = $$CardsTableTableManager(
+      $_db,
+      $_db.cards,
+    ).filter((f) => f.accountId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_cardsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5552,6 +6718,31 @@ class $$AccountsTableFilterComposer
           }) => $$TransactionsTableFilterComposer(
             $db: $db,
             $table: $db.transactions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> cardsRefs(
+    Expression<bool> Function($$CardsTableFilterComposer f) f,
+  ) {
+    final $$CardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.accountId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableFilterComposer(
+            $db: $db,
+            $table: $db.cards,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5707,6 +6898,31 @@ class $$AccountsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> cardsRefs<T extends Object>(
+    Expression<T> Function($$CardsTableAnnotationComposer a) f,
+  ) {
+    final $$CardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.accountId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$AccountsTableTableManager
@@ -5722,7 +6938,11 @@ class $$AccountsTableTableManager
           $$AccountsTableUpdateCompanionBuilder,
           (Account, $$AccountsTableReferences),
           Account,
-          PrefetchHooks Function({bool bankId, bool transactionsRefs})
+          PrefetchHooks Function({
+            bool bankId,
+            bool transactionsRefs,
+            bool cardsRefs,
+          })
         > {
   $$AccountsTableTableManager(_$AppDatabase db, $AccountsTable table)
     : super(
@@ -5783,66 +7003,90 @@ class $$AccountsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({bankId = false, transactionsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (transactionsRefs) db.transactions],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (bankId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.bankId,
-                        referencedTable: $$AccountsTableReferences._bankIdTable(
-                          db,
-                        ),
-                        referencedColumn: $$AccountsTableReferences
-                            ._bankIdTable(db)
-                            .id,
-                      ) as T;
-                    }
+          prefetchHooksCallback:
+              ({bankId = false, transactionsRefs = false, cardsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (transactionsRefs) db.transactions,
+                    if (cardsRefs) db.cards,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (bankId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.bankId,
+                            referencedTable: $$AccountsTableReferences
+                                ._bankIdTable(db),
+                            referencedColumn: $$AccountsTableReferences
+                                ._bankIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (transactionsRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Account,
+                          $AccountsTable,
+                          Transaction,
+                          $TransactionsTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$AccountsTableReferences
+                              ._transactionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AccountsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).transactionsRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'account_id',
+                          typedResults: items,
+                        ),
+                      if (cardsRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Account,
+                          $AccountsTable,
+                          PvCard,
+                          $CardsTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$AccountsTableReferences
+                              ._cardsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AccountsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cardsRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'account_id',
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (transactionsRefs)
-                    await $_getPrefetchedDataByColumns<
-                      Account,
-                      $AccountsTable,
-                      Transaction,
-                      $TransactionsTable
-                    >(
-                      currentTable: table,
-                      referencedTable: $$AccountsTableReferences
-                          ._transactionsRefsTable(db),
-                      managerFromTypedResult: (p0) => $$AccountsTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).transactionsRefs,
-                      currentColumn: 'id',
-                      referencedColumn: 'account_id',
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -5859,7 +7103,11 @@ typedef $$AccountsTableProcessedTableManager =
       $$AccountsTableUpdateCompanionBuilder,
       (Account, $$AccountsTableReferences),
       Account,
-      PrefetchHooks Function({bool bankId, bool transactionsRefs})
+      PrefetchHooks Function({
+        bool bankId,
+        bool transactionsRefs,
+        bool cardsRefs,
+      })
     >;
 typedef $$RawMessagesTableCreateCompanionBuilder =
     RawMessagesCompanion Function({
@@ -8185,6 +9433,944 @@ typedef $$HiddenHashTableProcessedTableManager =
       HiddenHashData,
       PrefetchHooks Function()
     >;
+typedef $$CardsTableCreateCompanionBuilder = CardsCompanion Function({
+  Value<int> id,
+  required int bankId,
+  Value<int?> accountId,
+  required CardType type,
+  required CardNetwork network,
+  required String last4,
+  Value<int?> expiryMonth,
+  Value<int?> expiryYear,
+  Value<String?> secretRef,
+  required DateTime createdAt,
+});
+typedef $$CardsTableUpdateCompanionBuilder = CardsCompanion Function({
+  Value<int> id,
+  Value<int> bankId,
+  Value<int?> accountId,
+  Value<CardType> type,
+  Value<CardNetwork> network,
+  Value<String> last4,
+  Value<int?> expiryMonth,
+  Value<int?> expiryYear,
+  Value<String?> secretRef,
+  Value<DateTime> createdAt,
+});
+
+final class $$CardsTableReferences
+    extends BaseReferences<_$AppDatabase, $CardsTable, PvCard> {
+  $$CardsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $BanksTable _bankIdTable(_$AppDatabase db) =>
+      db.banks.createAlias('cards__bank_id__banks__id');
+
+  $$BanksTableProcessedTableManager get bankId {
+    final $_column = $_itemColumn<int>('bank_id')!;
+
+    final manager = $$BanksTableTableManager(
+      $_db,
+      $_db.banks,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_bankIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AccountsTable _accountIdTable(_$AppDatabase db) =>
+      db.accounts.createAlias('cards__account_id__accounts__id');
+
+  $$AccountsTableProcessedTableManager? get accountId {
+    final $_column = $_itemColumn<int>('account_id');
+    if ($_column == null) return null;
+    final manager = $$AccountsTableTableManager(
+      $_db,
+      $_db.accounts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_accountIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$CardBillSettingsTable, List<CardBillSetting>>
+  _cardBillSettingsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.cardBillSettings,
+    aliasName: 'cards__id__card_bill_settings__card_id',
+  );
+
+  $$CardBillSettingsTableProcessedTableManager get cardBillSettingsRefs {
+    final manager = $$CardBillSettingsTableTableManager(
+      $_db,
+      $_db.cardBillSettings,
+    ).filter((f) => f.cardId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cardBillSettingsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CardsTableFilterComposer extends Composer<_$AppDatabase, $CardsTable> {
+  $$CardsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<CardType, CardType, String> get type =>
+      $composableBuilder(
+        column: $table.type,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnWithTypeConverterFilters<CardNetwork, CardNetwork, String>
+  get network => $composableBuilder(
+    column: $table.network,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get last4 => $composableBuilder(
+    column: $table.last4,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get expiryMonth => $composableBuilder(
+    column: $table.expiryMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get expiryYear => $composableBuilder(
+    column: $table.expiryYear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get secretRef => $composableBuilder(
+    column: $table.secretRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$BanksTableFilterComposer get bankId {
+    final $$BanksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bankId,
+      referencedTable: $db.banks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BanksTableFilterComposer(
+            $db: $db,
+            $table: $db.banks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AccountsTableFilterComposer get accountId {
+    final $$AccountsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.accountId,
+      referencedTable: $db.accounts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AccountsTableFilterComposer(
+            $db: $db,
+            $table: $db.accounts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> cardBillSettingsRefs(
+    Expression<bool> Function($$CardBillSettingsTableFilterComposer f) f,
+  ) {
+    final $$CardBillSettingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cardBillSettings,
+      getReferencedColumn: (t) => t.cardId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardBillSettingsTableFilterComposer(
+            $db: $db,
+            $table: $db.cardBillSettings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CardsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CardsTable> {
+  $$CardsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get network => $composableBuilder(
+    column: $table.network,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get last4 => $composableBuilder(
+    column: $table.last4,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get expiryMonth => $composableBuilder(
+    column: $table.expiryMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get expiryYear => $composableBuilder(
+    column: $table.expiryYear,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get secretRef => $composableBuilder(
+    column: $table.secretRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$BanksTableOrderingComposer get bankId {
+    final $$BanksTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bankId,
+      referencedTable: $db.banks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BanksTableOrderingComposer(
+            $db: $db,
+            $table: $db.banks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AccountsTableOrderingComposer get accountId {
+    final $$AccountsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.accountId,
+      referencedTable: $db.accounts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AccountsTableOrderingComposer(
+            $db: $db,
+            $table: $db.accounts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CardsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CardsTable> {
+  $$CardsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<CardType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<CardNetwork, String> get network =>
+      $composableBuilder(column: $table.network, builder: (column) => column);
+
+  GeneratedColumn<String> get last4 =>
+      $composableBuilder(column: $table.last4, builder: (column) => column);
+
+  GeneratedColumn<int> get expiryMonth => $composableBuilder(
+    column: $table.expiryMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get expiryYear => $composableBuilder(
+    column: $table.expiryYear,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get secretRef =>
+      $composableBuilder(column: $table.secretRef, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$BanksTableAnnotationComposer get bankId {
+    final $$BanksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.bankId,
+      referencedTable: $db.banks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$BanksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.banks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AccountsTableAnnotationComposer get accountId {
+    final $$AccountsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.accountId,
+      referencedTable: $db.accounts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AccountsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.accounts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> cardBillSettingsRefs<T extends Object>(
+    Expression<T> Function($$CardBillSettingsTableAnnotationComposer a) f,
+  ) {
+    final $$CardBillSettingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cardBillSettings,
+      getReferencedColumn: (t) => t.cardId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardBillSettingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cardBillSettings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CardsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CardsTable,
+          PvCard,
+          $$CardsTableFilterComposer,
+          $$CardsTableOrderingComposer,
+          $$CardsTableAnnotationComposer,
+          $$CardsTableCreateCompanionBuilder,
+          $$CardsTableUpdateCompanionBuilder,
+          (PvCard, $$CardsTableReferences),
+          PvCard,
+          PrefetchHooks Function({
+            bool bankId,
+            bool accountId,
+            bool cardBillSettingsRefs,
+          })
+        > {
+  $$CardsTableTableManager(_$AppDatabase db, $CardsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CardsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CardsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CardsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> bankId = const Value.absent(),
+                Value<int?> accountId = const Value.absent(),
+                Value<CardType> type = const Value.absent(),
+                Value<CardNetwork> network = const Value.absent(),
+                Value<String> last4 = const Value.absent(),
+                Value<int?> expiryMonth = const Value.absent(),
+                Value<int?> expiryYear = const Value.absent(),
+                Value<String?> secretRef = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => CardsCompanion(
+                id: id,
+                bankId: bankId,
+                accountId: accountId,
+                type: type,
+                network: network,
+                last4: last4,
+                expiryMonth: expiryMonth,
+                expiryYear: expiryYear,
+                secretRef: secretRef,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int bankId,
+                Value<int?> accountId = const Value.absent(),
+                required CardType type,
+                required CardNetwork network,
+                required String last4,
+                Value<int?> expiryMonth = const Value.absent(),
+                Value<int?> expiryYear = const Value.absent(),
+                Value<String?> secretRef = const Value.absent(),
+                required DateTime createdAt,
+              }) => CardsCompanion.insert(
+                id: id,
+                bankId: bankId,
+                accountId: accountId,
+                type: type,
+                network: network,
+                last4: last4,
+                expiryMonth: expiryMonth,
+                expiryYear: expiryYear,
+                secretRef: secretRef,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CardsTable, PvCard>(table),
+                  $$CardsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                bankId = false,
+                accountId = false,
+                cardBillSettingsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (cardBillSettingsRefs) db.cardBillSettings,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (bankId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.bankId,
+                            referencedTable: $$CardsTableReferences
+                                ._bankIdTable(db),
+                            referencedColumn: $$CardsTableReferences
+                                ._bankIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (accountId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.accountId,
+                            referencedTable: $$CardsTableReferences
+                                ._accountIdTable(db),
+                            referencedColumn: $$CardsTableReferences
+                                ._accountIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (cardBillSettingsRefs)
+                        await $_getPrefetchedDataByColumns<
+                          PvCard,
+                          $CardsTable,
+                          CardBillSetting,
+                          $CardBillSettingsTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CardsTableReferences
+                              ._cardBillSettingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CardsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cardBillSettingsRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'card_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$CardsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CardsTable,
+      PvCard,
+      $$CardsTableFilterComposer,
+      $$CardsTableOrderingComposer,
+      $$CardsTableAnnotationComposer,
+      $$CardsTableCreateCompanionBuilder,
+      $$CardsTableUpdateCompanionBuilder,
+      (PvCard, $$CardsTableReferences),
+      PvCard,
+      PrefetchHooks Function({
+        bool bankId,
+        bool accountId,
+        bool cardBillSettingsRefs,
+      })
+    >;
+typedef $$CardBillSettingsTableCreateCompanionBuilder =
+    CardBillSettingsCompanion Function({
+      Value<int> id,
+      required int cardId,
+      required int statementDay,
+      required int dueDay,
+      Value<int?> creditLimitPaise,
+      Value<String> reminderDays,
+    });
+typedef $$CardBillSettingsTableUpdateCompanionBuilder =
+    CardBillSettingsCompanion Function({
+      Value<int> id,
+      Value<int> cardId,
+      Value<int> statementDay,
+      Value<int> dueDay,
+      Value<int?> creditLimitPaise,
+      Value<String> reminderDays,
+    });
+
+final class $$CardBillSettingsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $CardBillSettingsTable, CardBillSetting> {
+  $$CardBillSettingsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CardsTable _cardIdTable(_$AppDatabase db) =>
+      db.cards.createAlias('card_bill_settings__card_id__cards__id');
+
+  $$CardsTableProcessedTableManager get cardId {
+    final $_column = $_itemColumn<int>('card_id')!;
+
+    final manager = $$CardsTableTableManager(
+      $_db,
+      $_db.cards,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cardIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CardBillSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $CardBillSettingsTable> {
+  $$CardBillSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get statementDay => $composableBuilder(
+    column: $table.statementDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dueDay => $composableBuilder(
+    column: $table.dueDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get creditLimitPaise => $composableBuilder(
+    column: $table.creditLimitPaise,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CardsTableFilterComposer get cardId {
+    final $$CardsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableFilterComposer(
+            $db: $db,
+            $table: $db.cards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CardBillSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CardBillSettingsTable> {
+  $$CardBillSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get statementDay => $composableBuilder(
+    column: $table.statementDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dueDay => $composableBuilder(
+    column: $table.dueDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get creditLimitPaise => $composableBuilder(
+    column: $table.creditLimitPaise,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CardsTableOrderingComposer get cardId {
+    final $$CardsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableOrderingComposer(
+            $db: $db,
+            $table: $db.cards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CardBillSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CardBillSettingsTable> {
+  $$CardBillSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get statementDay => $composableBuilder(
+    column: $table.statementDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dueDay =>
+      $composableBuilder(column: $table.dueDay, builder: (column) => column);
+
+  GeneratedColumn<int> get creditLimitPaise => $composableBuilder(
+    column: $table.creditLimitPaise,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => column,
+  );
+
+  $$CardsTableAnnotationComposer get cardId {
+    final $$CardsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cardId,
+      referencedTable: $db.cards,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CardsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cards,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CardBillSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CardBillSettingsTable,
+          CardBillSetting,
+          $$CardBillSettingsTableFilterComposer,
+          $$CardBillSettingsTableOrderingComposer,
+          $$CardBillSettingsTableAnnotationComposer,
+          $$CardBillSettingsTableCreateCompanionBuilder,
+          $$CardBillSettingsTableUpdateCompanionBuilder,
+          (CardBillSetting, $$CardBillSettingsTableReferences),
+          CardBillSetting,
+          PrefetchHooks Function({bool cardId})
+        > {
+  $$CardBillSettingsTableTableManager(
+    _$AppDatabase db,
+    $CardBillSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CardBillSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CardBillSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CardBillSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> cardId = const Value.absent(),
+                Value<int> statementDay = const Value.absent(),
+                Value<int> dueDay = const Value.absent(),
+                Value<int?> creditLimitPaise = const Value.absent(),
+                Value<String> reminderDays = const Value.absent(),
+              }) => CardBillSettingsCompanion(
+                id: id,
+                cardId: cardId,
+                statementDay: statementDay,
+                dueDay: dueDay,
+                creditLimitPaise: creditLimitPaise,
+                reminderDays: reminderDays,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int cardId,
+                required int statementDay,
+                required int dueDay,
+                Value<int?> creditLimitPaise = const Value.absent(),
+                Value<String> reminderDays = const Value.absent(),
+              }) => CardBillSettingsCompanion.insert(
+                id: id,
+                cardId: cardId,
+                statementDay: statementDay,
+                dueDay: dueDay,
+                creditLimitPaise: creditLimitPaise,
+                reminderDays: reminderDays,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CardBillSettingsTable, CardBillSetting>(table),
+                  $$CardBillSettingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({cardId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (cardId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.cardId,
+                        referencedTable: $$CardBillSettingsTableReferences
+                            ._cardIdTable(db),
+                        referencedColumn: $$CardBillSettingsTableReferences
+                            ._cardIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CardBillSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CardBillSettingsTable,
+      CardBillSetting,
+      $$CardBillSettingsTableFilterComposer,
+      $$CardBillSettingsTableOrderingComposer,
+      $$CardBillSettingsTableAnnotationComposer,
+      $$CardBillSettingsTableCreateCompanionBuilder,
+      $$CardBillSettingsTableUpdateCompanionBuilder,
+      (CardBillSetting, $$CardBillSettingsTableReferences),
+      CardBillSetting,
+      PrefetchHooks Function({bool cardId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8211,4 +10397,8 @@ class $AppDatabaseManager {
       $$PipelineLogTableTableManager(_db, _db.pipelineLog);
   $$HiddenHashTableTableManager get hiddenHash =>
       $$HiddenHashTableTableManager(_db, _db.hiddenHash);
+  $$CardsTableTableManager get cards =>
+      $$CardsTableTableManager(_db, _db.cards);
+  $$CardBillSettingsTableTableManager get cardBillSettings =>
+      $$CardBillSettingsTableTableManager(_db, _db.cardBillSettings);
 }

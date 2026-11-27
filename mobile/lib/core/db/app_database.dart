@@ -58,6 +58,8 @@ Future<void> seedCategories(AppDatabase db) async {
     BudgetAlertLog,
     PipelineLog,
     HiddenHash,
+    Cards,
+    CardBillSettings,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -71,7 +73,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -95,6 +97,10 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await m.createTable(categories);
+      }
+      if (from < 6) {
+        await m.createTable(cards);
+        await m.createTable(cardBillSettings);
       }
     },
     beforeOpen: (details) async {

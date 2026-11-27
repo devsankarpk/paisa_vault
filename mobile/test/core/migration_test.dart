@@ -5,7 +5,7 @@ import 'package:paisa_vault/core/db/app_database.dart';
 
 import '../generated_migrations/schema.dart';
 import '../generated_migrations/schema_v1.dart' as v1;
-import '../generated_migrations/schema_v5.dart' as v5;
+import '../generated_migrations/schema_v6.dart' as v6;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -43,7 +43,7 @@ void main() {
     await old.close();
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 5);
+    await verifier.migrateAndValidate(db, 6);
     final t = await db.select(db.transactions).getSingle();
     expect(t.amountPaise, 500);
     expect(t.bankCode, isNull);
@@ -69,9 +69,18 @@ void main() {
     await db.close();
   });
 
-  test('a fresh install is at v5 too', () async {
-    final db = v5.DatabaseAtV5((await verifier.schemaAt(5)).newConnection());
-    expect(db.schemaVersion, 5);
+  test('v5 to v6 adds cards and bill settings', () async {
+    final connection = await verifier.startAt(5);
+    final db = AppDatabase(connection);
+    await verifier.migrateAndValidate(db, 6);
+    expect(await db.select(db.cards).get(), isEmpty);
+    expect(await db.select(db.cardBillSettings).get(), isEmpty);
+    await db.close();
+  });
+
+  test('a fresh install is at v6 too', () async {
+    final db = v6.DatabaseAtV6((await verifier.schemaAt(6)).newConnection());
+    expect(db.schemaVersion, 6);
     await db.close();
   });
 }
