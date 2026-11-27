@@ -431,6 +431,109 @@ void main() {
     });
   });
 
+  group('messages set aside by older rules', () {
+    const autopay =
+        'AutoPay (E-mandate) Success!\nFor Acme Tools\nTxn Amt:INR2399.00\nDt:27/11/2026\nVia:HDFC Bank CC 1111';
+
+    test('a message saved as ignored that now counts becomes a transaction, once', () async {
+      // Saved earlier as "ignored" because the old rules called it a reminder.
+      final id = await raw.save(
+        sms(autopay, DateTime(2026, 11, 27, 9)),
+        status: RawMessageStatus.ignored,
+      );
+      expect(id, isNotNull);
+      final r = await service().processNew();
+      expect(r.transactions, 1);
+      final t = await db.select(db.transactions).getSingle();
+      expect(t.amountPaise, 239900);
+      expect(t.direction, Direction.debit);
+      expect(t.last4, '1111');
+      expect(t.occurredAt, DateTime(2026, 11, 27));
+
+      // Looked at only once per rules version: a second run adds nothing.
+      expect((await service().processNew()).transactions, 0);
+      expect(await db.select(db.transactions).get(), hasLength(1));
+    });
+
+    test('the same text saved twice makes one transaction, and an existing extra is removed', () async {
+      // Two saved copies of one SMS (for example the shortcut and a paste), hours apart.
+      await raw.save(
+        sms(autopay, DateTime(2026, 11, 27, 9)),
+        status: RawMessageStatus.ignored,
+      );
+      await raw.save(
+        sms(autopay, DateTime(2026, 11, 27, 14)),
+        status: RawMessageStatus.ignored,
+      );
+      final r = await service().processNew();
+      expect(r.transactions, 1);
+      expect(r.duplicates, 1);
+      expect(await db.select(db.transactions).get(), hasLength(1));
+
+      // A copy that already produced a second transaction is cleaned up once.
+      final firstId = (await db.select(db.transactions).getSingle()).id;
+      final second = (await db.select(db.rawMessages).get()).last.id;
+      await db
+          .into(db.transactions)
+          .insert(
+            TransactionsCompanion.insert(
+              rawMessageId: Value(second),
+              amountPaise: 239900,
+              direction: Direction.debit,
+              fingerprint: 'dup',
+              occurredAt: DateTime(2026, 11, 27),
+              createdAt: DateTime(2026, 11, 27),
+            ),
+          );
+      expect(await repo.removeSameTextDuplicates(), 1);
+      final left = await db.select(db.transactions).get();
+      expect(left.single.id, firstId);
+    });
+
+    test('two differently worded copies of one payment are cleaned up, edited rows stay', () async {
+      Future<int> add(
+        String merchant, {
+        bool corrected = false,
+        String? ref,
+      }) async => db
+          .into(db.transactions)
+          .insert(
+            TransactionsCompanion.insert(
+              amountPaise: 239900,
+              direction: Direction.debit,
+              merchant: Value(merchant),
+              last4: const Value('6464'),
+              reference: Value(ref),
+              userCorrected: Value(corrected),
+              fingerprint: 'f$merchant${ref ?? ''}$corrected',
+              occurredAt: DateTime(2026, 11, 27, 9),
+              createdAt: DateTime(2026, 11, 27),
+            ),
+          );
+      final first = await add('Anthropic');
+      await add('ANTHROPIC ');
+      await add('Anthropic', ref: '123'); // has a reference: left alone
+      await add('Swiggy'); // different merchant: left alone
+      await add(''); // no merchant, same payment: removed
+      expect(await repo.removeLookalikeDuplicates(), 2);
+      final ids = (await db.select(db.transactions).get()).map((t) => t.id);
+      expect(ids, contains(first));
+      expect(ids, hasLength(3));
+    });
+
+    test('a reminder or OTP stays set aside', () async {
+      await raw.save(
+        sms(
+          'Rs 499.00 will be debited on 5 Dec as per your e-mandate.',
+          DateTime(2026, 11, 27),
+        ),
+        status: RawMessageStatus.ignored,
+      );
+      expect((await service().processNew()).transactions, 0);
+      expect(await db.select(db.transactions).get(), isEmpty);
+    });
+  });
+
   group('categorising', () {
     const catReply =
         '{"merchant": "RAJU STORES", "category": "Shopping", "channel": "UPI"}';

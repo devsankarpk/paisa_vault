@@ -63,6 +63,32 @@ void main() {
     }
   }
 
+  test('a charged AutoPay is a transaction, but setting a mandate up or a future debit is not', () {
+    const c = SmsClassifier();
+    expect(
+      c
+          .classify(
+            'AutoPay (E-mandate) Success!\nFor Acme Tools\nTxn Amt:INR2399.00 Via:HDFC Bank CC 1111',
+          )
+          .kind,
+      SmsKind.transaction,
+    );
+    expect(
+      c
+          .classify(
+            'Your e-mandate for Rs 499.00 has been successfully registered.',
+          )
+          .kind,
+      SmsKind.reminder,
+    );
+    expect(
+      c
+          .classify('Rs 499.00 will be debited on 5 Dec as per your e-mandate.')
+          .kind,
+      SmsKind.reminder,
+    );
+  });
+
   test('a failed payment that was refunded still counts as a credit', () {
     final r = classifier.classify(
       'Txn of Rs 100 failed. Amount reversed to A/c XX1234',

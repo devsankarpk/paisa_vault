@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../core/db/app_database.dart';
 import '../../services/llm_engine.dart';
 import '../pipeline/extraction_pipeline.dart';
+import '../sms/sms_classifier.dart';
 import 'transaction_repository.dart';
 
 class ProcessingResult {
@@ -44,6 +45,9 @@ class ProcessingService {
     if (_running) return const ProcessingResult(transactions: 0, skipped: 0);
     _running = true;
     try {
+      await _reclassifyIfNeeded();
+      final extra = await _repo.removeSameTextDuplicates();
+      if (extra > 0) log?.call('duplicates_removed=$extra');
       final pending =
           await (_db.select(_db.rawMessages)
                 ..where(
@@ -94,6 +98,12 @@ class ProcessingService {
         var skipped = 0;
         var duplicates = 0;
         for (final m in pending) {
+          // The same text was already turned into a transaction: no need to read it again.
+          if (await _repo.sameTextAlreadyCounted(m)) {
+            await _mark(m.id, RawMessageStatus.processed);
+            duplicates++;
+            continue;
+          }
           final result = await pipeline.process(m.body);
           final t = result.transaction;
           if (t == null) {
@@ -133,6 +143,51 @@ class ProcessingService {
     } finally {
       _running = false;
     }
+  }
+
+  static const _versionKey = 'classifier_version';
+
+  /// After the rules improve, messages set aside earlier as reminders or "other" are looked at
+  /// once more. Any that now count as a transaction go back in the queue. Runs once per version.
+  /// Returns how many were put back.
+  Future<int> _reclassifyIfNeeded() async {
+    final stored = await (_db.select(
+      _db.settings,
+    )..where((s) => s.key.equals(_versionKey))).getSingleOrNull();
+    if (int.tryParse(stored?.value ?? '') == classifierVersion) return 0;
+    final ignored = await (_db.select(
+      _db.rawMessages,
+    )..where((m) => m.status.equals(RawMessageStatus.ignored.name))).get();
+    var back = 0;
+    final removed =
+        await _repo.removeSameTextDuplicates() +
+        await _repo.removeLookalikeDuplicates();
+    for (final m in ignored) {
+      final kind = const SmsClassifier()
+          .classify(m.body, sender: m.sender)
+          .kind;
+      if (kind != SmsKind.transaction) continue;
+      final has = await (_db.select(
+        _db.transactions,
+      )..where((t) => t.rawMessageId.equals(m.id))).get();
+      if (has.isNotEmpty) continue;
+      await _mark(m.id, RawMessageStatus.newMessage);
+      back++;
+    }
+    await _db
+        .into(_db.settings)
+        .insert(
+          SettingsCompanion.insert(
+            key: _versionKey,
+            value: '$classifierVersion',
+          ),
+          onConflict: DoUpdate(
+            (_) => SettingsCompanion(value: Value('$classifierVersion')),
+            target: [_db.settings.key],
+          ),
+        );
+    log?.call('reclassified back=$back duplicates_removed=$removed');
+    return back;
   }
 
   /// Fills in merchant, category and channel from the model. Amount, direction and the other rule

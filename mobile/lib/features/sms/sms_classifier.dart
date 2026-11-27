@@ -30,6 +30,10 @@ class SmsClassification {
   String toString() => '${kind.name}:$reason';
 }
 
+/// Raise this whenever the rules change what a message is. The app then looks again, once, at
+/// messages it earlier set aside, so a message the old rules missed is not lost.
+const classifierVersion = 6;
+
 /// Rules that sort bank SMS. They lean towards keeping a message: wrongly keeping a promo costs
 /// a little work later, wrongly dropping a transaction loses data.
 class SmsClassifier {
@@ -73,6 +77,19 @@ class SmsClassifier {
     caseSensitive: false,
   );
 
+  /// "AutoPay (E-mandate) Success!": a standing instruction that has just been charged. It names
+  /// a mandate, but the money has moved, so it is a transaction and not a reminder.
+  static final _autopayDone = RegExp(
+    r'\b(autopay|auto[- ]?debit|e-?mandate|mandate)\b[^\n]{0,40}\bsuccess(?:ful(?:ly)?)?\b',
+    caseSensitive: false,
+  );
+
+  /// Setting a mandate up or cancelling it moves no money.
+  static final _mandateAdmin = RegExp(
+    r'\b(regist\w*|creat\w*|set ?up|activat\w*|modif\w*|cancel\w*|revok\w*|paus\w*|enrol\w*)\b',
+    caseSensitive: false,
+  );
+
   static final _statement = RegExp(
     r'\b(statement|amount due|total due|minimum (amount )?due|due date|pay by|payment due|bill (of|for|is))\b',
     caseSensitive: false,
@@ -101,6 +118,9 @@ class SmsClassifier {
     // Failed payments: no money moved, unless it was taken and then given back.
     if (_declined.hasMatch(body) && !_reversed.hasMatch(body)) {
       return const SmsClassification(SmsKind.declined, 'declined_words');
+    }
+    if (_autopayDone.hasMatch(body) && !_mandateAdmin.hasMatch(body)) {
+      return const SmsClassification(SmsKind.transaction, 'autopay_done');
     }
     // A future debit is a reminder, not a transaction.
     if (_future.hasMatch(body) &&
