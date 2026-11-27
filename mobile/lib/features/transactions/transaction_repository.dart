@@ -289,6 +289,22 @@ class TransactionRepository {
     return fits(modelCategory) ? modelCategory : null;
   }
 
+  /// The learned and user-made rules, by merchant name.
+  Stream<List<MerchantRule>> watchRules() => (_db.select(
+    _db.merchantRules,
+  )..orderBy([(r) => OrderingTerm.asc(r.merchantKey)])).watch();
+
+  /// Changes the category a rule gives to new transactions. Old transactions are left as they are.
+  Future<void> changeRule(int id, String category) =>
+      (_db.update(_db.merchantRules)..where((r) => r.id.equals(id))).write(
+        MerchantRulesCompanion(categoryName: Value(category)),
+      );
+
+  /// Forgets a rule. Transactions already filed keep their category; the next one from this
+  /// merchant is categorised the usual way again.
+  Future<void> deleteRule(int id) =>
+      (_db.delete(_db.merchantRules)..where((r) => r.id.equals(id))).go();
+
   /// Remembers that [merchant] always gets [category], and applies it to transactions that are
   /// still waiting for a category. Returns how many of those were updated.
   Future<int> saveRule(String merchant, String category) async {
