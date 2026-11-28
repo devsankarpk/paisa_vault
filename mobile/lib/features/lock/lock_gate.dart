@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../vault/providers.dart';
 import 'lock_controller.dart';
 import 'lock_screens.dart';
 
@@ -56,6 +57,12 @@ class _LockGateState extends ConsumerState<LockGate>
   @override
   Widget build(BuildContext context) {
     final status = ref.watch(lockControllerProvider.select((s) => s.status));
+    // Whenever the app is not unlocked, the private vault closes and forgets its key.
+    ref.listen(lockControllerProvider.select((s) => s.status), (_, s) {
+      if (s != LockStatus.unlocked) {
+        ref.read(vaultSessionProvider).asData?.value.lock();
+      }
+    });
     final body = switch (status) {
       LockStatus.loading => const Scaffold(body: SizedBox.shrink()),
       LockStatus.needsSetup => const SetupScreen(),
