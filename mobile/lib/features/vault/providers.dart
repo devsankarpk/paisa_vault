@@ -6,6 +6,8 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../core/providers.dart';
 import '../lock/lock_controller.dart';
+import 'card_secret_store.dart';
+import 'hide_service.dart';
 import 'vault_key_service.dart';
 import 'vault_session.dart';
 
@@ -25,4 +27,19 @@ final vaultSessionProvider = FutureProvider<VaultSession>((ref) async {
   );
   ref.onDispose(session.lock);
   return session;
+});
+
+final cardSecretStoreProvider = FutureProvider<CardSecretStore>((ref) async {
+  return CardSecretStore(
+    await ref.watch(vaultSessionProvider.future),
+    ref.watch(clockProvider),
+  );
+});
+
+final hideServiceProvider = FutureProvider<HideService>((ref) async {
+  return HideService(
+    await ref.watch(appDatabaseProvider.future),
+    await ref.watch(vaultSessionProvider.future),
+    ref.watch(clockProvider),
+  );
 });

@@ -24,7 +24,11 @@ class VaultSession {
   final Clock clock;
 
   VaultDatabase? _db;
+  List<int>? _key;
   bool get isOpen => _db != null;
+
+  /// The vault key while the vault is open. Throws StateError when it is locked.
+  List<int> get key => _key ?? (throw StateError('The vault is locked'));
 
   /// The open vault. Throws StateError when it is locked, so no code can reach it by accident.
   VaultDatabase get db => _db ?? (throw StateError('The vault is locked'));
@@ -77,12 +81,16 @@ class VaultSession {
       rethrow;
     }
     _db = db;
+    _key = List<int>.of(key);
   }
 
   /// Closes the vault. Safe to call when it is already closed.
   Future<void> lock() async {
     final db = _db;
     _db = null;
+    final k = _key;
+    _key = null;
+    if (k != null) k.fillRange(0, k.length, 0);
     await db?.close();
   }
 }

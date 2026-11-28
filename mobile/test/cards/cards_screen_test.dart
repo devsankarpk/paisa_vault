@@ -50,6 +50,9 @@ void main() {
     }
   }
 
+  TextField tester(WidgetTester t, String label) =>
+      t.widget<TextField>(find.widgetWithText(TextField, label));
+
   Future<void> finish(WidgetTester t) async {
     await t.pumpWidget(const SizedBox());
     container?.dispose();
@@ -107,6 +110,21 @@ void main() {
       await settle(t);
       expect(find.text('Statement'), findsOneWidget);
       expect(find.textContaining('5, 1 days before'), findsOneWidget);
+
+      await t.tap(find.byTooltip('Edit card'));
+      await settle(t);
+      await t.pump(const Duration(seconds: 1));
+      expect(find.text('Edit card'), findsOneWidget);
+      expect(find.text('Save changes'), findsOneWidget);
+      expect(tester(t, 'Last 4 digits').controller!.text, '6464'); // prefilled
+      await t.enterText(
+        find.widgetWithText(TextField, 'Last 4 digits'),
+        '1234',
+      );
+      await t.tap(find.text('Save changes'));
+      await settle(t);
+      await t.pump(const Duration(seconds: 1));
+      expect(find.text('HDFC Bank •••• 1234'), findsWidgets);
       await finish(t);
     },
   );

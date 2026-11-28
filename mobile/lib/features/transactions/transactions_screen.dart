@@ -10,6 +10,7 @@ import '../cards/cards_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../categorise/ask_screen.dart';
 import '../search/search_screen.dart';
+import '../vault/hidden_screen.dart';
 import 'add_message_screen.dart';
 import '../settings/settings_screen.dart';
 import 'format.dart';
@@ -25,9 +26,13 @@ class TransactionsScreen extends ConsumerWidget {
     final list = ref.watch(transactionsProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Transactions',
-          style: TextStyle(fontWeight: FontWeight.w800),
+        // Long-press the title to open the private vault (not shown anywhere else).
+        title: GestureDetector(
+          onLongPress: () => openHiddenVault(context, ref),
+          child: const Text(
+            'Transactions',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
         ),
         backgroundColor: PvColors.background,
         surfaceTintColor: Colors.transparent,

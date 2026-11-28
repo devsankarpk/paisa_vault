@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/ui/screen_guard.dart';
+
 import '../transactions/rule_amount.dart';
 import 'card_repository.dart';
 import 'providers.dart';
@@ -100,74 +102,82 @@ class _BillSetupScreenState extends ConsumerState<BillSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Bill reminder',
-          style: TextStyle(fontWeight: FontWeight.w800),
+    return SecureScreen(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Bill reminder',
+            style: TextStyle(fontWeight: FontWeight.w800),
+          ),
+          backgroundColor: PvColors.background,
+          surfaceTintColor: Colors.transparent,
         ),
-        backgroundColor: PvColors.background,
-        surfaceTintColor: Colors.transparent,
-      ),
-      body: !_loaded
-          ? const SizedBox.shrink()
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                const Text(
-                  'Days are days of the month. Reminders are shown on this phone only.',
-                  style: TextStyle(color: PvColors.muted, height: 1.4),
-                ),
-                const SizedBox(height: 16),
-                _day(
-                  'Statement day',
-                  _statement,
-                  (v) => setState(() => _statement = v),
-                ),
-                const SizedBox(height: 12),
-                _day('Payment due day', _due, (v) => setState(() => _due = v)),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _limit,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
+        body: !_loaded
+            ? const SizedBox.shrink()
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  const Text(
+                    'Days are days of the month. Reminders are shown on this phone only.',
+                    style: TextStyle(color: PvColors.muted, height: 1.4),
                   ),
-                  decoration: const InputDecoration(
-                    labelText: 'Credit limit (₹, optional)',
+                  const SizedBox(height: 16),
+                  _day(
+                    'Statement day',
+                    _statement,
+                    (v) => setState(() => _statement = v),
                   ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Remind me before the due date',
-                  style: TextStyle(fontWeight: FontWeight.w700),
-                ),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    for (final d in _choices)
-                      FilterChip(
-                        label: Text(
-                          d == 0 ? 'On the day' : '$d day${d == 1 ? '' : 's'}',
-                        ),
-                        selected: _remind.contains(d),
-                        onSelected: (on) => setState(
-                          () => on ? _remind.add(d) : _remind.remove(d),
-                        ),
-                      ),
-                  ],
-                ),
-                if (_error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Text(
-                      _error!,
-                      style: const TextStyle(color: PvColors.error),
+                  const SizedBox(height: 12),
+                  _day(
+                    'Payment due day',
+                    _due,
+                    (v) => setState(() => _due = v),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _limit,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Credit limit (₹, optional)',
                     ),
                   ),
-                const SizedBox(height: 20),
-                FilledButton(onPressed: _save, child: const Text('Save')),
-              ],
-            ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Remind me before the due date',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      for (final d in _choices)
+                        FilterChip(
+                          label: Text(
+                            d == 0
+                                ? 'On the day'
+                                : '$d day${d == 1 ? '' : 's'}',
+                          ),
+                          selected: _remind.contains(d),
+                          onSelected: (on) => setState(
+                            () => on ? _remind.add(d) : _remind.remove(d),
+                          ),
+                        ),
+                    ],
+                  ),
+                  if (_error != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Text(
+                        _error!,
+                        style: const TextStyle(color: PvColors.error),
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                  FilledButton(onPressed: _save, child: const Text('Save')),
+                ],
+              ),
+      ),
     );
   }
 }
