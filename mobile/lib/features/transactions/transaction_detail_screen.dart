@@ -6,6 +6,8 @@ import '../../core/db/app_database.dart';
 import '../../core/theme/app_theme.dart';
 import 'edit_transaction_sheet.dart';
 import 'format.dart';
+import '../vault/providers.dart';
+import '../vault/unlock_dialog.dart';
 import 'providers.dart';
 
 /// Shows everything the app read from one message, next to the original message, so the owner
@@ -13,6 +15,24 @@ import 'providers.dart';
 class TransactionDetailScreen extends ConsumerWidget {
   const TransactionDetailScreen({super.key, required this.id});
   final int id;
+
+  /// Moves the transaction to the private vault (PIN or biometrics first), then closes the vault.
+  Future<void> _hide(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final nav = Navigator.of(context);
+    if (!await unlockVault(context, ref)) return;
+    final service = await ref.read(hideServiceProvider.future);
+    final session = await ref.read(vaultSessionProvider.future);
+    try {
+      await service.hide(id);
+    } finally {
+      await session.lock();
+    }
+    nav.pop();
+    messenger.showSnackBar(
+      const SnackBar(content: Text('Moved to your private vault')),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -80,6 +100,10 @@ class TransactionDetailScreen extends ConsumerWidget {
                 FilledButton(
                   onPressed: () => showEditTransactionSheet(context, tx),
                   child: const Text('Correct something'),
+                ),
+                TextButton(
+                  onPressed: () => _hide(context, ref),
+                  child: const Text('Hide this transaction'),
                 ),
                 TextButton(
                   onPressed: () async {

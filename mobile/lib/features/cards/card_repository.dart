@@ -23,9 +23,10 @@ class CardAdded {
 
 /// A card with its bank's name, for the list.
 class CardEntry {
-  const CardEntry(this.card, this.bankName);
+  const CardEntry(this.card, this.bankName, [this.bankCode = '']);
   final PvCard card;
   final String bankName;
+  final String bankCode;
 }
 
 /// Cards the user added. Holds only what the list may show; the full number and PIN will be
@@ -36,6 +37,74 @@ class CardRepository {
   final AppDatabase _db;
   final Clock _clock;
 
+  CardResult? _validate(String last4, int? month, int? year) {
+    if (!RegExp(r'^\d{4}$').hasMatch(last4)) return CardResult.badLast4;
+    if ((month == null) != (year == null)) return CardResult.badExpiry;
+    if (month != null &&
+        (month < 1 || month > 12 || year! < 2000 || year > 2100)) {
+      return CardResult.badExpiry;
+    }
+    return null;
+  }
+
+  /// Changes a card's details. The card moves to the account for its new bank and last 4, so
+  /// SMS transactions for those digits link to it. Earlier transactions stay where they are.
+  /// Switching a credit card to debit removes its bill reminder. The saved number and PIN in
+  /// the vault belong to the card, so they stay.
+  Future<CardResult> update(
+    int cardId, {
+    required String bankCode,
+    required CardType type,
+    required CardNetwork network,
+    required String last4,
+    int? expiryMonth,
+    int? expiryYear,
+  }) async {
+    final bad = _validate(last4, expiryMonth, expiryYear);
+    if (bad != null) return bad;
+    return _db.transaction(() async {
+      final card = await (_db.select(
+        _db.cards,
+      )..where((c) => c.id.equals(cardId))).getSingleOrNull();
+      if (card == null) return CardResult.notFound;
+      final bank = await _bank(bankCode);
+      final clash =
+          await (_db.select(_db.cards)..where(
+                (c) =>
+                    c.bankId.equals(bank.id) &
+                    c.type.equals(type.name) &
+                    c.last4.equals(last4) &
+                    c.id.equals(cardId).not(),
+              ))
+              .getSingleOrNull();
+      if (clash != null) return CardResult.exists;
+      final accountId = await _account(
+        bank.id,
+        last4,
+        type == CardType.credit
+            ? AccountKind.creditCard
+            : AccountKind.debitCard,
+      );
+      await (_db.update(_db.cards)..where((c) => c.id.equals(cardId))).write(
+        CardsCompanion(
+          bankId: Value(bank.id),
+          accountId: Value(accountId),
+          type: Value(type),
+          network: Value(network),
+          last4: Value(last4),
+          expiryMonth: Value(expiryMonth),
+          expiryYear: Value(expiryYear),
+        ),
+      );
+      if (type != CardType.credit) {
+        await (_db.delete(
+          _db.cardBillSettings,
+        )..where((b) => b.cardId.equals(cardId))).go();
+      }
+      return CardResult.ok;
+    });
+  }
+
   Future<CardAdded> add({
     required String bankCode,
     required CardType type,
@@ -44,19 +113,8 @@ class CardRepository {
     int? expiryMonth,
     int? expiryYear,
   }) async {
-    if (!RegExp(r'^\d{4}$').hasMatch(last4)) {
-      return const CardAdded(CardResult.badLast4);
-    }
-    if ((expiryMonth == null) != (expiryYear == null)) {
-      return const CardAdded(CardResult.badExpiry);
-    }
-    if (expiryMonth != null &&
-        (expiryMonth < 1 ||
-            expiryMonth > 12 ||
-            expiryYear! < 2000 ||
-            expiryYear > 2100)) {
-      return const CardAdded(CardResult.badExpiry);
-    }
+    final bad = _validate(last4, expiryMonth, expiryYear);
+    if (bad != null) return CardAdded(bad);
     return _db.transaction(() async {
       final bank = await _bank(bankCode);
       final dup =
@@ -146,7 +204,11 @@ class CardRepository {
     return q.watch().map(
       (rows) => [
         for (final r in rows)
-          CardEntry(r.readTable(_db.cards), r.readTable(_db.banks).name),
+          CardEntry(
+            r.readTable(_db.cards),
+            r.readTable(_db.banks).name,
+            r.readTable(_db.banks).code,
+          ),
       ],
     );
   }

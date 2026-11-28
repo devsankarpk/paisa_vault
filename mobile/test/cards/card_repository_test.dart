@@ -159,4 +159,68 @@ void main() {
     expect(await db.select(db.cardBillSettings).get(), isEmpty);
     expect(await db.select(db.accounts).get(), hasLength(1));
   });
+
+  test('edit: details change, card moves to the matching account, bill stays for credit', () async {
+    await add();
+    final id = (await repo.watchAll().first).single.card.id;
+    await repo.saveBill(id, statementDay: 5, dueDay: 25);
+    final r = await repo.update(
+      id,
+      bankCode: 'SBI',
+      type: CardType.credit,
+      network: CardNetwork.mastercard,
+      last4: '1234',
+      expiryMonth: 9,
+      expiryYear: 2031,
+    );
+    expect(r, CardResult.ok);
+    final e = (await repo.watchAll().first).single;
+    expect(e.bankCode, 'SBI');
+    expect(e.card.last4, '1234');
+    expect(e.card.network, CardNetwork.mastercard);
+    expect(e.card.expiryYear, 2031);
+    final account = await (db.select(
+      db.accounts,
+    )..where((a) => a.id.equals(e.card.accountId!))).getSingle();
+    expect(account.last4, '1234');
+    expect(await repo.billFor(id), isNotNull);
+  });
+
+  test('edit: switching to debit drops the bill reminder', () async {
+    await add();
+    final id = (await repo.watchAll().first).single.card.id;
+    await repo.saveBill(id, statementDay: 5, dueDay: 25);
+    await repo.update(
+      id,
+      bankCode: 'HDFC',
+      type: CardType.debit,
+      network: CardNetwork.visa,
+      last4: '6464',
+    );
+    expect(await repo.billFor(id), isNull);
+  });
+
+  test('edit: refuses a clash, bad input and a missing card', () async {
+    await add();
+    await add(last4: '1111');
+    final cards = (await repo.watchAll().first).map((e) => e.card).toList();
+    Future<CardResult> edit(int id, String last4, {int? m, int? y}) =>
+        repo.update(
+          id,
+          bankCode: 'HDFC',
+          type: CardType.credit,
+          network: CardNetwork.visa,
+          last4: last4,
+          expiryMonth: m,
+          expiryYear: y,
+        );
+    expect(await edit(cards[0].id, '1111'), CardResult.exists);
+    expect(await edit(cards[0].id, '12'), CardResult.badLast4);
+    expect(
+      await edit(cards[0].id, '6464', m: 13, y: 2030),
+      CardResult.badExpiry,
+    );
+    expect(await edit(999, '2222'), CardResult.notFound);
+    expect(await edit(cards[0].id, '6464'), CardResult.ok); // unchanged is fine
+  });
 }

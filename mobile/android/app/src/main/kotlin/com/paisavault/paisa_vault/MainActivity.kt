@@ -2,6 +2,7 @@ package com.paisavault.paisa_vault
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.view.WindowManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -47,6 +48,20 @@ class MainActivity : FlutterFragmentActivity() {
             }
         }
         SmsEvents.listener = { ch.invokeMethod("arrived", null) }
+        // FLAG_SECURE blocks screenshots and recordings and blanks the app switcher card.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "paisa_vault/screen")
+            .setMethodCallHandler { call, result ->
+                if (call.method == "setProtected") {
+                    val on = call.arguments as? Boolean ?: false
+                    runOnUiThread {
+                        if (on) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                        else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    }
+                    result.success(null)
+                } else {
+                    result.notImplemented()
+                }
+            }
     }
 
     override fun onDestroy() {
