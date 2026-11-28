@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import '../../core/db/key_store.dart';
 import '../../core/secret_store.dart';
 import '../../services/sms_source.dart';
+import '../vault/vault_key_service.dart';
 
 /// "Erase everything": deletes the database and its key, the PIN and lock settings, saved
 /// messages still waiting to be read, and the diagnostic logs. The app then starts like a
@@ -34,6 +35,7 @@ class EraseService {
     'pv_autolock_secs',
     'pv_sms_disclosure_seen',
     'pv_shortcut_guide_seen',
+    ...VaultKeyService.secretKeys,
   ];
 
   static const files = [
@@ -41,6 +43,10 @@ class EraseService {
     'main.db-wal',
     'main.db-shm',
     'main.db-journal',
+    'vault.db',
+    'vault.db-wal',
+    'vault.db-shm',
+    'vault.db-journal',
     'model_runs.log',
     'intent_runs.log',
     'crash.log',

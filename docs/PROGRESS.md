@@ -170,7 +170,7 @@ Status values: Not started, In progress, Blocked, Done.
 - [x] cards and card_bill_settings, card mapping (done 27 Nov, schema v6: cards table with bank, type, network, last 4, expiry and a vault link, no CVV or full-number column; bill settings per credit card; adding a card reuses and confirms the account its SMS transactions already use, so earlier transactions are linked to it; 8 tests)
 - [x] Card list and detail screens (done 27 Nov: Transactions top bar, card icon; list shows bank, last 4, type and network only; detail shows expiry and the bill reminder; full number and reveal come with the vault)
 - [ ] Add card: manual, camera, NFC per Phase 0 result (manual entry and credit card bill setup done 27 Nov, no CVV field; camera scan and NFC still to do)
-- [ ] vault.db with its own key
+- [x] vault.db with its own key (done 28 Nov: separate encrypted file, random key wrapped under the PIN, biometric copy only if turned on, PIN attempt limit applies, closes and forgets the key whenever the app locks, audit log, erased by Erase everything; tables hidden_transactions, hidden_fingerprints, card_secrets (no CVV), vault_audit; 9 tests; design in docs/adr/0003-vault-key.md; no screens yet; the hardware-bound biometric key is left for the security review)
 - [ ] Field-level encryption and timed reveal
 - [ ] Optional card PIN with warning
 - [ ] Screenshot block and app-switcher blur
@@ -320,3 +320,4 @@ Status values: Not started, In progress, Blocked, Done.
 | 27 Nov 2026 | vivo: backup, Erase everything, new PIN and restore from the file all worked. The iPhone round trip is still to do. |
 | 27 Nov 2026 | Phase 2 started: schema v6 adds cards and card bill settings (statement day, due day, optional limit, reminder days) and a card repository. Adding a card takes over the account that SMS transactions for that bank and last 4 already use. No screens yet; the card list and add flow are next. |
 | 27 Nov 2026 | Card vault screens: list, detail, add card by typing (bank, credit or debit, network, last 4, optional expiry) and the credit card bill reminder setup (statement day, due day, optional limit, remind 7, 5, 3, 2, 1 or 0 days before). A test caught a blank bill screen for a new card, fixed. List tiles now sit in a Material so taps show properly. Reminder notifications themselves are still to do (Week 4). |
+| 28 Nov 2026 | Phase 2, Week 2 started: vault.db with its own key (ADR 0003). The key is wrapped under the PIN; Face ID and fingerprint use a second copy kept in the Keystore or Keychain behind the app's biometric check, which is weaker than a hardware-bound key and is noted as a known limit. No screens yet. |
